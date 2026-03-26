@@ -63,6 +63,8 @@ Copy `templates/session_state.template.md` to the project root as `session_state
 
 Fill in:
 - **Current Goal**: one sentence describing what you are working on right now
+- **Working Hypothesis**: what you currently believe is true about the problem or solution (can be "none" if the task is fully understood)
+- **Confidence**: High / Medium / Low
 - **Acceptance Criteria**: the observable conditions that mark your first phase complete
 
 Leave everything else blank or with placeholder text until the first subtask is confirmed done.

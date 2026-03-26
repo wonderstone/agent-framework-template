@@ -158,6 +158,29 @@ When all acceptance criteria are ✅:
 
 ---
 
+## Rule 11: Cognitive Reasoning Loop
+
+Before committing to an approach for any task involving code changes, multi-file edits, API modifications, architectural decisions, or anything with non-obvious scope — run this lightweight reasoning cycle:
+
+1. **Hypothesize**: state a working hypothesis — the assumed cause, solution, or design — in one sentence.
+2. **Validate**: check the hypothesis against docs (Layer 3) and code (Layer 4) before acting.
+3. **Revise**: when evidence conflicts with the hypothesis, update it explicitly. Never silently shift position.
+4. **Calibrate**: when confidence is low, say so. Use language like *"I believe…"* or *"I'm not certain, but…"* rather than presenting uncertain conclusions as facts.
+
+**Confidence levels**:
+
+| Level | Meaning |
+|---|---|
+| **High** | Hypothesis is directly supported by code or docs |
+| **Medium** | Hypothesis is consistent with available evidence but not fully verified |
+| **Low** | Hypothesis is a best guess — flag for user review before proceeding |
+
+**Low-confidence rule**: do not act on a Low-confidence hypothesis without surfacing the uncertainty to the user first.
+
+Track the current hypothesis and confidence in `session_state.md` under **Working Hypothesis**. This rule runs alongside — not instead of — the Pre-operation Validation Sequence in Rule 0.
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*

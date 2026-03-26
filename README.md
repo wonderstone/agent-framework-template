@@ -63,8 +63,16 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 | 3 — Canonical docs | `docs/*.md` | Topic confirmed relevant |
 | 4 — Code files | actual source files | Immediately before edit |
 
+**Cognitive reasoning loop** — a lightweight discipline that runs across all four layers:
+
+- **Hypothesize**: form a working assumption before acting
+- **Validate**: check against docs and code as each layer loads
+- **Revise**: update the hypothesis explicitly when evidence conflicts — never silently
+- **Calibrate**: state uncertainty when confidence is Low; do not act without flagging it
+
 **State tracking** — `session_state.md` at repo root tracks:
 - Current goal
+- Working hypothesis, confidence level, and supporting evidence
 - Active work and what's completed this phase
 - Acceptance criteria
 - Technical decisions and durable insights

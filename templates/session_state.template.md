@@ -12,6 +12,21 @@
 
 ---
 
+## Working Hypothesis
+
+<!-- What the agent currently believes is true about the problem or solution -->
+<!-- Always state a hypothesis, even for well-understood tasks (e.g., "The fix requires X") -->
+<!-- Update explicitly when evidence conflicts; never silently shift position -->
+[Replace with working hypothesis]
+
+**Confidence**: [High / Medium / Low]
+
+**Evidence**: [supporting facts from docs or code]
+
+**Contradictions**: [anything that conflicts with the hypothesis]
+
+---
+
 ## Active Work
 
 <!-- Single item currently in progress -->

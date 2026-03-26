@@ -141,6 +141,30 @@ The dispatch decision is always disclosed in the user-visible reply, not just in
 
 ---
 
+## Cognitive Layer
+
+The cognitive layer is not a fifth load layer — it is a reasoning discipline that runs **across** all four layers as they are loaded.
+
+```
+Layer 1 loads → initial hypothesis formed from operating rules context
+Layer 2 loads → hypothesis refined with project-specific facts
+Layer 3 loads → evidence gathered; hypothesis validated or revised
+Layer 4 loads → final validation against actual code; confidence declared
+```
+
+| Concept | Definition | When it applies |
+|---|---|---|
+| **Hypothesis** | A working assumption about cause, solution, or design | Formed before Layer 3 is loaded |
+| **Evidence** | Facts from docs or code that support or conflict with the hypothesis | Gathered during Layer 3–4 loading |
+| **Confidence** | High / Medium / Low — reflects how well evidence supports the hypothesis | Declared before acting |
+| **Revision** | An explicit update to the hypothesis when evidence conflicts | Required; never silent |
+
+**Key constraint**: Low-confidence hypotheses must be surfaced to the user before proceeding. Do not act on a Low-confidence hypothesis without stating the uncertainty.
+
+The current hypothesis and confidence are tracked in `session_state.md` under **Working Hypothesis**.
+
+---
+
 ## Document Organization
 
 | Type | Definition | Location |
