@@ -105,6 +105,8 @@ If a pre-condition cannot be satisfied, state: `"I cannot produce a reliable ana
 
 **Status**: [continuing / blocked / complete]
 
+**Alignment**: [confirmed / uncertain / misaligned]
+
 **Next step**: [one sentence — what the implementer should do first]
   - If continuing: this line is the next step description — no sub-bullet needed
   - If blocked: [what decision or input is needed before proceeding]

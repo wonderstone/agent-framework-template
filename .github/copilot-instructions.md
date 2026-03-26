@@ -271,11 +271,18 @@ Every substantial reply must end with:
 
 **Status**: [continuing / blocked / complete]
 
+**Alignment**: [confirmed / uncertain / misaligned]
+
 **Next step**: [one sentence describing the next concrete action]
   - If continuing: this line is the next step description — no sub-bullet needed
   - If blocked: [what decision or input is needed]
   - If complete: [what was delivered]
 ```
+
+**Alignment values**:
+- `confirmed` — current work demonstrably satisfies the original user intent
+- `uncertain` — not enough evidence yet to confirm alignment; proceed but flag
+- `misaligned` — divergence detected; trigger Rule 17 reality check before continuing
 
 **Exceptions** (the only valid reasons to omit Next Actions):
 - The goal is fully complete
@@ -390,6 +397,64 @@ Do not silently deviate from the recorded plan. If the plan changes, state it ex
 - Do not over-plan trivial tasks — planning adds overhead, not safety, for single-step edits
 - A plan is an intent, not a contract — it can be revised, but revisions must be explicit
 - The Rule 14 progression loop executes the plan step-by-step; Rule 16 feeds it the starting map
+
+---
+
+## Rule 17: Reality Check and Goal Alignment (🔴 Mandatory)
+
+The agent must periodically verify that ongoing work is still aligned with the original goal and is producing real-world value — not just completing tasks.
+
+### When to Run a Reality Check
+
+A reality check is mandatory:
+- **After each full loop cycle** (not every micro-step — once per progression loop iteration)
+- **Before declaring `Status: complete`**
+- **When `Alignment: misaligned` is set** in any `## Next Actions` block
+
+### The Three Questions
+
+Every reality check answers these three questions with evidence, not assumption:
+
+| Question | Pass condition |
+|---|---|
+| Does the current state satisfy the user's original intent? | The output directly addresses what the user asked for |
+| Are we solving the real problem — not just completing tasks? | There is a traceable link from completed steps → original goal |
+| Is there evidence (not assumption) that this works? | A validation ran, a check passed, or the user confirmed |
+
+If any question cannot be answered with evidence → set `Alignment: uncertain` and flag it.
+
+### Decision Branch
+
+After the reality check, choose one of three branches:
+
+```
+REALITY CHECK
+   ↓
+All three questions answered with evidence?
+   ├── YES  → Alignment: confirmed  → continue
+   ├── SOME → Alignment: uncertain  → flag it; continue with caution
+   └── NO   → Alignment: misaligned → choose:
+               ├── Revise plan (Rule 16) if a better direction is visible
+               └── Stop and ask if direction is unclear
+```
+
+### Output Requirement
+
+Every `## Next Actions` block must include:
+
+```markdown
+**Alignment**: [confirmed / uncertain / misaligned]
+```
+
+- `confirmed` — all three questions answered with evidence
+- `uncertain` — one question unanswered; flag it but do not stop unless critical
+- `misaligned` — divergence from original intent detected; do not continue without correction
+
+### Constraints
+
+- Do not run a full re-analysis — answer the three questions in 1–3 sentences of evidence
+- Do not manufacture evidence to force `confirmed` — `uncertain` is a valid and safe result
+- A reality check is not a checkpoint review — it is a fast alignment pulse, not a deep audit
 
 ---
 

@@ -114,6 +114,8 @@ After all steps:
 
 **Status**: [continuing / blocked / complete]
 
+**Alignment**: [confirmed / uncertain / misaligned]
+
 **Next step**: [one sentence — what comes after this subtask]
   - If continuing: this line is the next step description — no sub-bullet needed
   - If blocked: [what decision or input is needed]
