@@ -30,7 +30,10 @@
 ## Active Work
 
 <!-- Single item currently in progress -->
-[Replace with in-progress item]
+
+**Current Step**: [What the agent is doing right now — one sentence]
+
+**Next Planned Step**: [What the agent will do after this step completes — one sentence]
 
 ---
 
@@ -41,9 +44,10 @@
 
 ---
 
-## Blocked / Pending
+## Blocker / Decision Needed
 
-<!-- Items waiting on external input or an explicit decision -->
+<!-- Items stalled on external input or a user decision — use this to trigger Rule 14 STOP -->
+<!-- Format: [what is blocked] — [what decision or input is needed] -->
 - (none)
 
 ---

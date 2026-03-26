@@ -85,17 +85,20 @@ The framework tracks work state in `session_state.md` at the project root.
 
 ```
 session_state.md structure:
-  Current Goal        — one sentence; survives phase transitions
-  Working Hypothesis  — current assumption + confidence (High/Medium/Low) + evidence
-  Active Work         — what is in progress right now
-  Completed This Phase — verified subtasks; cleared on graduation
-  Blocked / Pending   — waiting on external input
-  Acceptance Criteria — observable conditions marking phase complete
-  Phase Decisions     — key choices made this phase with rationale
-  Technical Insights  — durable patterns/traps; never auto-deleted
+  Current Goal          — one sentence; survives phase transitions
+  Working Hypothesis    — current assumption + confidence (High/Medium/Low) + evidence
+  Active Work
+    Current Step        — what the agent is doing right now (one sentence)
+    Next Planned Step   — what the agent will do after this step (one sentence)
+  Completed This Phase  — verified subtasks; cleared on graduation
+  Blocker / Decision Needed — items stalled on external input or a required decision
+  Mid-Session Corrections   — mistakes and course corrections; never cleared mid-session
+  Acceptance Criteria   — observable conditions marking phase complete
+  Phase Decisions       — key choices made this phase with rationale
+  Technical Insights    — durable patterns/traps; never auto-deleted
 ```
 
-**Update triggers**: sub-phase completes · major technical decision made · task interrupted · goal diverges from actual state.
+**Update triggers**: sub-phase completes · major technical decision made · task interrupted · goal diverges from actual state · progression loop runs (Rule 14).
 
 **File size rule**: keep under ~100 lines. When over limit, archive old phase content to `docs/archive/`.
 
@@ -224,6 +227,57 @@ When the agent makes a wrong assumption, produces an invalid change, or encounte
 Stopping is always preferred over continuing with Low confidence. A partial STOP is correct behavior, not a failure. An agent that continues on a known-wrong path is more dangerous than one that pauses.
 
 Failure recognition and recovery are defined as Rule 13 in `copilot-instructions.md`. The **Mid-Session Corrections** section in `session_state.md` is where correction entries are recorded.
+
+---
+
+## Progression Model
+
+The progression model gives the framework a "motor" — the mechanism that drives forward motion toward a goal after each subtask completes. It complements the safety brakes (self-check gate, failure recovery) with a mandatory forward-evaluation loop.
+
+### The Loop (Rule 14)
+
+After every completed subtask:
+
+```
+COMPLETE subtask
+   ↓
+RE-EVALUATE → Is the goal done?
+   ↓ NO
+IDENTIFY    → What is the next concrete step?
+   ↓
+DECIDE      → continue · decompose (Rule 15) · stop and ask
+   ↓
+UPDATE      → session_state.md: Current Step + Next Planned Step
+   ↓
+REPORT      → ## Next Actions in the reply
+```
+
+### How It Interacts with Other Layers
+
+| Other mechanism | Interaction |
+|---|---|
+| **Self-check gate (Rule 12)** | Runs *within* a step — the loop runs *between* steps. They are not alternatives. |
+| **Failure recovery (Rule 13)** | A failure can trigger "stop and ask" in the progression loop. The loop resumes after recovery is complete. |
+| **Architect role** | Called by the progression loop when the next step requires design analysis before execution. |
+| **Implementer role** | Called by the progression loop when the next step is a bounded execution task with known acceptance criteria. |
+| **session_state.md** | Current Step and Next Planned Step are written by the loop after every iteration. |
+
+### Decomposition Decision (Rule 15)
+
+When the "IDENTIFY" step reveals a next step that is compound, the agent runs the decomposition test:
+
+```
+All subtasks have independent owner files?    YES → fan-out eligible
+All subtasks have independent validation?     YES → fan-out eligible
+All subtasks produce summarizable results?    YES → fan-out → apply role assignment
+Any criterion fails?                          NO  → proceed serially, state why
+```
+
+Fan-out uses the Architect for design-uncertain or multi-option tasks and the Implementer for bounded execution tasks.
+
+### Why This Matters
+
+Without the progression loop, an agent that completes a step will stop and wait — even when the next step is obvious and safe. The loop makes forward motion the default and stopping the exception, while keeping explicit stop conditions for blockers and genuine ambiguity.
 
 ---
 

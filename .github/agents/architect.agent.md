@@ -87,4 +87,13 @@ If a pre-condition cannot be satisfied, state: `"I cannot produce a reliable ana
 
 ### Decision Record
 - [Decision]: [Rationale]
+
+## Next Actions
+
+**Status**: [continuing / blocked / complete]
+
+**Next step**: [one sentence — what the implementer should do first]
+  - If continuing: this line is the next step description — no sub-bullet needed
+  - If blocked: [what decision or input is needed before proceeding]
+  - If complete: [what was delivered and why no further action is needed]
 ```

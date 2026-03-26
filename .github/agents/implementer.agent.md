@@ -109,4 +109,13 @@ After all steps:
 - Staged: [files]
 - Commit message: `[type]: [description]`
 - Status: committed / awaiting authorization
+
+## Next Actions
+
+**Status**: [continuing / blocked / complete]
+
+**Next step**: [one sentence — what comes after this subtask]
+  - If continuing: this line is the next step description — no sub-bullet needed
+  - If blocked: [what decision or input is needed]
+  - If complete: [what was delivered and why no further action is needed]
 ```

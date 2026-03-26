@@ -240,6 +240,104 @@ Stopping is always preferred over continuing with Low confidence. A partial STOP
 
 ---
 
+## Rule 14: Task Progression Loop (🔴 Mandatory)
+
+After every completed subtask — before composing the reply — run this progression loop. Do not skip it.
+
+```
+1. RE-EVALUATE  → Is the overall goal now complete?
+2. CHECK        → Are all acceptance criteria met?
+3. IDENTIFY     → What is the next actionable step toward the goal?
+4. DECIDE       → Choose one: continue · decompose · stop and ask
+5. UPDATE       → Write Current Step + Next Planned Step in session_state.md
+6. REPORT       → End every substantial reply with a ## Next Actions section
+```
+
+### Decision Rules
+
+| State | Required action |
+|---|---|
+| Goal complete, all criteria ✅ | Declare done; run Phase Graduation Protocol (Rule 10) |
+| Goal not complete, next step is clear | Continue serially; state next step in footer and Next Actions |
+| Goal not complete, next step requires decomposition | Apply Rule 15; fan out or serialize with explicit rationale |
+| Blocked by external input or ambiguity | STOP; state the blocker in "Blocker / Decision Needed" in session_state.md; ask the user |
+
+### Next Actions Contract
+
+Every substantial reply must end with:
+
+```markdown
+## Next Actions
+
+**Status**: [continuing / blocked / complete]
+
+**Next step**: [one sentence describing the next concrete action]
+  - If continuing: this line is the next step description — no sub-bullet needed
+  - If blocked: [what decision or input is needed]
+  - If complete: [what was delivered]
+```
+
+**Exceptions** (the only valid reasons to omit Next Actions):
+- The goal is fully complete
+- A blocking condition exists and has been declared to the user
+- The reply is purely informational (no active task)
+
+This loop makes explicit the difference between "I finished a step" and "I am making progress toward the goal." It prevents stalling after individual safe actions.
+
+---
+
+## Rule 15: Decomposition and Dispatch Decision (🔴 Mandatory)
+
+Before proceeding serially on any multi-step task, run the decomposition decision. This replaces the informal dispatch guidance in Rule 5 with concrete, enforceable criteria.
+
+### Decomposition Test
+
+A task qualifies for decomposition when **all three** of the following are true:
+
+| Criterion | Test |
+|---|---|
+| **Independent owner files** | Each subtask touches a distinct, non-overlapping set of files |
+| **Independent validation** | Each subtask can be validated without running the others first |
+| **Summarizable result** | Each subtask produces a result that can be stated in one sentence |
+
+If any criterion fails → proceed serially. State the criterion that failed.
+
+### Role Assignment Rules
+
+| Task profile | Assign to |
+|---|---|
+| Unknown design space, multiple options, architectural risk | Architect first, then Implementer |
+| Clear plan, bounded scope, known acceptance criteria | Implementer directly |
+| Mix of design and execution in the same task | Architect produces checklist; Implementer executes it |
+| Single-file edit with no design ambiguity | Implementer directly — no Architect needed |
+
+### Fan-Out Justification (required disclosure)
+
+When fan-out is chosen:
+
+```
+Decomposition Decision:
+- Subtasks: [list each subtask and its owner file set]
+- Validation: [how each subtask is independently validated]
+- Role: [Architect / Implementer / main thread for each]
+- Why serial was rejected: [which criterion passed and which serial exemption did not apply]
+```
+
+When serial is chosen, state the exemption:
+
+```
+Proceeding serially — [criterion that failed / exemption reason]
+```
+
+### Serial Exemptions (valid reasons to stay serial)
+
+- Strong sequential dependency (output of step N is input to step N+1)
+- High-risk or destructive operation (safer to validate each step before proceeding)
+- Still in the locating/reading phase (scope not yet established)
+- Single file or single module (decomposition adds no value)
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*
