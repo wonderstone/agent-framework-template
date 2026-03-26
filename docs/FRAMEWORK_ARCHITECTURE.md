@@ -86,6 +86,7 @@ The framework tracks work state in `session_state.md` at the project root.
 ```
 session_state.md structure:
   Current Goal        — one sentence; survives phase transitions
+  Working Hypothesis  — current assumption + confidence (High/Medium/Low) + evidence
   Active Work         — what is in progress right now
   Completed This Phase — verified subtasks; cleared on graduation
   Blocked / Pending   — waiting on external input

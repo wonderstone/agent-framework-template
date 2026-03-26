@@ -8,7 +8,7 @@ A minimal, reusable GitHub Copilot agent framework. Drop it into any project to 
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (10 rules, always loaded)
+  copilot-instructions.md          ← operating rules (Rule 0–11, always loaded)
   project-context.instructions.md  ← project adapter (fill in for your project)
   agents/
     architect.agent.md             ← analysis / planning / critique agent
@@ -21,10 +21,15 @@ docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
+  archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
   project-context.template.md      ← blank project adapter
   session_state.template.md        ← blank cross-session state file
+  roadmap.template.md              ← blank ROADMAP with phase/subtask structure
+
+scripts/
+  validate-template.sh             ← checks template integrity (run after setup)
 ```
 
 ---

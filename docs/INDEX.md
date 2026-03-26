@@ -5,7 +5,17 @@
 
 ---
 
-## Core
+## Framework (included with this template)
+
+| Document | Description |
+|---|---|
+| `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
+| `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
+
+## Project (create these for your project)
+
+> These entries are placeholders. Replace them with the actual docs for your project.
+> Remove any entry that does not apply; add new rows as your project's docs grow.
 
 | Document | Description |
 |---|---|
@@ -13,20 +23,15 @@
 | `ARCHITECTURE.md` | System architecture, module map, and service boundaries |
 | `ROADMAP.md` | Phase planning, milestones, and acceptance criteria |
 
-## Framework
-
-| Document | Description |
-|---|---|
-| `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
-| `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
-
 ## Guides and Runbooks
 
+> Add entries here as runbooks are created under `docs/runbooks/`.
+
 | Document | Description |
 |---|---|
-| `docs/runbooks/` | Operational runbooks (add entries here as runbooks are created) |
+| *(none yet)* | |
 
 ---
 
-*Last updated: [YYYY-MM-DD]*
+*Last updated: [fill in when your project first uses this index]*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*
