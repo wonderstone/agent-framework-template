@@ -87,6 +87,7 @@ The framework tracks work state in `session_state.md` at the project root.
 session_state.md structure:
   Current Goal          — one sentence; survives phase transitions
   Working Hypothesis    — current assumption + confidence (High/Medium/Low) + evidence
+  Plan                  — chosen approach + steps (max 5) + rationale; set by Rule 16
   Active Work
     Current Step        — what the agent is doing right now (one sentence)
     Next Planned Step   — what the agent will do after this step (one sentence)
@@ -166,6 +167,56 @@ Layer 4 loads → final validation against actual code; confidence declared
 **Key constraint**: Low-confidence hypotheses must be surfaced to the user before proceeding. Do not act on a Low-confidence hypothesis without stating the uncertainty.
 
 The current hypothesis and confidence are tracked in `session_state.md` under **Working Hypothesis**.
+
+---
+
+## Planning Layer
+
+The planning layer sits between goal intake and step execution. It answers the question: *how* should the agent reach the goal? The cognitive layer (Rule 11) reasons about *what is true*; the planning layer (Rule 16) decides *what to do*.
+
+### When Planning Runs
+
+```
+New multi-step task received
+   ↓
+Rule 16: Clarify goal → Identify approaches → Evaluate → Select → Record
+   ↓
+Plan written to session_state.md (## Plan)
+   ↓
+Rule 14 progression loop executes plan step-by-step
+```
+
+Planning runs **once at the start** of a task. It re-runs (as a plan revision) only when:
+- a failure invalidates a core assumption (Rule 13 recovery)
+- a better path is discovered mid-execution
+- the goal itself turns out to be mis-stated
+
+Single-step tasks skip planning entirely (Rule 16 constraint).
+
+### Role Assignment During Planning
+
+| Planning scenario | Role |
+|---|---|
+| One obvious path, clear scope | Main thread — plan inline, proceed |
+| 2–3 viable approaches, design uncertainty | Architect — enumerate options, recommend |
+| Bounded execution after plan is chosen | Implementer — execute checklist from plan |
+
+### How Planning Interacts with Other Mechanisms
+
+| Mechanism | Interaction |
+|---|---|
+| **Cognitive layer (Rule 11)** | Hypothesis and evidence inform which approaches are viable |
+| **Self-check gate (Rule 12)** | Runs per-step *inside* execution — planning happens *before* the first step |
+| **Failure recovery (Rule 13)** | Recovery can trigger a plan revision; the revised plan re-feeds Rule 14 |
+| **Progression loop (Rule 14)** | Consumes the plan — each loop iteration picks the next step from the recorded plan |
+| **Decomposition (Rule 15)** | If the plan reveals independent subtasks, Rule 15 decides whether to fan out |
+| **session_state.md** | The `## Plan` section holds the current approach, steps, and rationale |
+
+### Why This Matters
+
+Without a planning layer, the progression loop (Rule 14) executes steps without a map — it can pick individually correct steps that collectively miss the goal. Planning gives the loop a starting direction, while still allowing revision as new information surfaces.
+
+A plan is short by design (max 5 steps). Long plans create false confidence and resist revision. Short plans are easy to update, easy to verify, and easy to discard when wrong.
 
 ---
 

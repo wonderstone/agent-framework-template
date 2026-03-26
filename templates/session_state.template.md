@@ -27,9 +27,26 @@
 
 ---
 
+## Plan
+
+<!-- Created by Rule 16 before execution; revised explicitly when assumptions break -->
+<!-- Skip for single-step tasks; required for any multi-step task -->
+
+**Approach**: [chosen path — one sentence]
+
+**Steps**:
+1. [step 1]
+2. [step 2]
+3. [step 3]
+
+**Why this approach**: [one sentence rationale over the alternatives considered]
+
+---
+
 ## Active Work
 
-<!-- Single item currently in progress -->
+<!-- Active Work is always structured as a Current Step / Next Planned Step pair. -->
+<!-- There is no free-form single-line description — use Current Step for that. -->
 
 **Current Step**: [What the agent is doing right now — one sentence]
 

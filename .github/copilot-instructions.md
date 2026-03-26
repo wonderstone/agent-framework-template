@@ -338,6 +338,61 @@ Proceeding serially — [criterion that failed / exemption reason]
 
 ---
 
+## Rule 16: Planning and Path Selection (🔴 Mandatory)
+
+Before executing any multi-step task that is non-trivial, the agent MUST produce a short plan. Skip this rule only for single-step edits or tasks with an obviously unique path.
+
+### When to Plan
+
+| Task type | Action |
+|---|---|
+| Single-step edit, no design decision | Skip — proceed directly to execution |
+| Multi-step task with one obvious path | Plan in one sentence; record it; proceed |
+| Multi-step task with 2+ viable approaches | Enumerate options, evaluate, select explicitly |
+| Task with significant risk or cross-module impact | Always plan; involve Architect role |
+
+### Planning Steps
+
+1. **Clarify** — state the goal in one sentence; confirm it matches the user's intent
+2. **Identify approaches** — list 1–3 viable paths (do not force alternatives when there is only one)
+3. **Evaluate tradeoffs** — for each option: speed · risk · scope · dependencies (one line each)
+4. **Select** — choose one path explicitly; state why
+5. **Record** — write the chosen approach and steps in `session_state.md` under `## Plan`
+
+### Plan Format
+
+A plan is short. Maximum 5 steps. Write it in `session_state.md`:
+
+```markdown
+## Plan
+
+**Approach**: [one sentence describing the chosen path]
+
+**Steps**:
+1. [step 1]
+2. [step 2]
+3. [step N — max 5]
+
+**Why this approach**: [one sentence rationale over the alternatives]
+```
+
+### Plan Revision
+
+Revise the plan (and re-record it) when:
+- a failure occurs that invalidates an assumption the plan relied on
+- a better path is discovered mid-execution
+- a step reveals that the original goal was mis-stated
+
+Do not silently deviate from the recorded plan. If the plan changes, state it explicitly and update `session_state.md`.
+
+### Constraints
+
+- Do not over-plan trivial tasks — planning adds overhead, not safety, for single-step edits
+- A plan is an intent, not a contract — it can be revised, but revisions must be explicit
+- The Rule 14 progression loop executes the plan step-by-step; Rule 16 feeds it the starting map
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*
