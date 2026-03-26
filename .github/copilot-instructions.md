@@ -181,6 +181,65 @@ Track the current hypothesis and confidence in `session_state.md` under **Workin
 
 ---
 
+## Rule 12: Pre-Action Self-Check Gate (🔴 Mandatory)
+
+Before any file edit, destructive operation, config change, or commit — run this three-step gate. Do not skip or abbreviate it.
+
+### Step 1 — THINK
+State the action you are about to take and why, in one sentence.
+
+### Step 2 — SELF-CHECK
+Answer each question. If any answer is NO or UNKNOWN, resolve it before proceeding.
+
+| Question | Failure action |
+|---|---|
+| Have I read every file I plan to change? | **STOP** — read missing files first |
+| Are any target paths listed under Protected Paths? | **STOP** — request explicit user confirmation |
+| Have I loaded `.github/project-context.instructions.md`? | **STOP** — load it now |
+| Do all sources (docs, code, config) agree on this change? | **STOP** — escalate the conflict; do not guess |
+| Is the scope of this change fully understood? | **STOP** — ask for clarification |
+
+### Step 3 — ACT
+Only proceed if every self-check question was answered YES. If any check failed, the gate is not satisfied — state what is blocking and wait.
+
+**STOP language to use**:
+- Unread file: `"I need to read [file] before I can proceed safely."`
+- Protected path: `"[path] is a protected path. Explicit confirmation required before I continue."`
+- Unloaded adapter: `"I have not yet loaded the project adapter. Loading it now before I act."`
+- Conflicting sources: `"[Source A] and [Source B] disagree on [topic]. Which is authoritative?"`
+- Unclear scope: `"The scope of this change is unclear to me. I need clarification on [X] before I act."`
+
+---
+
+## Rule 13: Failure Recovery (🔴 Mandatory)
+
+When the agent makes a wrong assumption, produces an invalid change, or encounters missing or inconsistent project context:
+
+### Recognition
+State explicitly: `"I made an incorrect assumption: [what the assumption was]."`
+Never continue silently on a known-wrong path.
+
+### Recording
+Add an entry to `session_state.md` under **Mid-Session Corrections**:
+```
+[what was assumed] → [what was wrong] → [correction taken]
+```
+
+### Recovery Actions
+
+| Failure type | Recovery action |
+|---|---|
+| Wrong assumption | Re-read the source of truth; explicitly revise the hypothesis |
+| Invalid change | Revert or correct before continuing; do not layer fixes on top of errors |
+| Missing context | STOP — request the missing information; do not substitute guesses |
+| Conflicting project context | Escalate to the user; do not silently choose one source over another |
+| Scope exceeded | Stop the current change; confirm revised scope before resuming |
+
+### Recovery Constraint
+Stopping is always preferred over continuing with Low confidence. A partial STOP is not a failure — it is correct behavior.
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*

@@ -48,6 +48,15 @@
 
 ---
 
+## Mid-Session Corrections
+
+<!-- Record mistakes, wrong assumptions, or course corrections made this session -->
+<!-- Format: [what was assumed] → [what was wrong] → [correction taken] -->
+<!-- This section is never cleared mid-session; carry it forward until phase graduation -->
+- (none)
+
+---
+
 ## Acceptance Criteria
 
 <!-- Observable conditions that mark this phase complete -->

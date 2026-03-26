@@ -78,6 +78,31 @@ if ! grep -q "Rule 11" "${ROOT}/.github/copilot-instructions.md"; then
   ERRORS=$((ERRORS + 1))
 fi
 
+if ! grep -q "Rule 12" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 12' (Pre-Action Self-Check Gate) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Rule 13" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 13' (Failure Recovery) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Self-Check Stage" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Self-Check Stage' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Failure Modes" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Failure Modes' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Mid-Session Corrections" "${ROOT}/templates/session_state.template.md"; then
+  echo "  MISSING: 'Mid-Session Corrections' section not found in session_state.template.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then

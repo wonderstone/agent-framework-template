@@ -68,6 +68,12 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 | 3 — Canonical docs | `docs/*.md` | Topic confirmed relevant |
 | 4 — Code files | actual source files | Immediately before edit |
 
+**Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
+
+**Enforcement rules** — rules 0–13 include explicit STOP conditions. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope.
+
+**Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
+
 **Cognitive reasoning loop** — a lightweight discipline that runs across all four layers:
 
 - **Hypothesize**: form a working assumption before acting
@@ -79,6 +85,7 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 - Current goal
 - Working hypothesis, confidence level, and supporting evidence
 - Active work and what's completed this phase
+- Mid-session corrections (mistakes and course corrections)
 - Acceptance criteria
 - Technical decisions and durable insights
 
