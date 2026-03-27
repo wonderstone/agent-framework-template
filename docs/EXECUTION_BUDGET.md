@@ -91,21 +91,75 @@ observable stop instead of a runaway degradation.
 
 ---
 
-## Budget Limits
+## Execution Modes
 
-Default limits are defined in `templates/session_state.template.md`:
+The budget system exposes one of three execution modes, determined entirely by
+the scripts — not by freeform agent judgment:
 
-```
-**Loop Count**: 0 / 5
-**Heavy Reasoning Calls**: 0 / 2
-**Reality Checks**: 0 / 3
-**Stagnation Count**: 0 / 2
-**Budget Status**: healthy
-```
+| Mode | Meaning | Agent behavior |
+|---|---|---|
+| `healthy` | All budgets within limits, no platform cooldown | Full execution permitted |
+| `constrained` | Some feature limits reached (heavy reasoning or reality checks) but loop not exhausted | Lightweight-only continuation; no Architect, no Rule 17 |
+| `exhausted` | Loop limit hit, stagnation detected, or platform cooldown active | Stop, summarize, wait for user |
 
-These defaults are intentionally conservative. A user may raise specific
-limits for a long-running task by editing `session_state.md` directly.
-The scripts will respect whatever limit is written in the file.
+The mode is printed as `Execution Mode` in the `check_budget.sh` output and
+also stored as `**Execution Mode**` in the `## Platform Constraints` section of
+`session_state.md`.
+
+### Why Degraded Mode Exists
+
+Without a `constrained` mode, the only options are "continue as normal" or
+"stop completely." A constrained mode lets the agent make forward progress on
+a task while avoiding the actions most likely to consume tokens or trigger rate
+limits — specifically Architect invocations and repeated reality-check passes.
+
+This is preferable to an immediate full stop because:
+- The user still gets output and progress.
+- The agent avoids the high-cost operations that cause runaway behavior.
+- The stop is deferred until it is actually required (budget exhausted).
+
+### Local Budget vs Platform Constraint
+
+The execution budget tracks local counters (loop iterations, heavy reasoning
+calls, etc.) that reset per session. These prevent runaway loops within a
+single session.
+
+The `## Platform Constraints` section in `session_state.md` tracks external
+signals — rate-limit responses, cooldown periods, retry-after headers — from
+the platform running the agent. These are independent of local counters.
+
+**A platform cooldown overrides local budget state.** Even if all local
+counters are at 0, a `Cooldown Active: yes` flag forces `exhausted` mode.
+This is enforced by `check_budget.sh` directly.
+
+### Why Early Stopping Is Preferred Over Retry Loops
+
+A retry loop under a platform cooldown will:
+1. Consume additional requests against the rate limit.
+2. Potentially trigger a longer cooldown or a harder block.
+3. Produce no useful output while burning context.
+
+Stopping cleanly and surfacing the state to the user costs nothing and
+preserves the session context for a clean resume. Rule 19 in
+`copilot-instructions.md` mandates this behavior.
+
+---
+
+## Platform Constraints Integration
+
+When a rate-limit or cooldown signal is received, the agent must:
+
+1. Write to `## Platform Constraints` in `session_state.md`:
+   - `Last Platform Event`: brief description of the signal
+   - `Cooldown Active`: yes
+   - `Retry After`: value if known
+   - `Execution Mode`: exhausted
+
+2. The next `check_budget.sh` run will detect `Cooldown Active: yes` and
+   output `Execution Mode: exhausted`, blocking all progression.
+
+3. The agent stops, summarizes, and waits for the user to confirm the
+   cooldown has lifted before resetting `Cooldown Active` to `no`.
 
 ---
 
@@ -113,11 +167,12 @@ The scripts will respect whatever limit is written in the file.
 
 | File | Purpose |
 |---|---|
-| `.github/skills/execution-budget/SKILL.md` | Defines the Pipeline skill and gates |
+| `.github/skills/execution-budget/SKILL.md` | Defines the Pipeline skill, modes, and gates |
 | `scripts/execution_budget/update_budget.sh` | Increments a counter in `session_state.md` |
-| `scripts/execution_budget/check_budget.sh` | Reads budget state and prints enforcement report |
-| `templates/session_state.template.md` | Contains the `## Execution Budget` section template |
+| `scripts/execution_budget/check_budget.sh` | Reads budget + platform state; prints enforcement report with Execution Mode |
+| `templates/session_state.template.md` | Contains `## Execution Budget` and `## Platform Constraints` sections |
 
 ---
 
 > Updated 2026-03-27: initial implementation — deterministic script-backed budget system.
+> Updated 2026-03-27: added Execution Mode (healthy/constrained/exhausted), Platform Constraints section, Rule 19.

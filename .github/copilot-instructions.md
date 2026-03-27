@@ -503,6 +503,52 @@ before running the scripts.
 
 ---
 
+## Rule 19: Platform Rate-Limit Response (🔴 Mandatory)
+
+When the agent receives any signal indicating a platform rate limit, cooldown,
+or retry-after condition — including HTTP 429 responses, explicit "rate limited"
+messages, or any tool response that references a cooldown or retry delay — the
+agent **must**:
+
+1. **Stop autonomous progression immediately.** Do not start a new subtask,
+   invoke the Architect, or run a Reality Check.
+
+2. **Record the event in `session_state.md`** under `## Platform Constraints`:
+   ```
+   **Last Platform Event**: rate-limit received — [brief description]
+   **Cooldown Active**: yes
+   **Retry After**: [value if known, otherwise "unknown"]
+   **Execution Mode**: exhausted
+   ```
+
+3. **Write a blocker** to `session_state.md` under `## Blocker / Decision Needed`:
+   ```
+   Platform cooldown active — waiting for user to confirm it is safe to resume.
+   ```
+
+4. **Surface the state to the user.** Summarize what work was completed, what
+   was blocked, and what the user should do to resume.
+
+5. **Do not retry or loop.** Do not attempt to work around the rate limit by
+   switching tools or reducing request size. Stop cleanly.
+
+### Why This Rule Exists
+
+A cooldown-active state detected at the platform level overrides local budget
+counters. Even if the local execution budget says `healthy`, a platform signal
+must be treated as `exhausted` mode. The `check_budget.sh` script enforces this
+when `Cooldown Active: yes` is present in `session_state.md`.
+
+### Resume Condition
+
+The agent may resume only after the user explicitly confirms the cooldown has
+lifted. At that point:
+- Reset `Cooldown Active` to `no` in `session_state.md`
+- Reset `Execution Mode` to `healthy`
+- Re-run the budget check before continuing
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*

@@ -197,6 +197,27 @@ fi
 
 check_file "docs/EXECUTION_BUDGET.md"
 
+# ── Platform-aware budget (Rule 19) ───────────────────────────────────────────
+if ! grep -q "Rule 19" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 19' (Platform Rate-Limit Response) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "## Platform Constraints" "${ROOT}/templates/session_state.template.md"; then
+  echo "  MISSING: '## Platform Constraints' section not found in session_state.template.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Execution Mode" "${ROOT}/scripts/execution_budget/check_budget.sh"; then
+  echo "  MISSING: 'Execution Mode' field not found in check_budget.sh output"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Execution Mode" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
+  echo "  MISSING: 'Execution Mode' section not found in docs/EXECUTION_BUDGET.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then

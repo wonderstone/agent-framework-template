@@ -66,7 +66,8 @@ bash scripts/execution_budget/check_budget.sh
 ```
 
 The script reads `session_state.md`, compares all counters against limits,
-and prints a report in this format:
+checks `## Platform Constraints` for any active cooldown, and prints a report
+in this format:
 
 ```
 Execution Budget Report
@@ -75,11 +76,13 @@ Execution Budget Report
 - Reality Checks: 1 / 3
 - Stagnation Count: 1 / 2
 - Budget Status: constrained
+- Execution Mode: constrained
 
 Budget Enforcement
 - Autonomous progression allowed: YES
 - Heavy reasoning allowed: NO
 - Reality check allowed: YES
+- Allowed mode: constrained
 - Required action if no progress next cycle: STOP
 ```
 
@@ -89,14 +92,37 @@ The script exits with code `1` when autonomous progression must stop.
 
 ### Step 3 — Decision Gate
 
-Read the Budget Enforcement section of the report and apply it **literally**:
+Read the `Execution Mode` and `Budget Enforcement` fields and apply the
+corresponding mode behavior **literally**:
+
+#### Mode: `healthy`
 
 | Report field | Hard gate behavior |
 |---|---|
-| `Autonomous progression allowed: NO` | **STOP.** Do not continue. Declare the blocker in `session_state.md` and surface it to the user. |
-| `Heavy reasoning allowed: NO` | **Do not invoke the Architect.** Do not run any heavy analysis block. Use only what is already known. |
-| `Reality check allowed: NO` | **Do not run Rule 17.** Skip the reality check this iteration. |
-| `Required action: STOP` | **STOP.** Do not proceed. Surface the budget-exhausted state to the user. |
+| `Autonomous progression allowed: NO` | **STOP.** Declare the blocker in `session_state.md` and surface it to the user. |
+| `Heavy reasoning allowed: NO` | **Do not invoke the Architect.** Use only what is already known. |
+| `Reality check allowed: NO` | **Do not run Rule 17.** Skip this iteration. |
+
+#### Mode: `constrained`
+
+All `healthy` gates apply, plus:
+
+- **No Architect invocation.** Heavy reasoning is blocked regardless of the
+  individual `Heavy reasoning allowed` field — constrained mode means lightweight-only.
+- **No additional reality-check passes.** Skip Rule 17 for this iteration.
+- **Prefer lightweight continuation only.** Proceed with the next concrete
+  step using already-known information. Do not expand scope.
+
+#### Mode: `exhausted`
+
+**Stop unconditionally.** Do not continue.
+
+1. Write a blocker to `session_state.md` under `## Blocker / Decision Needed`.
+2. Summarize the current state for the user: what was completed, what is blocked.
+3. Ask for the next user-triggered action before resuming.
+
+If `exhausted` was triggered by a platform cooldown (`Cooldown Active: yes`),
+follow Rule 19 in addition to stopping.
 
 Do not interpret these gates. Apply them literally.
 
@@ -106,10 +132,9 @@ Do not interpret these gates. Apply them literally.
 
 Only after the gate in Step 3 has been applied may the agent proceed.
 
-- If all gates allow continuation → proceed with the next subtask.
-- If any gate blocked an action → respect the block and report it.
-- If progression was stopped → write the blocker to `session_state.md`
-  under `## Blocker / Decision Needed` and stop.
+- `healthy` → proceed with the next subtask normally.
+- `constrained` → proceed with lightweight continuation only; no Architect, no Rule 17.
+- `exhausted` → stop; summarize; wait for user input.
 
 **Never continue without completing Steps 1–3 first.**
 
@@ -146,6 +171,7 @@ with explicit user approval.
 ## Integration with Framework Rules
 
 - **Rule 14 (Progression Loop)**: invoke this skill at the start of each loop iteration.
-- **Rule 17 (Reality Check)**: blocked by this skill when reality check budget is exhausted.
-- **Architect role**: blocked by this skill when heavy reasoning budget is exhausted.
+- **Rule 17 (Reality Check)**: blocked by this skill when reality check budget is exhausted or mode is `constrained`/`exhausted`.
+- **Rule 19 (Platform Rate-Limit Response)**: platform cooldown sets `Execution Mode: exhausted`; this skill enforces the stop.
+- **Architect role**: blocked by this skill when heavy reasoning budget is exhausted or mode is `constrained`/`exhausted`.
 - **Rule 16 (Planning)**: planning work counts as a loop iteration; update `--loop` before planning begins.

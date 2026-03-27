@@ -114,3 +114,15 @@
 **Reality Checks**: 0 / 3
 **Stagnation Count**: 0 / 2
 **Budget Status**: healthy
+
+---
+
+## Platform Constraints
+
+<!-- Set by the agent when a rate-limit, cooldown, or retry-after signal is received -->
+<!-- Checked by scripts/execution_budget/check_budget.sh — forces exhausted mode when Cooldown Active: yes -->
+
+**Last Platform Event**: none
+**Cooldown Active**: no
+**Retry After**: -
+**Execution Mode**: healthy
