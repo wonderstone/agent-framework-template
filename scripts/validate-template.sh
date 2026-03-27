@@ -179,6 +179,8 @@ fi
 check_file ".github/skills/execution-budget/SKILL.md"
 check_file "scripts/execution_budget/update_budget.sh"
 check_file "scripts/execution_budget/check_budget.sh"
+check_file "scripts/execution_budget/enforce_pipeline.sh"
+check_file "scripts/execution_budget/test_pipeline.sh"
 
 if ! grep -q "## Execution Budget" "${ROOT}/templates/session_state.template.md"; then
   echo "  MISSING: '## Execution Budget' section not found in session_state.template.md"
@@ -236,6 +238,21 @@ fi
 
 if ! grep -q "Pipeline Enforcement" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
   echo "  MISSING: 'Pipeline Enforcement' section not found in docs/EXECUTION_BUDGET.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -qi "sole.*runtime" "${ROOT}/.github/skills/execution-budget/SKILL.md"; then
+  echo "  MISSING: SKILL.md does not declare enforce_pipeline.sh as the 'sole runtime' entrypoint"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "enforce_pipeline.sh" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: Rule 20 in copilot-instructions.md does not reference enforce_pipeline.sh"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -qi "internal implementation" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
+  echo "  MISSING: docs/EXECUTION_BUDGET.md does not classify update/check scripts as 'internal implementation'"
   ERRORS=$((ERRORS + 1))
 fi
 

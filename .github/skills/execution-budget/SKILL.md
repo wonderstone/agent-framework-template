@@ -55,11 +55,33 @@ before continuing. Do **not** proceed to Step 2 without both sections present.
 
 ### Step 2 — Run Budget Check
 
-Run the budget check script to produce a structured enforcement report:
+**`enforce_pipeline.sh` is the sole valid runtime entrypoint for budget enforcement.**
+
+Every loop iteration must call:
 
 ```
-bash scripts/execution_budget/check_budget.sh
+bash scripts/execution_budget/enforce_pipeline.sh --loop
 ```
+
+Replace `--loop` with `--heavy`, `--reality`, or `--stagnation` to match the
+event type (see the Budget Limits table below for which events correspond to
+which flags).
+
+The wrapper atomically increments the counter, runs the budget check, and
+emits the Pipeline Status Summary. It exits with:
+- `0` — `PIPELINE OK` (healthy)
+- `2` — `PIPELINE DEGRADED: constrained` (lightweight only)
+- `1` — `PIPELINE BLOCKED: exhausted` (must stop)
+
+> **`update_budget.sh` and `check_budget.sh` are internal implementation
+> details.** Calling them directly during normal execution — instead of using
+> `enforce_pipeline.sh` — is a **Rule 20 violation**. The only valid uses of
+> those scripts outside `enforce_pipeline.sh` are:
+> - running `test_pipeline.sh` (edge-case testing)
+> - debugging or setup work outside an active agent session
+> - maintenance of the budget system itself
+>
+> If you are an agent executing a task loop, use `enforce_pipeline.sh`. Period.
 
 The script reads `session_state.md`, compares all counters against limits,
 checks `## Platform Constraints` for any active cooldown, and prints a report
@@ -182,3 +204,15 @@ with explicit user approval.
 - **Rule 20 (Pipeline Enforcement)**: this skill is the implementation of Rule 20 — the pipeline is mandatory and non-bypassable.
 - **Architect role**: blocked by this skill when heavy reasoning budget is exhausted or mode is `constrained`/`exhausted`.
 - **Rule 16 (Planning)**: planning work counts as a loop iteration; update `--loop` before planning begins.
+
+---
+
+## Files
+
+| File | Role | Valid callers |
+|---|---|---|
+| `scripts/execution_budget/enforce_pipeline.sh` | **Sole runtime entrypoint** — update + check + Pipeline Status Summary in one command | Agent (every loop iteration) |
+| `scripts/execution_budget/update_budget.sh` | Internal implementation detail — increments a counter | `enforce_pipeline.sh`, `test_pipeline.sh`, debugging only |
+| `scripts/execution_budget/check_budget.sh` | Internal implementation detail — reads budget + platform state; prints enforcement report | `enforce_pipeline.sh`, `test_pipeline.sh`, debugging only |
+| `scripts/execution_budget/test_pipeline.sh` | Test/validation path — edge-case tests: cooldown, constrained, mode transitions | CI, developers, setup verification |
+| `templates/session_state.template.md` | State schema — contains `## Execution Budget` and `## Platform Constraints` sections | Setup only |

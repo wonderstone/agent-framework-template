@@ -177,6 +177,80 @@ After setup, run `bash scripts/validate-template.sh` from the repo root to confi
 
 ---
 
+## Pipeline Enforcement at Runtime
+
+The framework includes a deterministic pipeline enforcement system that prevents
+runaway loops and rate-limit storms. Every agent iteration must pass through a
+4-stage pipeline before any task is permitted to execute.
+
+### How it works
+
+```
+Stage 0 — Signal Capture
+  Agent writes platform events (rate-limit, cooldown) to
+  ## Platform Constraints in session_state.md
+
+Stage 1+2 — Enforcement (sole valid runtime command)
+  bash scripts/execution_budget/enforce_pipeline.sh --loop
+    (or --heavy, --reality, --stagnation)
+
+Stage 3 — Hard Gate
+  Script outputs PIPELINE OK / DEGRADED / BLOCKED
+  Exit 1 on BLOCKED — agent must not continue
+
+Stage 4 — Controlled Execution
+  healthy     → full execution
+  constrained → lightweight only (no Architect, no Rule 17)
+  exhausted   → STOP — summarize — wait for user
+```
+
+`enforce_pipeline.sh` is the **sole valid runtime command**. `update_budget.sh`
+and `check_budget.sh` are internal implementation details — they are called by
+the wrapper, never directly by the agent during task execution.
+
+### What happens when PIPELINE BLOCKED appears
+
+When `check_budget.sh` or `enforce_pipeline.sh` outputs `PIPELINE BLOCKED: exhausted`
+and exits with code `1`, the agent **must**:
+
+1. Stop all task execution immediately.
+2. Write a blocker entry to `session_state.md` under `## Blocker / Decision Needed`.
+3. Surface a human-readable summary: what was completed, what is blocked, why.
+4. Wait for the user to take action before resuming.
+
+The agent must **not**:
+- Start a new subtask
+- Call the Architect
+- Run a reality check (Rule 17)
+- Make any file edits except `session_state.md`
+
+### Why bypass is impossible
+
+The enforcement guarantee rests on three mutually reinforcing layers:
+
+| Layer | Mechanism |
+|---|---|
+| **Script exit code** | `check_budget.sh` exits `1` when exhausted; any shell pipeline that checks `$?` will fail |
+| **Pipeline status line** | `PIPELINE BLOCKED: exhausted` is the last line of output — easily grep-able; agents read it literally |
+| **Rule 20 (copilot-instructions.md)** | Defines any deviation as an *invalid execution* — the agent instruction set treats skipping the pipeline the same as violating a hard safety rule |
+
+None of these can be bypassed without explicitly overriding the scripts or the
+instructions. The counters live in `session_state.md` as plain text that
+persists across turns and context windows — the model's internal state has no
+bearing on what the file contains.
+
+### Verifying the pipeline is working
+
+Run the edge-case test suite to confirm all enforcement behaviors work:
+
+```bash
+bash scripts/execution_budget/test_pipeline.sh
+```
+
+Expected output: 11 assertions, all passing (✅).
+
+---
+
 ## Troubleshooting
 
 **Agent ignores the rules**: confirm `.github/copilot-instructions.md` is being loaded by your AI assistant. Some tools require explicit activation.
@@ -184,3 +258,11 @@ After setup, run `bash scripts/validate-template.sh` from the repo root to confi
 **Agent doesn't load the right doc**: check the Critical Topic Triggers in your project adapter — ensure the keyword matches what appears in typical user messages.
 
 **session_state.md is out of sync**: treat the actual code as truth; update session_state.md to match, not the other way around.
+
+**`PIPELINE BLOCKED` appears unexpectedly**: check `session_state.md` → `## Platform Constraints`. If `Cooldown Active: yes`, a platform rate-limit was received. Reset it to `no` only after confirming the cooldown has lifted, then re-run the budget check.
+
+**Agent continues after PIPELINE BLOCKED**: this is a Rule 20 violation. The agent's instruction set explicitly defines this as invalid. Verify that `copilot-instructions.md` contains Rule 20 and that it is being loaded. Run `bash scripts/validate-template.sh` to check integrity.
+
+**Budget counters seem wrong**: counters in `session_state.md` accumulate across a session and are never auto-reset. To start a fresh session, reset the counters to `0` manually or copy from `templates/session_state.template.md`. Only do this between sessions, not mid-task.
+
+**validate-template.sh fails with missing checks**: re-run after copying the latest `copilot-instructions.md` and `scripts/` from this template repository.
