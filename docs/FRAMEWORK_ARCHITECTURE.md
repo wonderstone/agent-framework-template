@@ -290,6 +290,15 @@ The progression model gives the framework a "motor" — the mechanism that drive
 After every completed subtask:
 
 ```
+START of loop iteration
+   ↓
+EXECUTION BUDGET GATE (Rule 18)
+   → update_budget.sh --loop
+   → check_budget.sh
+   ├── progression blocked → STOP; surface to user
+   ├── heavy reasoning blocked → skip Architect this iteration
+   └── reality check blocked → skip Rule 17 this iteration
+   ↓
 COMPLETE subtask
    ↓
 RE-EVALUATE → Is the goal done?
@@ -312,12 +321,13 @@ REPORT      → ## Next Actions in the reply (includes Alignment field)
 
 | Other mechanism | Interaction |
 |---|---|
+| **Execution budget (Rule 18)** | Runs *at the start* of each loop iteration — before any work. Hard gates block progression, Architect invocation, or Rule 17 when limits are exhausted. |
 | **Self-check gate (Rule 12)** | Runs *within* a step — the loop runs *between* steps. They are not alternatives. |
 | **Failure recovery (Rule 13)** | A failure can trigger "stop and ask" in the progression loop. The loop resumes after recovery is complete. |
 | **Reality check (Rule 17)** | Runs *between* loop iterations — before IDENTIFY. Misalignment triggers plan revision or stop; uncertain alignment is flagged and tracked. |
-| **Architect role** | Called by the progression loop when the next step requires design analysis before execution. |
+| **Architect role** | Called by the progression loop when the next step requires design analysis before execution. Blocked by Rule 18 when heavy reasoning budget is exhausted. |
 | **Implementer role** | Called by the progression loop when the next step is a bounded execution task with known acceptance criteria. |
-| **session_state.md** | Current Step and Next Planned Step are written by the loop after every iteration. |
+| **session_state.md** | Current Step, Next Planned Step, and Execution Budget counters are written by the loop after every iteration. |
 
 ### Decomposition Decision (Rule 15)
 
@@ -386,6 +396,75 @@ Unanswerable questions → `Alignment: uncertain`. Contradicted questions → `A
 Planning (Rule 16) and progression (Rule 14) can both execute correctly and still miss the user's intent if the original goal was subtly mis-stated or if the execution drifted during a long task. The reality check is the mechanism that catches this drift before `Status: complete` is declared.
 
 A fast alignment pulse — three questions, evidence only, one of three outcomes — is far less expensive than discovering at the end that the work addressed the wrong problem.
+
+---
+
+## Execution Budget Layer
+
+The execution budget layer is a deterministic, script-backed gate that runs at
+the start of every iteration of the progression loop. It prevents runaway
+loops, excessive heavy reasoning, repeated reality checks, and
+stagnation-induced rate-limit-triggering behavior.
+
+Where the reality check layer provides a course-correction signal, the
+execution budget layer provides a hard stop when the agent has consumed its
+permitted share of resources for a session.
+
+### When It Runs
+
+```
+At the START of every Rule 14 loop iteration — before any work begins
+```
+
+This is enforced by Rule 18 in `copilot-instructions.md`.
+
+### The Pipeline
+
+```
+update_budget.sh --loop  (or --heavy / --reality / --stagnation)
+   ↓
+check_budget.sh
+   ↓
+Enforcement report (structured text)
+   ↓
+Agent applies hard gates literally
+```
+
+### Budget Counters and Limits
+
+| Counter | Default Limit | What it prevents |
+|---|---|---|
+| Loop Count | 5 | Infinite progression loops |
+| Heavy Reasoning Calls | 2 | Excessive Architect invocations |
+| Reality Checks | 3 | Rule 17 running on every micro-step |
+| Stagnation Count | 2 | Agent spinning without real output |
+
+### Hard Gates
+
+| Enforcement flag | Agent behavior |
+|---|---|
+| `Autonomous progression allowed: NO` | Stop; write blocker to `session_state.md`; surface to user |
+| `Heavy reasoning allowed: NO` | Do not invoke Architect; proceed without design analysis |
+| `Reality check allowed: NO` | Skip Rule 17 this iteration |
+| `Required action: STOP` | Stop unconditionally |
+
+### How It Interacts with Other Layers
+
+| Mechanism | Interaction |
+|---|---|
+| **Progression loop (Rule 14)** | Budget gate runs *before* the loop begins — it is the entry condition, not a mid-loop check |
+| **Reality check (Rule 17)** | Blocked by the budget gate when reality check count is exhausted |
+| **Architect role** | Blocked by the budget gate when heavy reasoning count is exhausted |
+| **session_state.md** | Budget counters live in the `## Execution Budget` section; scripts write directly to this file |
+
+### Why This Matters
+
+An LLM cannot reliably count its own loop iterations across long tasks. A
+counter in `session_state.md` maintained by deterministic shell scripts is
+authoritative — it persists across turns and is not subject to model drift.
+
+The budget layer converts "the agent should stop eventually" from an advisory
+intent into an enforced hard limit.
 
 ---
 

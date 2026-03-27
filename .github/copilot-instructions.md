@@ -458,6 +458,51 @@ Every `## Next Actions` block must include:
 
 ---
 
+## Rule 18: Execution Budget Gate (🔴 Mandatory)
+
+Every iteration of the Rule 14 progression loop **must begin** by running the
+execution-budget skill before any work is performed.
+
+### Skill Location
+
+`.github/skills/execution-budget/SKILL.md`
+
+### Mandatory Pipeline (do not skip or reorder)
+
+```
+Step 1 — Update Budget State
+  bash scripts/execution_budget/update_budget.sh --loop
+  (use --heavy before Architect invocation; --reality before Rule 17; --stagnation on no-progress cycle)
+
+Step 2 — Check Budget
+  bash scripts/execution_budget/check_budget.sh
+
+Step 3 — Apply Decision Gate (literal, not advisory)
+  Autonomous progression allowed: NO  → STOP; write blocker to session_state.md
+  Heavy reasoning allowed: NO         → do not invoke Architect; proceed without design analysis
+  Reality check allowed: NO           → skip Rule 17 this iteration
+
+Step 4 — Execution Permission
+  Proceed only after gate is applied
+```
+
+### Hard Constraints
+
+- Do **not** skip the budget check.
+- Do **not** continue if `Autonomous progression allowed: NO`.
+- Do **not** invoke the Architect if `Heavy reasoning allowed: NO`.
+- Do **not** run Rule 17 if `Reality check allowed: NO`.
+- Do **not** adjust budget limits without explicit user instruction.
+- The scripts are authoritative — not the agent's internal count.
+
+### Session State Requirement
+
+`session_state.md` must contain an `## Execution Budget` section.
+If it is missing, copy the section from `templates/session_state.template.md`
+before running the scripts.
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*

@@ -170,6 +170,33 @@ if ! grep -q "\*\*Alignment\*\*:" "${ROOT}/.github/agents/implementer.agent.md";
   ERRORS=$((ERRORS + 1))
 fi
 
+# ── Execution budget layer (Rule 18) ──────────────────────────────────────────
+if ! grep -q "Rule 18" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 18' (Execution Budget Gate) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+check_file ".github/skills/execution-budget/SKILL.md"
+check_file "scripts/execution_budget/update_budget.sh"
+check_file "scripts/execution_budget/check_budget.sh"
+
+if ! grep -q "## Execution Budget" "${ROOT}/templates/session_state.template.md"; then
+  echo "  MISSING: '## Execution Budget' section not found in session_state.template.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Execution Budget Layer" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Execution Budget Layer' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "EXECUTION_BUDGET" "${ROOT}/docs/INDEX.md"; then
+  echo "  MISSING: 'EXECUTION_BUDGET.md' not listed in docs/INDEX.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+check_file "docs/EXECUTION_BUDGET.md"
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then
