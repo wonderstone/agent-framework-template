@@ -218,6 +218,27 @@ if ! grep -q "Execution Mode" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
   ERRORS=$((ERRORS + 1))
 fi
 
+# ── Pipeline enforcement (Rule 20) ────────────────────────────────────────────
+if ! grep -q "Rule 20" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 20' (Pipeline Enforcement) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "HARD GATE" "${ROOT}/.github/skills/execution-budget/SKILL.md"; then
+  echo "  MISSING: 'HARD GATE' section not found in SKILL.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "PIPELINE" "${ROOT}/scripts/execution_budget/check_budget.sh"; then
+  echo "  MISSING: 'PIPELINE' status line not found in check_budget.sh"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Pipeline Enforcement" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
+  echo "  MISSING: 'Pipeline Enforcement' section not found in docs/EXECUTION_BUDGET.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then

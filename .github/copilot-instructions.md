@@ -532,6 +532,10 @@ agent **must**:
 5. **Do not retry or loop.** Do not attempt to work around the rate limit by
    switching tools or reducing request size. Stop cleanly.
 
+6. **Pipeline stop is immediate.** The next `check_budget.sh` run will output
+   `PIPELINE BLOCKED: exhausted` and exit with code `1`. Rule 20 mandates the
+   agent obey this output unconditionally.
+
 ### Why This Rule Exists
 
 A cooldown-active state detected at the platform level overrides local budget
@@ -546,6 +550,49 @@ lifted. At that point:
 - Reset `Cooldown Active` to `no` in `session_state.md`
 - Reset `Execution Mode` to `healthy`
 - Re-run the budget check before continuing
+
+---
+
+## Rule 20: Pipeline Enforcement (🔴 Mandatory)
+
+The execution-budget pipeline is **non-bypassable**. The agent must follow it
+before performing any task in any session.
+
+### Enforcement Requirements
+
+- The agent **MUST** run the execution-budget pipeline (SKILL.md Steps 1–4)
+  before any task, subtask, Architect invocation, or Reality Check.
+- The agent **MUST NOT** act if `check_budget.sh` outputs `PIPELINE BLOCKED`
+  or exits with code `1`.
+- The agent **MUST** obey Execution Mode restrictions strictly:
+  - `exhausted` → stop, summarize, wait for user — no exceptions
+  - `constrained` → lightweight continuation only — no Architect, no Rule 17
+  - `healthy` → full execution permitted, individual gates still apply
+- The agent **MUST NOT** override, reinterpret, or ignore Platform Constraints.
+- The agent **MUST NOT** substitute its own judgment for the script output.
+
+### What Constitutes a Violation
+
+Any of the following is an **invalid execution**:
+
+- Continuing a task when `Autonomous progression allowed: NO`
+- Invoking the Architect when `Heavy reasoning allowed: NO`
+- Running Rule 17 when `Reality check allowed: NO`
+- Skipping the budget check pipeline at the start of a loop iteration
+- Ignoring a `Cooldown Active: yes` flag in `## Platform Constraints`
+- Proceeding after `PIPELINE BLOCKED: exhausted` output
+
+### Pipeline Status Lines
+
+The script output includes one of three pipeline status lines:
+
+| Status line | Meaning | Agent action |
+|---|---|---|
+| `PIPELINE OK` | healthy mode | proceed normally |
+| `PIPELINE DEGRADED: constrained` | constrained mode | lightweight only |
+| `PIPELINE BLOCKED: exhausted` | exhausted mode | stop immediately |
+
+These lines are the authoritative signal. Read them literally.
 
 ---
 

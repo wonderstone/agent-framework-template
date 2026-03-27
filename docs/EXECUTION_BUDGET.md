@@ -145,7 +145,73 @@ preserves the session context for a clean resume. Rule 19 in
 
 ---
 
-## Platform Constraints Integration
+## Pipeline Enforcement Model
+
+The execution budget system is implemented as a **4-stage enforced pipeline**.
+Every agent iteration must pass through all four stages. No stage may be skipped.
+
+```
+Stage 0 — Signal Capture
+  └── Agent writes platform signals (rate-limit, cooldown, retry-after) to
+      ## Platform Constraints in session_state.md
+
+Stage 1 — Budget Evaluation
+  └── bash scripts/execution_budget/update_budget.sh --loop (or --heavy / --reality / --stagnation)
+       → increments the relevant counter in session_state.md
+
+Stage 2 — Execution Gate (HARD STOP)
+  └── bash scripts/execution_budget/check_budget.sh
+       → reads both ## Execution Budget and ## Platform Constraints
+       → determines Execution Mode
+       → prints PIPELINE OK / DEGRADED / BLOCKED
+       → exits 1 if progression must stop
+
+Stage 3 — Controlled Execution
+  └── agent applies mode behavior strictly:
+       - healthy     → full execution
+       - constrained → lightweight only (no Architect, no Rule 17)
+       - exhausted   → STOP — summarize — ask user
+```
+
+### Mode Behavior Table
+
+| Mode | Allowed Actions | Blocked Actions |
+|---|---|---|
+| `healthy` | Full execution; Architect; Rule 17 | None (individual budget fields still apply) |
+| `constrained` | Direct continuation only | Architect, Rule 17, multi-step planning |
+| `exhausted` | Summarize state, surface to user | Everything — agent must stop |
+
+### Why This Is a Hard Gate
+
+Stage 2 is not advisory — the script is the **single source of truth**. The
+agent reads the pipeline status line (`PIPELINE OK / DEGRADED / BLOCKED`) and
+the exit code, then applies them without interpretation. Rule 20 in
+`copilot-instructions.md` mandates this and defines what constitutes an
+invalid execution.
+
+The gate exists because:
+- LLM self-discipline cannot be relied on to count iterations accurately
+- A file-backed counter survives across turns and context windows
+- The script output is deterministic and auditable
+- Platform cooldowns must override local budget state instantly
+
+---
+
+## Budget Limits
+
+Default limits are defined in `templates/session_state.template.md`:
+
+```
+**Loop Count**: 0 / 5
+**Heavy Reasoning Calls**: 0 / 2
+**Reality Checks**: 0 / 3
+**Stagnation Count**: 0 / 2
+**Budget Status**: healthy
+```
+
+These defaults are intentionally conservative. A user may raise specific
+limits for a long-running task by editing `session_state.md` directly.
+The scripts will respect whatever limit is written in the file.
 
 When a rate-limit or cooldown signal is received, the agent must:
 

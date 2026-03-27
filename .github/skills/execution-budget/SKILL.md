@@ -40,24 +40,20 @@ merge steps.
 
 ---
 
-### Step 1 — Update Budget State
+### Step 1 — Load State
 
-Record the event type that is about to occur by running the appropriate
-update script. This increments the counter **before** the work starts.
+Before any budget check, confirm that `session_state.md` is present and
+contains both required sections:
 
-| Event | Command |
-|---|---|
-| Loop iteration beginning | `bash scripts/execution_budget/update_budget.sh --loop` |
-| Heavy reasoning about to run | `bash scripts/execution_budget/update_budget.sh --heavy` |
-| Reality check about to run | `bash scripts/execution_budget/update_budget.sh --reality` |
-| No progress made last cycle | `bash scripts/execution_budget/update_budget.sh --stagnation` |
+- `## Execution Budget` — loop, heavy reasoning, reality check, and stagnation counters
+- `## Platform Constraints` — cooldown status, retry-after, last platform event
 
-Run this script from the repository root. The script writes the updated
-counter back to `session_state.md` immediately.
+If either section is missing, copy it from `templates/session_state.template.md`
+before continuing. Do **not** proceed to Step 2 without both sections present.
 
 ---
 
-### Step 2 — Check Budget
+### Step 2 — Run Budget Check
 
 Run the budget check script to produce a structured enforcement report:
 
@@ -84,47 +80,57 @@ Budget Enforcement
 - Reality check allowed: YES
 - Allowed mode: constrained
 - Required action if no progress next cycle: STOP
+
+PIPELINE DEGRADED: constrained
 ```
 
-The script exits with code `1` when autonomous progression must stop.
+Parse both `Execution Mode` and the `PIPELINE` status line. The script exits
+with code `1` when autonomous progression must stop.
 
 ---
 
-### Step 3 — Decision Gate
+### Step 3 — HARD GATE ⛔ (NON-BYPASSABLE)
 
-Read the `Execution Mode` and `Budget Enforcement` fields and apply the
-corresponding mode behavior **literally**:
+Read the `Execution Mode` field and apply the corresponding mode behavior
+**literally and immediately**.
 
-#### Mode: `healthy`
+**DO NOT PROCEED if gate conditions are violated.**
+
+#### Mode: `exhausted` — STOP UNCONDITIONALLY
+
+`PIPELINE BLOCKED: exhausted`
+
+1. Do **not** continue any task.
+2. Write a blocker to `session_state.md` under `## Blocker / Decision Needed`.
+3. Summarize the current state for the user: what was completed, what is blocked.
+4. Ask for the next user-triggered action before resuming.
+5. If triggered by a platform cooldown (`Cooldown Active: yes`), follow Rule 19.
+
+There are **no exceptions** to exhausted-mode stop behavior.
+
+#### Mode: `constrained` — LIGHTWEIGHT ONLY
+
+`PIPELINE DEGRADED: constrained`
+
+Continue, but enforce all of the following without exception:
+
+- **NO Architect invocation.** Heavy reasoning is fully blocked.
+- **NO Rule 17 (reality check).** Skip for this iteration.
+- **NO multi-step planning.** Do not expand scope.
+- **Direct continuation only.** Proceed with the next concrete step using
+  already-known information.
+
+#### Mode: `healthy` — FULL EXECUTION
+
+`PIPELINE OK`
+
+Full execution is permitted. Apply individual field gates:
 
 | Report field | Hard gate behavior |
 |---|---|
-| `Autonomous progression allowed: NO` | **STOP.** Declare the blocker in `session_state.md` and surface it to the user. |
-| `Heavy reasoning allowed: NO` | **Do not invoke the Architect.** Use only what is already known. |
-| `Reality check allowed: NO` | **Do not run Rule 17.** Skip this iteration. |
-
-#### Mode: `constrained`
-
-All `healthy` gates apply, plus:
-
-- **No Architect invocation.** Heavy reasoning is blocked regardless of the
-  individual `Heavy reasoning allowed` field — constrained mode means lightweight-only.
-- **No additional reality-check passes.** Skip Rule 17 for this iteration.
-- **Prefer lightweight continuation only.** Proceed with the next concrete
-  step using already-known information. Do not expand scope.
-
-#### Mode: `exhausted`
-
-**Stop unconditionally.** Do not continue.
-
-1. Write a blocker to `session_state.md` under `## Blocker / Decision Needed`.
-2. Summarize the current state for the user: what was completed, what is blocked.
-3. Ask for the next user-triggered action before resuming.
-
-If `exhausted` was triggered by a platform cooldown (`Cooldown Active: yes`),
-follow Rule 19 in addition to stopping.
-
-Do not interpret these gates. Apply them literally.
+| `Autonomous progression allowed: NO` | **STOP.** Declare the blocker in `session_state.md`. |
+| `Heavy reasoning allowed: NO` | **Do not invoke the Architect.** |
+| `Reality check allowed: NO` | **Do not run Rule 17.** |
 
 ---
 
@@ -172,6 +178,7 @@ with explicit user approval.
 
 - **Rule 14 (Progression Loop)**: invoke this skill at the start of each loop iteration.
 - **Rule 17 (Reality Check)**: blocked by this skill when reality check budget is exhausted or mode is `constrained`/`exhausted`.
-- **Rule 19 (Platform Rate-Limit Response)**: platform cooldown sets `Execution Mode: exhausted`; this skill enforces the stop.
+- **Rule 19 (Platform Rate-Limit Response)**: platform cooldown sets `Execution Mode: exhausted`; this skill enforces the pipeline stop.
+- **Rule 20 (Pipeline Enforcement)**: this skill is the implementation of Rule 20 — the pipeline is mandatory and non-bypassable.
 - **Architect role**: blocked by this skill when heavy reasoning budget is exhausted or mode is `constrained`/`exhausted`.
 - **Rule 16 (Planning)**: planning work counts as a loop iteration; update `--loop` before planning begins.

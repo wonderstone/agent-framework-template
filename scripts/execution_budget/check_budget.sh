@@ -144,6 +144,15 @@ else:
 
 print(f"- Required action if no progress next cycle: {required}")
 
+# ── Pipeline Status ───────────────────────────────────────────────────────────
+print()
+if execution_mode == "exhausted":
+    print("PIPELINE BLOCKED: exhausted")
+elif execution_mode == "constrained":
+    print("PIPELINE DEGRADED: constrained")
+else:
+    print("PIPELINE OK")
+
 # Exit 1 when progression must stop
 if not autonomous_progression_allowed:
     sys.exit(1)
