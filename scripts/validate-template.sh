@@ -241,6 +241,21 @@ if ! grep -q "Pipeline Enforcement" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
   ERRORS=$((ERRORS + 1))
 fi
 
+if ! grep -qi "sole.*runtime" "${ROOT}/.github/skills/execution-budget/SKILL.md"; then
+  echo "  MISSING: SKILL.md does not declare enforce_pipeline.sh as the 'sole runtime' entrypoint"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "enforce_pipeline.sh" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: Rule 20 in copilot-instructions.md does not reference enforce_pipeline.sh"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -qi "internal implementation" "${ROOT}/docs/EXECUTION_BUDGET.md"; then
+  echo "  MISSING: docs/EXECUTION_BUDGET.md does not classify update/check scripts as 'internal implementation'"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then

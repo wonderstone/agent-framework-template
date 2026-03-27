@@ -470,19 +470,16 @@ execution-budget skill before any work is performed.
 ### Mandatory Pipeline (do not skip or reorder)
 
 ```
-Step 1 — Update Budget State
-  bash scripts/execution_budget/update_budget.sh --loop
+Step 1 — Run Enforcement Wrapper (sole valid runtime command)
+  bash scripts/execution_budget/enforce_pipeline.sh --loop
   (use --heavy before Architect invocation; --reality before Rule 17; --stagnation on no-progress cycle)
 
-Step 2 — Check Budget
-  bash scripts/execution_budget/check_budget.sh
+Step 2 — Apply Decision Gate (literal, not advisory)
+  PIPELINE BLOCKED: exhausted     → STOP; write blocker to session_state.md
+  PIPELINE DEGRADED: constrained  → no Architect, no Rule 17; proceed lightweight
+  PIPELINE OK                     → full execution permitted
 
-Step 3 — Apply Decision Gate (literal, not advisory)
-  Autonomous progression allowed: NO  → STOP; write blocker to session_state.md
-  Heavy reasoning allowed: NO         → do not invoke Architect; proceed without design analysis
-  Reality check allowed: NO           → skip Rule 17 this iteration
-
-Step 4 — Execution Permission
+Step 3 — Execution Permission
   Proceed only after gate is applied
 ```
 
@@ -532,7 +529,7 @@ agent **must**:
 5. **Do not retry or loop.** Do not attempt to work around the rate limit by
    switching tools or reducing request size. Stop cleanly.
 
-6. **Pipeline stop is immediate.** The next `check_budget.sh` run will output
+6. **Pipeline stop is immediate.** The next `enforce_pipeline.sh` run will output
    `PIPELINE BLOCKED: exhausted` and exit with code `1`. Rule 20 mandates the
    agent obey this output unconditionally.
 
@@ -581,6 +578,18 @@ Any of the following is an **invalid execution**:
 - Skipping the budget check pipeline at the start of a loop iteration
 - Ignoring a `Cooldown Active: yes` flag in `## Platform Constraints`
 - Proceeding after `PIPELINE BLOCKED: exhausted` output
+- Calling `update_budget.sh` directly during normal execution (bypasses the wrapper)
+- Calling `check_budget.sh` directly during normal execution (bypasses the wrapper)
+
+The only valid runtime command for an agent iteration is:
+
+```
+bash scripts/execution_budget/enforce_pipeline.sh --loop   # (or --heavy / --reality / --stagnation)
+```
+
+Direct calls to `update_budget.sh` or `check_budget.sh` are permitted only in:
+tests (`test_pipeline.sh`), debugging sessions, and implementation maintenance.
+They are never a valid substitute for `enforce_pipeline.sh` during task execution.
 
 ### Pipeline Status Lines
 

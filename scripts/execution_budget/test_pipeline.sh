@@ -250,6 +250,31 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Test 4 — Documentation asserts enforce_pipeline.sh is the sole runtime path
+# ─────────────────────────────────────────────────────────────────────────────
+
+echo ""
+echo "Test 4: enforce_pipeline.sh declared as sole runtime entrypoint in SKILL.md"
+
+SKILL_FILE="${SCRIPT_DIR}/../../.github/skills/execution-budget/SKILL.md"
+
+if [ -f "${SKILL_FILE}" ]; then
+  if grep -qi "sole.*runtime" "${SKILL_FILE}"; then
+    pass "SKILL.md declares enforce_pipeline.sh as the sole runtime entrypoint"
+  else
+    fail "SKILL.md does not use 'sole runtime' language for enforce_pipeline.sh"
+  fi
+
+  if grep -q "Rule 20 violation" "${SKILL_FILE}"; then
+    pass "SKILL.md states direct two-step usage is a Rule 20 violation"
+  else
+    fail "SKILL.md does not state direct two-step usage is a Rule 20 violation"
+  fi
+else
+  fail "SKILL.md not found at expected path: ${SKILL_FILE}"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Results
 # ─────────────────────────────────────────────────────────────────────────────
 

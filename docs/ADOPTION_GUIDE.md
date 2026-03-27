@@ -190,19 +190,23 @@ Stage 0 — Signal Capture
   Agent writes platform events (rate-limit, cooldown) to
   ## Platform Constraints in session_state.md
 
-Stage 1 — Budget Evaluation
+Stage 1+2 — Enforcement (sole valid runtime command)
   bash scripts/execution_budget/enforce_pipeline.sh --loop
     (or --heavy, --reality, --stagnation)
 
-Stage 2 — Hard Gate
+Stage 3 — Hard Gate
   Script outputs PIPELINE OK / DEGRADED / BLOCKED
   Exit 1 on BLOCKED — agent must not continue
 
-Stage 3 — Controlled Execution
+Stage 4 — Controlled Execution
   healthy     → full execution
   constrained → lightweight only (no Architect, no Rule 17)
   exhausted   → STOP — summarize — wait for user
 ```
+
+`enforce_pipeline.sh` is the **sole valid runtime command**. `update_budget.sh`
+and `check_budget.sh` are internal implementation details — they are called by
+the wrapper, never directly by the agent during task execution.
 
 ### What happens when PIPELINE BLOCKED appears
 

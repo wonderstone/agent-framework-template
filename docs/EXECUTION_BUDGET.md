@@ -54,25 +54,25 @@ Every iteration of the Rule 14 progression loop must run the pipeline before
 any work begins:
 
 ```
-Step 1 — Update Budget State
-  └── bash scripts/execution_budget/update_budget.sh --loop   (or --heavy / --reality / --stagnation)
+Step 1 — Run Enforcement Wrapper (sole valid runtime command)
+  └── bash scripts/execution_budget/enforce_pipeline.sh --loop   (or --heavy / --reality / --stagnation)
+       → internally calls update_budget.sh then check_budget.sh (implementation details)
+       → prints Execution Budget Report + Pipeline Status Summary
 
-Step 2 — Check Budget
-  └── bash scripts/execution_budget/check_budget.sh
-       → prints Execution Budget Report + Budget Enforcement block
+Step 2 — Decision Gate
+  └── agent reads the PIPELINE status line and applies hard gates:
+       - PIPELINE BLOCKED: exhausted → STOP
+       - PIPELINE DEGRADED: constrained → skip Architect, skip Rule 17
+       - PIPELINE OK → full execution permitted
 
-Step 3 — Decision Gate
-  └── agent reads enforcement output and applies hard gates:
-       - Autonomous progression allowed: NO  → STOP
-       - Heavy reasoning allowed: NO         → skip Architect
-       - Reality check allowed: NO           → skip Rule 17
-
-Step 4 — Execution Permission
+Step 3 — Execution Permission
   └── agent may proceed only after gates are applied
 ```
 
-The scripts read and write `session_state.md`. The counter fields live under
-`## Execution Budget` in that file.
+`update_budget.sh` and `check_budget.sh` are internal implementation details
+used by `enforce_pipeline.sh`. Agents do not call them directly during task
+execution. Direct calls to those scripts are valid only in tests, debugging,
+and maintenance of the budget system itself.
 
 ---
 
@@ -155,14 +155,12 @@ Stage 0 — Signal Capture
   └── Agent writes platform signals (rate-limit, cooldown, retry-after) to
       ## Platform Constraints in session_state.md
 
-Stage 1 — Budget Evaluation
-  └── bash scripts/execution_budget/update_budget.sh --loop (or --heavy / --reality / --stagnation)
-       → increments the relevant counter in session_state.md
-
-Stage 2 — Execution Gate (HARD STOP)
-  └── bash scripts/execution_budget/check_budget.sh
-       → reads both ## Execution Budget and ## Platform Constraints
+Stage 1+2 — Enforcement (sole valid runtime command)
+  └── bash scripts/execution_budget/enforce_pipeline.sh --loop (or --heavy / --reality / --stagnation)
+       → increments the counter (internal: update_budget.sh)
+       → reads both ## Execution Budget and ## Platform Constraints (internal: check_budget.sh)
        → determines Execution Mode
+       → prints Pipeline Status Summary
        → prints PIPELINE OK / DEGRADED / BLOCKED
        → exits 1 if progression must stop
 
@@ -231,17 +229,18 @@ When a rate-limit or cooldown signal is received, the agent must:
 
 ## Files
 
-| File | Purpose |
-|---|---|
-| `.github/skills/execution-budget/SKILL.md` | Defines the Pipeline skill, modes, and gates |
-| `scripts/execution_budget/enforce_pipeline.sh` | Atomic wrapper — update + check + Pipeline Status Summary in one command |
-| `scripts/execution_budget/update_budget.sh` | Increments a counter in `session_state.md` |
-| `scripts/execution_budget/check_budget.sh` | Reads budget + platform state; prints enforcement report with Execution Mode |
-| `scripts/execution_budget/test_pipeline.sh` | Edge-case tests: cooldown, constrained mode, mode transitions |
-| `templates/session_state.template.md` | Contains `## Execution Budget` and `## Platform Constraints` sections |
+| File | Role | Valid callers |
+|---|---|---|
+| `.github/skills/execution-budget/SKILL.md` | Defines the Pipeline skill, modes, and gates | Reference |
+| `scripts/execution_budget/enforce_pipeline.sh` | **Sole runtime entrypoint** — update + check + Pipeline Status Summary in one command | Agent (every loop iteration) |
+| `scripts/execution_budget/update_budget.sh` | Internal implementation detail — increments a counter | `enforce_pipeline.sh`, `test_pipeline.sh`, debugging only |
+| `scripts/execution_budget/check_budget.sh` | Internal implementation detail — reads budget + platform state; prints enforcement report | `enforce_pipeline.sh`, `test_pipeline.sh`, debugging only |
+| `scripts/execution_budget/test_pipeline.sh` | Test/validation path — edge-case tests: cooldown, constrained mode, mode transitions | CI, developers, setup verification |
+| `templates/session_state.template.md` | State schema — contains `## Execution Budget` and `## Platform Constraints` sections | Setup only |
 
 ---
 
 > Updated 2026-03-27: initial implementation — deterministic script-backed budget system.
 > Updated 2026-03-27: added Execution Mode (healthy/constrained/exhausted), Platform Constraints section, Rule 19.
 > Updated 2026-03-27: added Pipeline Enforcement Model (4-stage pipeline), Rule 20, PIPELINE status lines, enforce_pipeline.sh wrapper, test_pipeline.sh.
+> Updated 2026-03-27: enforce_pipeline.sh designated sole runtime entrypoint; update_budget.sh and check_budget.sh classified as internal implementation details.
