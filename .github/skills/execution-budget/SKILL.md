@@ -1,3 +1,8 @@
+---
+name: execution-budget
+description: "Pipeline skill for enforcing execution-budget limits. Use when working with progression loops, heavy reasoning gates, reality-check limits, or session budget enforcement."
+---
+
 # Execution Budget Skill
 
 > **Pattern**: Pipeline
