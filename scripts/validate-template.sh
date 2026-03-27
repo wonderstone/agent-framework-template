@@ -103,6 +103,36 @@ if ! grep -q "Mid-Session Corrections" "${ROOT}/templates/session_state.template
   ERRORS=$((ERRORS + 1))
 fi
 
+if ! grep -q "Rule 14" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 14' (Task Progression Loop) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Rule 15" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 15' (Decomposition and Dispatch Decision) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Progression Model" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Progression Model' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Next Planned Step" "${ROOT}/templates/session_state.template.md"; then
+  echo "  MISSING: 'Next Planned Step' field not found in session_state.template.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Next Actions" "${ROOT}/.github/agents/implementer.agent.md"; then
+  echo "  MISSING: 'Next Actions' output contract not found in implementer.agent.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Next Actions" "${ROOT}/.github/agents/architect.agent.md"; then
+  echo "  MISSING: 'Next Actions' output contract not found in architect.agent.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then
