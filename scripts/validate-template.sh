@@ -133,6 +133,43 @@ if ! grep -q "Next Actions" "${ROOT}/.github/agents/architect.agent.md"; then
   ERRORS=$((ERRORS + 1))
 fi
 
+# ── Planning layer (Rule 16) ──────────────────────────────────────────────────
+if ! grep -q "Rule 16" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 16' (Planning and Path Selection) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Planning Layer" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Planning Layer' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "## Plan" "${ROOT}/templates/session_state.template.md"; then
+  echo "  MISSING: '## Plan' section not found in session_state.template.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# ── Reality check layer (Rule 17) ─────────────────────────────────────────────
+if ! grep -q "Rule 17" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 17' (Reality Check and Goal Alignment) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Reality Check Layer" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Reality Check Layer' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "\*\*Alignment\*\*:" "${ROOT}/.github/agents/architect.agent.md"; then
+  echo "  MISSING: 'Alignment' field not found in architect.agent.md Next Actions contract"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "\*\*Alignment\*\*:" "${ROOT}/.github/agents/implementer.agent.md"; then
+  echo "  MISSING: 'Alignment' field not found in implementer.agent.md Next Actions contract"
+  ERRORS=$((ERRORS + 1))
+fi
+
 # ── Result ────────────────────────────────────────────────────────────────────
 echo ""
 if [ "${ERRORS}" -eq 0 ]; then

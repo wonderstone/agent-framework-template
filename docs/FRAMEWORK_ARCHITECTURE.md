@@ -87,6 +87,7 @@ The framework tracks work state in `session_state.md` at the project root.
 session_state.md structure:
   Current Goal          — one sentence; survives phase transitions
   Working Hypothesis    — current assumption + confidence (High/Medium/Low) + evidence
+  Plan                  — chosen approach + steps (max 5) + rationale; set by Rule 16
   Active Work
     Current Step        — what the agent is doing right now (one sentence)
     Next Planned Step   — what the agent will do after this step (one sentence)
@@ -169,6 +170,56 @@ The current hypothesis and confidence are tracked in `session_state.md` under **
 
 ---
 
+## Planning Layer
+
+The planning layer sits between goal intake and step execution. It answers the question: *how* should the agent reach the goal? The cognitive layer (Rule 11) reasons about *what is true*; the planning layer (Rule 16) decides *what to do*.
+
+### When Planning Runs
+
+```
+New multi-step task received
+   ↓
+Rule 16: Clarify goal → Identify approaches → Evaluate → Select → Record
+   ↓
+Plan written to session_state.md (## Plan)
+   ↓
+Rule 14 progression loop executes plan step-by-step
+```
+
+Planning runs **once at the start** of a task. It re-runs (as a plan revision) only when:
+- a failure invalidates a core assumption (Rule 13 recovery)
+- a better path is discovered mid-execution
+- the goal itself turns out to be mis-stated
+
+Single-step tasks skip planning entirely (Rule 16 constraint).
+
+### Role Assignment During Planning
+
+| Planning scenario | Role |
+|---|---|
+| One obvious path, clear scope | Main thread — plan inline, proceed |
+| 2–3 viable approaches, design uncertainty | Architect — enumerate options, recommend |
+| Bounded execution after plan is chosen | Implementer — execute checklist from plan |
+
+### How Planning Interacts with Other Mechanisms
+
+| Mechanism | Interaction |
+|---|---|
+| **Cognitive layer (Rule 11)** | Hypothesis and evidence inform which approaches are viable |
+| **Self-check gate (Rule 12)** | Runs per-step *inside* execution — planning happens *before* the first step |
+| **Failure recovery (Rule 13)** | Recovery can trigger a plan revision; the revised plan re-feeds Rule 14 |
+| **Progression loop (Rule 14)** | Consumes the plan — each loop iteration picks the next step from the recorded plan |
+| **Decomposition (Rule 15)** | If the plan reveals independent subtasks, Rule 15 decides whether to fan out |
+| **session_state.md** | The `## Plan` section holds the current approach, steps, and rationale |
+
+### Why This Matters
+
+Without a planning layer, the progression loop (Rule 14) executes steps without a map — it can pick individually correct steps that collectively miss the goal. Planning gives the loop a starting direction, while still allowing revision as new information surfaces.
+
+A plan is short by design (max 5 steps). Long plans create false confidence and resist revision. Short plans are easy to update, easy to verify, and easy to discard when wrong.
+
+---
+
 ## Self-Check Stage
 
 Every action follows the sequence: **think → self-check → act**. The self-check stage is a mandatory gate between forming an intent and executing it.
@@ -243,13 +294,18 @@ COMPLETE subtask
    ↓
 RE-EVALUATE → Is the goal done?
    ↓ NO
+REALITY CHECK (Rule 17) → Are we aligned with the original intent?
+   ├── confirmed  → proceed
+   ├── uncertain  → flag it; proceed with caution
+   └── misaligned → revise plan (Rule 16) or stop and ask
+   ↓
 IDENTIFY    → What is the next concrete step?
    ↓
 DECIDE      → continue · decompose (Rule 15) · stop and ask
    ↓
 UPDATE      → session_state.md: Current Step + Next Planned Step
    ↓
-REPORT      → ## Next Actions in the reply
+REPORT      → ## Next Actions in the reply (includes Alignment field)
 ```
 
 ### How It Interacts with Other Layers
@@ -258,6 +314,7 @@ REPORT      → ## Next Actions in the reply
 |---|---|
 | **Self-check gate (Rule 12)** | Runs *within* a step — the loop runs *between* steps. They are not alternatives. |
 | **Failure recovery (Rule 13)** | A failure can trigger "stop and ask" in the progression loop. The loop resumes after recovery is complete. |
+| **Reality check (Rule 17)** | Runs *between* loop iterations — before IDENTIFY. Misalignment triggers plan revision or stop; uncertain alignment is flagged and tracked. |
 | **Architect role** | Called by the progression loop when the next step requires design analysis before execution. |
 | **Implementer role** | Called by the progression loop when the next step is a bounded execution task with known acceptance criteria. |
 | **session_state.md** | Current Step and Next Planned Step are written by the loop after every iteration. |
@@ -278,6 +335,57 @@ Fan-out uses the Architect for design-uncertain or multi-option tasks and the Im
 ### Why This Matters
 
 Without the progression loop, an agent that completes a step will stop and wait — even when the next step is obvious and safe. The loop makes forward motion the default and stopping the exception, while keeping explicit stop conditions for blockers and genuine ambiguity.
+
+---
+
+## Reality Check Layer
+
+The reality check layer prevents the agent from confidently executing in the wrong direction. Where the progression model drives forward motion, the reality check layer provides a periodic course correction pulse — fast, not exhaustive.
+
+### When It Runs
+
+```
+After every full loop cycle (not every micro-step)
+   +
+Before declaring Status: complete
+   +
+When Alignment: misaligned appears in any Next Actions block
+```
+
+### The Three Questions
+
+The agent answers these three questions using evidence from the current session:
+
+| Question | Evidence standard |
+|---|---|
+| Does the current state satisfy the user's original intent? | Traceable link from completed work → original goal statement |
+| Are we solving the real problem — not just completing tasks? | Each step advances the goal, not just closes checklist items |
+| Is there evidence (not assumption) that this works? | Validation ran, check passed, or user confirmed |
+
+Unanswerable questions → `Alignment: uncertain`. Contradicted questions → `Alignment: misaligned`.
+
+### Decision Outcomes
+
+| Result | Action |
+|---|---|
+| `confirmed` | Continue — proceed to next step in the progression loop |
+| `uncertain` | Flag it in `## Next Actions`; continue with caution; do not stop unless critical |
+| `misaligned` | Revise the plan (Rule 16) if a better direction is visible; otherwise stop and ask |
+
+### How It Interacts with Other Layers
+
+| Mechanism | Interaction |
+|---|---|
+| **Progression loop (Rule 14)** | Reality check is a mandatory step inside the loop — between RE-EVALUATE and IDENTIFY |
+| **Planning layer (Rule 16)** | Misalignment triggers a plan revision — reality check is the signal, Rule 16 is the response |
+| **Failure recovery (Rule 13)** | A misaligned reality check is not a failure — it is a navigation correction. Record it in `session_state.md` as a plan revision, not a Mid-Session Correction, unless a wrong assumption caused it |
+| **Next Actions contract** | Every `## Next Actions` block must carry an `Alignment` field: `confirmed / uncertain / misaligned` |
+
+### Why This Matters
+
+Planning (Rule 16) and progression (Rule 14) can both execute correctly and still miss the user's intent if the original goal was subtly mis-stated or if the execution drifted during a long task. The reality check is the mechanism that catches this drift before `Status: complete` is declared.
+
+A fast alignment pulse — three questions, evidence only, one of three outcomes — is far less expensive than discovering at the end that the work addressed the wrong problem.
 
 ---
 
