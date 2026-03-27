@@ -179,6 +179,8 @@ fi
 check_file ".github/skills/execution-budget/SKILL.md"
 check_file "scripts/execution_budget/update_budget.sh"
 check_file "scripts/execution_budget/check_budget.sh"
+check_file "scripts/execution_budget/enforce_pipeline.sh"
+check_file "scripts/execution_budget/test_pipeline.sh"
 
 if ! grep -q "## Execution Budget" "${ROOT}/templates/session_state.template.md"; then
   echo "  MISSING: '## Execution Budget' section not found in session_state.template.md"

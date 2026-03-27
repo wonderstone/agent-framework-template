@@ -234,11 +234,14 @@ When a rate-limit or cooldown signal is received, the agent must:
 | File | Purpose |
 |---|---|
 | `.github/skills/execution-budget/SKILL.md` | Defines the Pipeline skill, modes, and gates |
+| `scripts/execution_budget/enforce_pipeline.sh` | Atomic wrapper — update + check + Pipeline Status Summary in one command |
 | `scripts/execution_budget/update_budget.sh` | Increments a counter in `session_state.md` |
 | `scripts/execution_budget/check_budget.sh` | Reads budget + platform state; prints enforcement report with Execution Mode |
+| `scripts/execution_budget/test_pipeline.sh` | Edge-case tests: cooldown, constrained mode, mode transitions |
 | `templates/session_state.template.md` | Contains `## Execution Budget` and `## Platform Constraints` sections |
 
 ---
 
 > Updated 2026-03-27: initial implementation — deterministic script-backed budget system.
 > Updated 2026-03-27: added Execution Mode (healthy/constrained/exhausted), Platform Constraints section, Rule 19.
+> Updated 2026-03-27: added Pipeline Enforcement Model (4-stage pipeline), Rule 20, PIPELINE status lines, enforce_pipeline.sh wrapper, test_pipeline.sh.

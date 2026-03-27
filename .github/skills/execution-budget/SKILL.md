@@ -55,11 +55,33 @@ before continuing. Do **not** proceed to Step 2 without both sections present.
 
 ### Step 2 — Run Budget Check
 
-Run the budget check script to produce a structured enforcement report:
+**Recommended:** use the atomic enforcement wrapper, which runs the update and
+check in one step and emits a Pipeline Status Summary:
 
 ```
+bash scripts/execution_budget/enforce_pipeline.sh --loop
+```
+
+Replace `--loop` with `--heavy`, `--reality`, or `--stagnation` as appropriate
+(see event table in Step 1 of the legacy path below).
+
+The wrapper outputs the full Pipeline Status Summary and exits with:
+- `0` — `PIPELINE OK` (healthy)
+- `2` — `PIPELINE DEGRADED: constrained` (lightweight only)
+- `1` — `PIPELINE BLOCKED: exhausted` (must stop)
+
+**Legacy path (two separate calls):**
+
+```
+# 1. Increment the counter
+bash scripts/execution_budget/update_budget.sh --loop
+
+# 2. Check the budget
 bash scripts/execution_budget/check_budget.sh
 ```
+
+Either path produces the same enforcement result. Use enforce_pipeline.sh for
+consistency and for the formatted Pipeline Status Summary.
 
 The script reads `session_state.md`, compares all counters against limits,
 checks `## Platform Constraints` for any active cooldown, and prints a report
@@ -182,3 +204,15 @@ with explicit user approval.
 - **Rule 20 (Pipeline Enforcement)**: this skill is the implementation of Rule 20 — the pipeline is mandatory and non-bypassable.
 - **Architect role**: blocked by this skill when heavy reasoning budget is exhausted or mode is `constrained`/`exhausted`.
 - **Rule 16 (Planning)**: planning work counts as a loop iteration; update `--loop` before planning begins.
+
+---
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `scripts/execution_budget/enforce_pipeline.sh` | Atomic wrapper — update + check + Pipeline Status Summary in one command |
+| `scripts/execution_budget/update_budget.sh` | Increments a counter in `session_state.md` |
+| `scripts/execution_budget/check_budget.sh` | Reads budget + platform state; prints enforcement report |
+| `scripts/execution_budget/test_pipeline.sh` | Edge-case tests: cooldown, constrained, mode transitions |
+| `templates/session_state.template.md` | Contains `## Execution Budget` and `## Platform Constraints` sections |
