@@ -8,7 +8,7 @@ A minimal, reusable GitHub Copilot agent framework. Drop it into any project to 
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (10 rules, always loaded)
+  copilot-instructions.md          ← operating rules (Rule 0–11, always loaded)
   project-context.instructions.md  ← project adapter (fill in for your project)
   agents/
     architect.agent.md             ← analysis / planning / critique agent
@@ -21,10 +21,15 @@ docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
+  archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
   project-context.template.md      ← blank project adapter
   session_state.template.md        ← blank cross-session state file
+  roadmap.template.md              ← blank ROADMAP with phase/subtask structure
+
+scripts/
+  validate-template.sh             ← checks template integrity (run after setup)
 ```
 
 ---
@@ -63,9 +68,24 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 | 3 — Canonical docs | `docs/*.md` | Topic confirmed relevant |
 | 4 — Code files | actual source files | Immediately before edit |
 
+**Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
+
+**Enforcement rules** — rules 0–13 include explicit STOP conditions. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope.
+
+**Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
+
+**Cognitive reasoning loop** — a lightweight discipline that runs across all four layers:
+
+- **Hypothesize**: form a working assumption before acting
+- **Validate**: check against docs and code as each layer loads
+- **Revise**: update the hypothesis explicitly when evidence conflicts — never silently
+- **Calibrate**: state uncertainty when confidence is Low; do not act without flagging it
+
 **State tracking** — `session_state.md` at repo root tracks:
 - Current goal
+- Working hypothesis, confidence level, and supporting evidence
 - Active work and what's completed this phase
+- Mid-session corrections (mistakes and course corrections)
 - Acceptance criteria
 - Technical decisions and durable insights
 

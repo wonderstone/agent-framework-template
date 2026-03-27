@@ -8,7 +8,7 @@ Step-by-step guide for adopting this agent framework in a new project.
 
 - GitHub repository (new or existing)
 - A coding assistant that reads `.github/copilot-instructions.md` (GitHub Copilot, Cursor, Augment, etc.)
-- A `ROADMAP.md` or equivalent planning document (can be minimal)
+- Bash (to run `scripts/validate-template.sh` after setup)
 
 ---
 
@@ -18,7 +18,7 @@ Copy these files into your new repository, preserving their paths:
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–10)
+  copilot-instructions.md          ← operating rules (Rule 0–11)
   project-context.instructions.md  ← project adapter (fill in Step 2)
   agents/
     architect.agent.md             ← analysis/planning agent
@@ -31,10 +31,12 @@ docs/
   INDEX.md                         ← TYPE-A doc navigation index
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
+  archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
   project-context.template.md      ← blank project adapter to fill in
   session_state.template.md        ← blank session state to fill in
+  roadmap.template.md              ← blank ROADMAP to fill in
 ```
 
 ---
@@ -63,6 +65,8 @@ Copy `templates/session_state.template.md` to the project root as `session_state
 
 Fill in:
 - **Current Goal**: one sentence describing what you are working on right now
+- **Working Hypothesis**: state the current working assumption (e.g., "The fix requires X" or "The root cause is Y") — even for well-understood tasks, a brief hypothesis anchors the cognitive loop
+- **Confidence**: High / Medium / Low
 - **Acceptance Criteria**: the observable conditions that mark your first phase complete
 
 Leave everything else blank or with placeholder text until the first subtask is confirmed done.
@@ -85,26 +89,45 @@ Update this index every time you add or remove a TYPE-A document.
 
 ---
 
-## Step 5 — Create docs/archive/
+## Step 5 — Verify docs/archive/ Exists
 
-Create an empty `docs/archive/` directory (add a `.gitkeep` if needed).
+The `docs/archive/` directory ships with the template (it contains a `.gitkeep`). Confirm it is present after copying:
 
-This is where all TYPE-C documents (phase reports, one-time analyses, summaries) will live.
+```bash
+ls docs/archive/
+```
+
+If it is missing (e.g., some copy tools skip empty-ish directories), recreate it:
 
 ```bash
 mkdir -p docs/archive
 touch docs/archive/.gitkeep
 ```
 
+All TYPE-C documents (phase reports, one-time analyses, summaries) go here.
+
 ---
 
-## Step 6 — Customize Rule 8 Footer Language (Optional)
+## Step 6 — Initialize ROADMAP.md
+
+Copy `templates/roadmap.template.md` to the project root as `ROADMAP.md`.
+
+Fill in:
+- **Phase 1 name and goal**: one sentence describing what the first phase achieves
+- **Initial subtasks**: the work items you know about right now
+- **Acceptance criteria**: observable conditions that mark Phase 1 complete
+
+Rules 9 and 10 both write to `ROADMAP.md` (updating rows to `✅ YYYY-MM-DD`), so this file must exist before the agent starts work.
+
+---
+
+## Step 7 — Customize Rule 8 Footer Language (Optional)
 
 The default footer in `copilot-instructions.md` uses English. If your team works in another language, update the footer examples in Rule 8 accordingly.
 
 ---
 
-## Step 7 — Remove What You Don't Need
+## Step 8 — Remove What You Don't Need
 
 The following files are optional and can be removed for simpler projects:
 
@@ -130,13 +153,15 @@ If you want the smallest possible setup:
 
 docs/
   INDEX.md                         ← keep (update as docs grow)
-  archive/                         ← keep (empty)
+  archive/                         ← keep (ships empty)
 
-session_state.md                   ← create from template
-ROADMAP.md                         ← create (can be minimal)
+session_state.md                   ← create from templates/session_state.template.md
+ROADMAP.md                         ← create from templates/roadmap.template.md
 ```
 
 Everything else is additive.
+
+After setup, run `bash scripts/validate-template.sh` from the repo root to confirm no required files are missing.
 
 ---
 

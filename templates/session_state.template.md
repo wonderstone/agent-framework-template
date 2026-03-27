@@ -12,6 +12,21 @@
 
 ---
 
+## Working Hypothesis
+
+<!-- What the agent currently believes is true about the problem or solution -->
+<!-- Always state a hypothesis, even for well-understood tasks (e.g., "The fix requires X") -->
+<!-- Update explicitly when evidence conflicts; never silently shift position -->
+[Replace with working hypothesis]
+
+**Confidence**: [High / Medium / Low]
+
+**Evidence**: [supporting facts from docs or code]
+
+**Contradictions**: [anything that conflicts with the hypothesis]
+
+---
+
 ## Active Work
 
 <!-- Single item currently in progress -->
@@ -29,6 +44,15 @@
 ## Blocked / Pending
 
 <!-- Items waiting on external input or an explicit decision -->
+- (none)
+
+---
+
+## Mid-Session Corrections
+
+<!-- Record mistakes, wrong assumptions, or course corrections made this session -->
+<!-- Format: [what was assumed] → [what was wrong] → [correction taken] -->
+<!-- This section is never cleared mid-session; carry it forward until phase graduation -->
 - (none)
 
 ---

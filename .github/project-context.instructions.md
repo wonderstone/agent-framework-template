@@ -24,10 +24,10 @@ description: >
 | Doc | Purpose |
 |---|---|
 | `README.md` | Project entry point |
-| `ARCHITECTURE.md` | System architecture and service boundaries |
-| `ROADMAP.md` | Phase planning and acceptance targets |
-| `session_state.md` | Cross-session state (current goal, decisions, insights) |
+| `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
+| `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
 | `docs/INDEX.md` | Navigation index for all TYPE-A docs |
+| `session_state.md` | Cross-session state (current goal, decisions, insights) |
 
 ## Task Recovery Sequence
 
@@ -46,11 +46,9 @@ When resuming a multi-step task, recover context in this order:
 
 | Trigger keywords | Canonical doc |
 |---|---|
-| `network\|port\|proxy\|ssh\|connectivity` | `docs/NETWORK_GUIDE.md` |
-| `architecture\|design\|service boundary\|api contract` | `ARCHITECTURE.md` |
+| `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
+| `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
 | `roadmap\|phase\|milestone\|current focus\|next phase` | `ROADMAP.md` |
-| `agent\|llm\|tool\|orchestrator\|memory` | `docs/AGENT_FRAMEWORK.md` |
-| `git\|commit\|push\|stage\|gitignore` | `docs/runbooks/git-workflow.md` |
 | `flags\|config\|default values\|runtime override` | → check Runtime Config Locations |
 
 ## Build and Test Commands

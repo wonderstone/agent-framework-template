@@ -86,6 +86,7 @@ The framework tracks work state in `session_state.md` at the project root.
 ```
 session_state.md structure:
   Current Goal        — one sentence; survives phase transitions
+  Working Hypothesis  — current assumption + confidence (High/Medium/Low) + evidence
   Active Work         — what is in progress right now
   Completed This Phase — verified subtasks; cleared on graduation
   Blocked / Pending   — waiting on external input
@@ -138,6 +139,91 @@ Can the task be split into 2+ scopes where ALL of the following are true for eac
 ```
 
 The dispatch decision is always disclosed in the user-visible reply, not just in the footer.
+
+---
+
+## Cognitive Layer
+
+The cognitive layer is not a fifth load layer — it is a reasoning discipline that runs **across** all four layers as they are loaded.
+
+```
+Layer 1 loads → initial hypothesis formed from operating rules context
+Layer 2 loads → hypothesis refined with project-specific facts
+Layer 3 loads → evidence gathered; hypothesis validated or revised
+Layer 4 loads → final validation against actual code; confidence declared
+```
+
+| Concept | Definition | When it applies |
+|---|---|---|
+| **Hypothesis** | A working assumption about cause, solution, or design | Formed before Layer 3 is loaded |
+| **Evidence** | Facts from docs or code that support or conflict with the hypothesis | Gathered during Layer 3–4 loading |
+| **Confidence** | High / Medium / Low — reflects how well evidence supports the hypothesis | Declared before acting |
+| **Revision** | An explicit update to the hypothesis when evidence conflicts | Required; never silent |
+
+**Key constraint**: Low-confidence hypotheses must be surfaced to the user before proceeding. Do not act on a Low-confidence hypothesis without stating the uncertainty.
+
+The current hypothesis and confidence are tracked in `session_state.md` under **Working Hypothesis**.
+
+---
+
+## Self-Check Stage
+
+Every action follows the sequence: **think → self-check → act**. The self-check stage is a mandatory gate between forming an intent and executing it.
+
+```
+THINK   → State the intended action and why (one sentence)
+   ↓
+SELF-CHECK → Answer five gate questions (all must pass)
+   ↓
+ACT     → Only if all checks pass; otherwise STOP and resolve
+```
+
+### Gate Questions
+
+| # | Question | Failure action |
+|---|---|---|
+| 1 | Have I read every file I plan to change? | STOP — read missing files first |
+| 2 | Are any target paths listed under Protected Paths? | STOP — request explicit user confirmation |
+| 3 | Is `.github/project-context.instructions.md` loaded? | STOP — load it now |
+| 4 | Do all sources (docs, code, config) agree on this change? | STOP — escalate the conflict; do not guess |
+| 5 | Is the full scope of this change understood? | STOP — ask for clarification |
+
+### Why This Matters
+
+Without the self-check gate, an agent can act on stale assumptions, skip reading files, or miss protected paths — all of which produce incorrect or dangerous changes. The gate makes these failures visible **before** they happen, not after.
+
+The self-check stage is defined as Rule 12 in `copilot-instructions.md` and is enforced in both agent role files.
+
+---
+
+## Failure Modes and Recovery
+
+When the agent makes a wrong assumption, produces an invalid change, or encounters missing or inconsistent project context, it follows a four-step recovery protocol.
+
+### Recovery Protocol
+
+```
+1. RECOGNIZE  → State the failure explicitly; never continue silently
+2. RECORD     → Add to session_state.md under Mid-Session Corrections
+3. RECOVER    → Apply the appropriate recovery action (see table below)
+4. CONTINUE   → Resume only after the failure condition is resolved
+```
+
+### Recovery Actions by Failure Type
+
+| Failure type | Recovery action |
+|---|---|
+| Wrong assumption | Re-read the source of truth; explicitly revise the working hypothesis |
+| Invalid change | Revert or correct the change before continuing; do not layer fixes on top of errors |
+| Missing context | STOP — request the missing information; do not substitute a guess |
+| Conflicting project context | Escalate to the user; do not silently choose one source over another |
+| Scope exceeded | Stop the current change; confirm revised scope before resuming |
+
+### Key Constraint
+
+Stopping is always preferred over continuing with Low confidence. A partial STOP is correct behavior, not a failure. An agent that continues on a known-wrong path is more dangerous than one that pauses.
+
+Failure recognition and recovery are defined as Rule 13 in `copilot-instructions.md`. The **Mid-Session Corrections** section in `session_state.md` is where correction entries are recorded.
 
 ---
 
