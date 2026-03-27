@@ -458,6 +458,144 @@ Every `## Next Actions` block must include:
 
 ---
 
+## Rule 18: Execution Budget Gate (🔴 Mandatory)
+
+Every iteration of the Rule 14 progression loop **must begin** by running the
+execution-budget skill before any work is performed.
+
+### Skill Location
+
+`.github/skills/execution-budget/SKILL.md`
+
+### Mandatory Pipeline (do not skip or reorder)
+
+```
+Step 1 — Update Budget State
+  bash scripts/execution_budget/update_budget.sh --loop
+  (use --heavy before Architect invocation; --reality before Rule 17; --stagnation on no-progress cycle)
+
+Step 2 — Check Budget
+  bash scripts/execution_budget/check_budget.sh
+
+Step 3 — Apply Decision Gate (literal, not advisory)
+  Autonomous progression allowed: NO  → STOP; write blocker to session_state.md
+  Heavy reasoning allowed: NO         → do not invoke Architect; proceed without design analysis
+  Reality check allowed: NO           → skip Rule 17 this iteration
+
+Step 4 — Execution Permission
+  Proceed only after gate is applied
+```
+
+### Hard Constraints
+
+- Do **not** skip the budget check.
+- Do **not** continue if `Autonomous progression allowed: NO`.
+- Do **not** invoke the Architect if `Heavy reasoning allowed: NO`.
+- Do **not** run Rule 17 if `Reality check allowed: NO`.
+- Do **not** adjust budget limits without explicit user instruction.
+- The scripts are authoritative — not the agent's internal count.
+
+### Session State Requirement
+
+`session_state.md` must contain an `## Execution Budget` section.
+If it is missing, copy the section from `templates/session_state.template.md`
+before running the scripts.
+
+---
+
+## Rule 19: Platform Rate-Limit Response (🔴 Mandatory)
+
+When the agent receives any signal indicating a platform rate limit, cooldown,
+or retry-after condition — including HTTP 429 responses, explicit "rate limited"
+messages, or any tool response that references a cooldown or retry delay — the
+agent **must**:
+
+1. **Stop autonomous progression immediately.** Do not start a new subtask,
+   invoke the Architect, or run a Reality Check.
+
+2. **Record the event in `session_state.md`** under `## Platform Constraints`:
+   ```
+   **Last Platform Event**: rate-limit received — [brief description]
+   **Cooldown Active**: yes
+   **Retry After**: [value if known, otherwise "unknown"]
+   **Execution Mode**: exhausted
+   ```
+
+3. **Write a blocker** to `session_state.md` under `## Blocker / Decision Needed`:
+   ```
+   Platform cooldown active — waiting for user to confirm it is safe to resume.
+   ```
+
+4. **Surface the state to the user.** Summarize what work was completed, what
+   was blocked, and what the user should do to resume.
+
+5. **Do not retry or loop.** Do not attempt to work around the rate limit by
+   switching tools or reducing request size. Stop cleanly.
+
+6. **Pipeline stop is immediate.** The next `check_budget.sh` run will output
+   `PIPELINE BLOCKED: exhausted` and exit with code `1`. Rule 20 mandates the
+   agent obey this output unconditionally.
+
+### Why This Rule Exists
+
+A cooldown-active state detected at the platform level overrides local budget
+counters. Even if the local execution budget says `healthy`, a platform signal
+must be treated as `exhausted` mode. The `check_budget.sh` script enforces this
+when `Cooldown Active: yes` is present in `session_state.md`.
+
+### Resume Condition
+
+The agent may resume only after the user explicitly confirms the cooldown has
+lifted. At that point:
+- Reset `Cooldown Active` to `no` in `session_state.md`
+- Reset `Execution Mode` to `healthy`
+- Re-run the budget check before continuing
+
+---
+
+## Rule 20: Pipeline Enforcement (🔴 Mandatory)
+
+The execution-budget pipeline is **non-bypassable**. The agent must follow it
+before performing any task in any session.
+
+### Enforcement Requirements
+
+- The agent **MUST** run the execution-budget pipeline (SKILL.md Steps 1–4)
+  before any task, subtask, Architect invocation, or Reality Check.
+- The agent **MUST NOT** act if `check_budget.sh` outputs `PIPELINE BLOCKED`
+  or exits with code `1`.
+- The agent **MUST** obey Execution Mode restrictions strictly:
+  - `exhausted` → stop, summarize, wait for user — no exceptions
+  - `constrained` → lightweight continuation only — no Architect, no Rule 17
+  - `healthy` → full execution permitted, individual gates still apply
+- The agent **MUST NOT** override, reinterpret, or ignore Platform Constraints.
+- The agent **MUST NOT** substitute its own judgment for the script output.
+
+### What Constitutes a Violation
+
+Any of the following is an **invalid execution**:
+
+- Continuing a task when `Autonomous progression allowed: NO`
+- Invoking the Architect when `Heavy reasoning allowed: NO`
+- Running Rule 17 when `Reality check allowed: NO`
+- Skipping the budget check pipeline at the start of a loop iteration
+- Ignoring a `Cooldown Active: yes` flag in `## Platform Constraints`
+- Proceeding after `PIPELINE BLOCKED: exhausted` output
+
+### Pipeline Status Lines
+
+The script output includes one of three pipeline status lines:
+
+| Status line | Meaning | Agent action |
+|---|---|---|
+| `PIPELINE OK` | healthy mode | proceed normally |
+| `PIPELINE DEGRADED: constrained` | constrained mode | lightweight only |
+| `PIPELINE BLOCKED: exhausted` | exhausted mode | stop immediately |
+
+These lines are the authoritative signal. Read them literally.
+
+---
+
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*

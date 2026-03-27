@@ -9,6 +9,7 @@
 
 | Document | Description |
 |---|---|
+| `docs/EXECUTION_BUDGET.md` | Execution budget system — why it exists, how the pipeline works, rate-limit prevention |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
 
