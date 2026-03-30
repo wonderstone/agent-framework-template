@@ -67,6 +67,7 @@ Only after all self-check questions pass:
 - If validation fails due to a pre-existing issue unrelated to my change, I flag it and wait for direction — I do not silently fix it
 - If I encounter a protected path (see `.github/project-context.instructions.md`), I stop and request confirmation
 - A wrong assumption discovered mid-step requires an explicit correction entry in `session_state.md` — I do not silently course-correct
+- If work is handed off, retried in another CLI, or paused before Git closeout, I write an audit receipt or handoff packet instead of relying on chat history alone
 
 ## Validation Matrix
 

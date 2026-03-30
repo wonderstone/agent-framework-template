@@ -42,9 +42,17 @@ check_file ".github/instructions/docs.instructions.md"
 check_file "docs/INDEX.md"
 check_file "docs/FRAMEWORK_ARCHITECTURE.md"
 check_file "docs/ADOPTION_GUIDE.md"
+check_file "docs/STRATEGY_MECHANISM_LAYERING.md"
+check_file "docs/ROLE_STRATEGY_EXAMPLES.md"
+check_file "docs/runbooks/resumable-git-audit-pipeline.md"
 check_file "templates/session_state.template.md"
 check_file "templates/project-context.template.md"
 check_file "templates/roadmap.template.md"
+check_file "templates/git_audit_task_packet.template.md"
+check_file "templates/git_audit_receipt.template.md"
+check_file "templates/git_audit_handoff_packet.template.md"
+check_file "templates/reviewer_role_profile.template.md"
+check_file "scripts/git_audit_pipeline.py"
 
 # ── Required directories ──────────────────────────────────────────────────────
 echo ""
@@ -57,6 +65,9 @@ echo "[ Cross-references: Framework docs listed in docs/INDEX.md ]"
 FRAMEWORK_REFS=(
   "docs/FRAMEWORK_ARCHITECTURE.md"
   "docs/ADOPTION_GUIDE.md"
+  "docs/STRATEGY_MECHANISM_LAYERING.md"
+  "docs/ROLE_STRATEGY_EXAMPLES.md"
+  "docs/runbooks/resumable-git-audit-pipeline.md"
 )
 for ref in "${FRAMEWORK_REFS[@]}"; do
   if [ ! -f "${ROOT}/${ref}" ]; then
@@ -157,6 +168,52 @@ fi
 
 if ! grep -q "Reality Check Layer" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
   echo "  MISSING: 'Reality Check Layer' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# ── Resumable audit workflow (Rule 18) ───────────────────────────────────────
+if ! grep -q "Rule 18" "${ROOT}/.github/copilot-instructions.md"; then
+  echo "  MISSING: 'Rule 18' (Resumable Audit Assets) not found in copilot-instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Resumable Audit Artifacts" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Resumable Audit Artifacts' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "Strategy vs Mechanism Layering" "${ROOT}/docs/FRAMEWORK_ARCHITECTURE.md"; then
+  echo "  MISSING: 'Strategy vs Mechanism Layering' section not found in FRAMEWORK_ARCHITECTURE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "STRATEGY_MECHANISM_LAYERING.md" "${ROOT}/README.md"; then
+  echo "  MISSING: strategy/mechanism layering doc not surfaced in README.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "ROLE_STRATEGY_EXAMPLES.md" "${ROOT}/README.md"; then
+  echo "  MISSING: role strategy examples doc not surfaced in README.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "strategy\\|mechanism\\|review role\\|reviewer split\\|codex\\|claude" "${ROOT}/.github/project-context.instructions.md"; then
+  echo "  MISSING: strategy/mechanism trigger row not found in project-context.instructions.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "ROLE_STRATEGY_EXAMPLES.md" "${ROOT}/docs/ADOPTION_GUIDE.md"; then
+  echo "  MISSING: role strategy examples doc not referenced in ADOPTION_GUIDE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "resumable-git-audit-pipeline" "${ROOT}/docs/ADOPTION_GUIDE.md"; then
+  echo "  MISSING: resumable git audit workflow not referenced in ADOPTION_GUIDE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "audit\\|handoff\\|receipt\\|packet" "${ROOT}/.github/project-context.instructions.md"; then
+  echo "  MISSING: audit/handoff trigger row not found in project-context.instructions.md"
   ERRORS=$((ERRORS + 1))
 fi
 

@@ -461,3 +461,61 @@ Every `## Next Actions` block must include:
 *Project facts: `.github/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*
+
+---
+
+## Rule 18: Resumable Audit Assets (🔴 Mandatory)
+
+When a task uses external Codex, multiple CLI sessions, internal subagents, or any reviewer workflow that may be interrupted, the agent must externalize progress into repository artifacts instead of relying on chat history.
+
+### Required Artifacts
+
+| Artifact | Purpose | Minimum timing |
+|---|---|---|
+| **Task packet** | Freeze goal, truth sources, allowed files, do-not-touch list, validation, acceptance boundary | Before fan-out or external execution starts |
+| **Audit receipt** | Record what an executor/reviewer changed, validated, and what risks remain | After each scoped execution or audit pass |
+| **Handoff packet** | Capture resume point, blocker, and next executor when a session stops or is replaced | Before switching executors or stopping mid-task |
+
+### Mandatory Use Cases
+
+Create these assets when any of the following is true:
+
+1. The task is split across 2+ executors or sessions
+2. An external CLI / Codex reviewer is asked to audit or implement part of the work
+3. Git closeout depends on a semantic audit that might need to be retried or handed off
+4. The task is important enough that losing chat history would materially block recovery
+
+### Hard Rules
+
+1. Do not treat chat history as the only source of task state.
+2. Do not ask a replacement executor to reconstruct context from memory if a handoff packet could be written first.
+3. Hard gates (tests, type checks, sync checks, schema validators, hooks) must stay outside the semantic auditor when possible.
+4. The main thread retains final owner review and Git closeout authority.
+
+### Canonical Locations
+
+Default working location:
+
+```text
+tmp/git_audit/<task_slug>/
+   task_packet.md
+   audit_receipt.md
+   handoff_packet.md
+```
+
+Use the canonical runbook and generator:
+
+1. `docs/runbooks/resumable-git-audit-pipeline.md`
+2. `scripts/git_audit_pipeline.py`
+3. `templates/git_audit_task_packet.template.md`
+4. `templates/git_audit_receipt.template.md`
+5. `templates/git_audit_handoff_packet.template.md`
+
+### Minimum Workflow
+
+1. Freeze the task packet before dispatch
+2. Execute scoped work
+3. Record an audit receipt with touched files, validation, and risks
+4. If interrupted, create a handoff packet before switching executor
+5. Run hard gates
+6. Return to main-thread owner review for final acceptance and Git closeout

@@ -8,7 +8,7 @@ A minimal, reusable GitHub Copilot agent framework. Drop it into any project to 
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–11, always loaded)
+  copilot-instructions.md          ← operating rules (Rule 0–18, always loaded)
   project-context.instructions.md  ← project adapter (fill in for your project)
   agents/
     architect.agent.md             ← analysis / planning / critique agent
@@ -21,15 +21,24 @@ docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
+  STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
+  ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
+  runbooks/
+    resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
   archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
   project-context.template.md      ← blank project adapter
   session_state.template.md        ← blank cross-session state file
   roadmap.template.md              ← blank ROADMAP with phase/subtask structure
+  git_audit_task_packet.template.md ← task packet template for resumable audit work
+  git_audit_receipt.template.md    ← audit receipt template
+  git_audit_handoff_packet.template.md ← handoff packet template
+  reviewer_role_profile.template.md ← formal role definition for reviewer or agent splits
 
 scripts/
   validate-template.sh             ← checks template integrity (run after setup)
+  git_audit_pipeline.py            ← generates task packet / receipt / handoff assets
 ```
 
 ---
@@ -68,9 +77,17 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 | 3 — Canonical docs | `docs/*.md` | Topic confirmed relevant |
 | 4 — Code files | actual source files | Immediately before edit |
 
+**Resumable audit assets** — multi-step implementation and git review work can be externalized into three portable artifacts:
+
+- `task packet` — freezes truth sources, allowed files, validation, and acceptance boundary
+- `audit receipt` — records what an executor or reviewer actually changed and verified
+- `handoff packet` — captures resume point, blocker, and next executor when a CLI or agent session is interrupted
+
+The template ships a canonical runbook, three templates, and `scripts/git_audit_pipeline.py` to generate these assets under `tmp/git_audit/<task_slug>/`.
+
 **Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
 
-**Enforcement rules** — rules 0–13 include explicit STOP conditions. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope.
+**Enforcement rules** — rules 0–18 include explicit STOP conditions and recovery/progression hooks. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state.
 
 **Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
 
@@ -88,6 +105,19 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 - Mid-session corrections (mistakes and course corrections)
 - Acceptance criteria
 - Technical decisions and durable insights
+
+**Resumable git audit workflow** — when work is split across external Codex, subagents, or multiple CLI sessions, the agent does not rely on chat history alone. It creates a task packet before fan-out, records audit receipts after scoped execution, and emits a handoff packet when a session is interrupted. This behavior is governed by Rule 18 and the runbook at `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+**Strategy layer vs mechanism layer** — the template now makes an explicit distinction between:
+
+- `strategy layer`: what each reviewer, CLI, or specialized agent is formally responsible for
+- `mechanism layer`: how bounded work is frozen, validated, handed off, and recovered when execution is interrupted
+
+This means repositories can define domain-specific role splits such as “runtime correctness reviewer” vs “maintainability reviewer” without re-inventing packet, receipt, handoff, and hard-gate behavior every time.
+
+The important boundary is: roles should be named after the judgment they provide, not after the current tool that happens to implement them. A CLI, subagent, or custom agent is an executor choice, not the strategy-layer identity.
+
+The template also ships a concrete example set in `docs/ROLE_STRATEGY_EXAMPLES.md`, covering not just two external CLIs but broader role families such as git closeout reviewer, protocol boundary reviewer, performance reviewer, observability reviewer, and migration reviewer. These examples are role-first and executor-pluggable by design.
 
 **Completion checkpoints** — when a subtask is confirmed done, the agent updates ROADMAP, session state, acceptance criteria, and the reply footer before moving on.
 
@@ -115,6 +145,10 @@ Works with any AI coding assistant that loads `.github/copilot-instructions.md`:
 | Protected paths | `project-context.instructions.md` → Protected Paths |
 | Footer language | `copilot-instructions.md` → Rule 8 |
 | Agent roles/format | `.github/agents/*.agent.md` |
+| Strategy-vs-mechanism guidance | `docs/STRATEGY_MECHANISM_LAYERING.md` |
+| Concrete role examples | `docs/ROLE_STRATEGY_EXAMPLES.md` |
+| Git audit packet defaults | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` |
+| Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
 
 ---
 

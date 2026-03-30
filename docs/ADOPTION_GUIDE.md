@@ -31,12 +31,23 @@ docs/
   INDEX.md                         ← TYPE-A doc navigation index
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
+  STRATEGY_MECHANISM_LAYERING.md   ← keep if you want formal reviewer or agent role splits
+  ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
+  runbooks/
+    resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
   project-context.template.md      ← blank project adapter to fill in
   session_state.template.md        ← blank session state to fill in
   roadmap.template.md              ← blank ROADMAP to fill in
+  git_audit_task_packet.template.md ← task packet template
+  git_audit_receipt.template.md    ← audit receipt template
+  git_audit_handoff_packet.template.md ← handoff packet template
+  reviewer_role_profile.template.md ← role profile template for external or internal reviewers
+
+scripts/
+  git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
 ```
 
 ---
@@ -56,6 +67,14 @@ Open `.github/project-context.instructions.md` and replace every `[placeholder]`
 | Runtime Config Locations | Where your config files live |
 
 Use `templates/project-context.template.md` as a blank starting point if preferred.
+
+If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+If your project will define multiple reviewer or agent roles with different judgment responsibilities, keep `docs/STRATEGY_MECHANISM_LAYERING.md` and use `templates/reviewer_role_profile.template.md` to formalize them.
+
+When doing so, define the role by judgment boundary first, not by tool name. For example, prefer `runtime correctness reviewer` over `Codex reviewer`, and `maintainability reviewer` over `Claude reviewer`. A CLI, subagent, or custom agent can then be listed as one possible executor of that role.
+
+If you want concrete starting points instead of a blank role profile, keep `docs/ROLE_STRATEGY_EXAMPLES.md` and adapt the examples that fit your repository.
 
 ---
 
@@ -83,6 +102,9 @@ Your `docs/INDEX.md` starts with the core docs that exist. For a new project, th
 | `README.md` | Project entry point |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | How to adopt this framework |
+| `docs/STRATEGY_MECHANISM_LAYERING.md` | How to split role strategy from reusable workflow mechanism |
+| `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples to adapt |
+| `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable Git audit |
 ```
 
 Update this index every time you add or remove a TYPE-A document.
@@ -138,6 +160,11 @@ The following files are optional and can be removed for simpler projects:
 | `.github/instructions/backend.instructions.md` | Not a backend project |
 | `.github/instructions/docs.instructions.md` | Documentation is minimal |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Team is familiar with the framework |
+| `docs/STRATEGY_MECHANISM_LAYERING.md` | You do not need formal reviewer or agent role splits |
+| `docs/ROLE_STRATEGY_EXAMPLES.md` | You do not need example reviewer families because you already have your own role model |
+| `docs/runbooks/resumable-git-audit-pipeline.md` | No external reviewer, multi-CLI, or resumable handoff workflow is needed |
+| `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` | Same as above |
+| `templates/reviewer_role_profile.template.md` | Same as above |
 | `templates/` | All templates have been applied |
 
 ---
@@ -162,6 +189,19 @@ ROADMAP.md                         ← create from templates/roadmap.template.md
 Everything else is additive.
 
 After setup, run `bash scripts/validate-template.sh` from the repo root to confirm no required files are missing.
+
+If you keep the resumable audit workflow, do a smoke run once:
+
+```bash
+python scripts/git_audit_pipeline.py init-task \
+  --task-id "template-smoke" \
+  --goal "Verify packet generation" \
+  --truth-sources "- docs/runbooks/resumable-git-audit-pipeline.md" \
+  --allowed-files "- docs/**" \
+  --do-not-touch "- .env" \
+  --validation "- bash scripts/validate-template.sh" \
+  --acceptance-boundary "- task packet exists"
+```
 
 ---
 

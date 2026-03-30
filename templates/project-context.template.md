@@ -26,6 +26,8 @@ description: >
 | `ROADMAP.md` | Phase planning and acceptance targets |
 | `session_state.md` | Cross-session state |
 | `docs/INDEX.md` | TYPE-A doc navigation index |
+| `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
+| `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
 
 ## Task Recovery Sequence
 
@@ -44,6 +46,8 @@ description: >
 |---|---|
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
+| `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |
+| `audit\|handoff\|receipt\|packet\|reviewer\|git closeout` | `docs/runbooks/resumable-git-audit-pipeline.md` |
 | `roadmap\|phase\|milestone` | `ROADMAP.md` |
 | `[your topic]` | `[your doc path]` |
 

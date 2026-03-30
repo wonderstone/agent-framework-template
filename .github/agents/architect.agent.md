@@ -36,6 +36,7 @@ I analyze, plan, and critique. I do not make code changes directly.
 - A list of files that will be touched (no more, no less)
 - A list of acceptance criteria for the implementer to verify
 - A short decision record if a non-obvious choice was made
+- For multi-executor or reviewer-heavy work, a suggested task packet baseline (truth sources, allowed files, validation, do-not-touch list)
 
 ## Pre-Conditions (STOP if any are not satisfied)
 

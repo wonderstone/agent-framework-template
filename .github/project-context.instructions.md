@@ -26,6 +26,9 @@ description: >
 | `README.md` | Project entry point |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
+| `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanisms |
+| `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples that repositories can adapt |
+| `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
 | `docs/INDEX.md` | Navigation index for all TYPE-A docs |
 | `session_state.md` | Cross-session state (current goal, decisions, insights) |
 
@@ -48,6 +51,9 @@ When resuming a multi-step task, recover context in this order:
 |---|---|
 | `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
 | `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
+| `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |
+| `role example\|review example\|runtime reviewer\|maintainability reviewer\|git reviewer\|performance reviewer` | `docs/ROLE_STRATEGY_EXAMPLES.md` |
+| `audit\|handoff\|receipt\|packet\|reviewer\|git closeout` | `docs/runbooks/resumable-git-audit-pipeline.md` |
 | `roadmap\|phase\|milestone\|current focus\|next phase` | `ROADMAP.md` |
 | `flags\|config\|default values\|runtime override` | → check Runtime Config Locations |
 

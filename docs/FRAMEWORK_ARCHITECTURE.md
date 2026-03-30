@@ -15,6 +15,13 @@ Layer 3 — Canonical Docs          (loaded on confirmed topic match)
 Layer 4 — Code / Config Files     (loaded immediately before any edit)
 ```
 
+The framework also ships a **resumable audit artifact system**. It is **not** a fifth instruction layer. It is an operational recovery mechanism that runs alongside the four-layer loading model.
+
+The framework also distinguishes **strategy** from **mechanism**:
+
+1. strategy answers: which agent / CLI / reviewer is responsible for what kind of judgment
+2. mechanism answers: how that work is frozen, validated, handed off, and recovered
+
 ---
 
 ## Layer 1 — Operating Rules
@@ -102,6 +109,97 @@ session_state.md structure:
 **Update triggers**: sub-phase completes · major technical decision made · task interrupted · goal diverges from actual state · progression loop runs (Rule 14).
 
 **File size rule**: keep under ~100 lines. When over limit, archive old phase content to `docs/archive/`.
+
+## Resumable Audit Artifacts
+
+The framework includes a portable artifact contract for multi-executor implementation and Git review work.
+
+These artifacts are operational state, not instruction layers:
+
+| Artifact | Purpose | Default location |
+|---|---|---|
+| `task packet` | Freeze goal, truth sources, allowed files, do-not-touch list, validation, acceptance boundary | `tmp/git_audit/<task_slug>/task_packet.md` |
+| `audit receipt` | Record what a given executor or reviewer changed and verified | `tmp/git_audit/<task_slug>/audit_receipt.md` |
+| `handoff packet` | Capture resume point, blocker, and next executor when a session is interrupted | `tmp/git_audit/<task_slug>/handoff_packet.md` |
+
+These artifacts matter because semantic reviewers are replaceable, but hard gates are not. A new CLI session or reviewer should be able to resume from the artifacts without reconstructing state from memory alone.
+
+### Why This Is Not A Fifth Layer
+
+The load layers answer **what to read before acting**.
+
+The audit artifacts answer **how to preserve execution state when work spans multiple sessions or executors**.
+
+They do not change the layer order:
+
+1. Load rules
+2. Load adapter
+3. Load canonical docs
+4. Read code/config to edit
+5. Externalize execution state into packet / receipt / handoff when work must survive interruption
+
+### Default Flow
+
+1. Freeze a task packet before fan-out or external audit
+2. Execute a bounded scope
+3. Record an audit receipt
+4. If execution stops or ownership changes, create a handoff packet
+5. Run hard gates outside the semantic auditor
+6. Return to the main thread for owner review and Git closeout
+
+## Strategy vs Mechanism Layering
+
+This framework now makes an explicit distinction between two reusable surfaces.
+
+### Strategy Layer
+
+The strategy layer defines **who is responsible for which kind of judgment**.
+
+Examples:
+
+1. a runtime-correctness reviewer
+2. a maintainability reviewer
+3. a protocol-boundary reviewer
+4. a benchmark/performance reviewer
+5. a refactor-safety reviewer
+
+This layer answers questions such as:
+
+1. What is this reviewer optimizing for?
+2. What should it ignore?
+3. What evidence must it respect?
+4. What kinds of findings are blocking vs optional?
+
+### Mechanism Layer
+
+The mechanism layer defines **how any of those roles operate safely and recoverably**.
+
+Examples:
+
+1. task packet
+2. audit receipt
+3. handoff packet
+4. hard gates
+5. validation ordering
+6. owner review
+
+This layer does not care whether the reviewer is Codex, Claude, an internal subagent, or a future custom agent. It exists so role replacement does not break process continuity.
+
+### Why The Split Matters
+
+Without the split, repositories tend to entangle three different concerns:
+
+1. reviewer identity
+2. reviewer judgment criteria
+3. workflow recovery and hard-gate mechanics
+
+That creates brittle systems. If one CLI times out or one reviewer becomes unavailable, the whole workflow has to be reinvented.
+
+With the split:
+
+1. role profiles can change without rewriting the workflow machinery
+2. packet / receipt / handoff can stay stable across reviewer changes
+3. repositories can introduce domain-specific reviewers as first-class strategy implementations
 
 ---
 
@@ -253,6 +351,13 @@ The self-check stage is defined as Rule 12 in `copilot-instructions.md` and is e
 ## Failure Modes and Recovery
 
 When the agent makes a wrong assumption, produces an invalid change, or encounters missing or inconsistent project context, it follows a four-step recovery protocol.
+
+For multi-session or multi-executor work, failure recovery should also preserve resumability:
+
+1. wrong assumption → correct it in `session_state.md`
+2. interrupted execution → write a handoff packet
+3. partial implementation → append an audit receipt before switching executor
+4. failing hard gate → keep the failure outside the auditor narrative; do not hand-wave it away
 
 ### Recovery Protocol
 

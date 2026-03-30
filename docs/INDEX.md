@@ -11,6 +11,8 @@
 |---|---|
 | `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
+| `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanism |
+| `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples spanning multiple development-stage responsibilities |
 
 ## Project (create these for your project)
 
@@ -29,7 +31,7 @@
 
 | Document | Description |
 |---|---|
-| *(none yet)* | |
+| `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit, replaceable reviewers, and Git closeout recovery |
 
 ---
 
