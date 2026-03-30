@@ -20,6 +20,13 @@ Each example below should be read together with the mechanism layer:
 
 The role decides **what to judge**. The mechanism decides **how the judgment participates in a recoverable workflow**.
 
+The template also ships a concrete starter pack under `examples/reviewer_roles/`. Those files turn the role families below into ready-to-adapt profiles instead of leaving them only as prose examples.
+
+Recommended adoption order:
+
+1. first batch: goal/acceptance owner, plan/checkpoint owner, runtime correctness reviewer, boundary/contract reviewer, git closeout reviewer, maintainability reviewer
+2. second batch: observability/failure-path reviewer, performance/benchmark reviewer, migration/compatibility reviewer, docs/spec drift reviewer
+
 ## 1. Runtime Correctness Reviewer
 
 Possible executors:

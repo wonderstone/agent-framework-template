@@ -36,6 +36,19 @@ templates/
   git_audit_handoff_packet.template.md ← handoff packet template
   reviewer_role_profile.template.md ← formal role definition for reviewer or agent splits
 
+examples/
+  reviewer_roles/
+    01_goal_acceptance_owner.md    ← first-batch strategy role
+    02_plan_checkpoint_owner.md    ← first-batch strategy role
+    03_runtime_correctness_reviewer.md ← first-batch strategy role
+    04_boundary_contract_reviewer.md ← first-batch strategy role
+    05_git_closeout_reviewer.md    ← first-batch strategy role
+    06_maintainability_reviewer.md ← first-batch strategy role
+    07_observability_failure_path_reviewer.md ← second-batch strategy role
+    08_performance_benchmark_reviewer.md ← second-batch strategy role
+    09_migration_compatibility_reviewer.md ← second-batch strategy role
+    10_docs_spec_drift_reviewer.md ← second-batch strategy role
+
 scripts/
   validate-template.sh             ← checks template integrity (run after setup)
   git_audit_pipeline.py            ← generates task packet / receipt / handoff assets
@@ -119,6 +132,8 @@ The important boundary is: roles should be named after the judgment they provide
 
 The template also ships a concrete example set in `docs/ROLE_STRATEGY_EXAMPLES.md`, covering not just two external CLIs but broader role families such as git closeout reviewer, protocol boundary reviewer, performance reviewer, observability reviewer, and migration reviewer. These examples are role-first and executor-pluggable by design.
 
+If you want something more concrete than a doc example list, the template now also ships a starter set of 10 formal role profiles under `examples/reviewer_roles/`. The first batch covers goal/acceptance, plan/checkpointing, correctness, boundary/contracts, git closeout, and maintainability. The second batch covers observability/failure-paths, performance, migration/compatibility, and docs/spec drift.
+
 **Completion checkpoints** — when a subtask is confirmed done, the agent updates ROADMAP, session state, acceptance criteria, and the reply footer before moving on.
 
 ---
@@ -147,6 +162,7 @@ Works with any AI coding assistant that loads `.github/copilot-instructions.md`:
 | Agent roles/format | `.github/agents/*.agent.md` |
 | Strategy-vs-mechanism guidance | `docs/STRATEGY_MECHANISM_LAYERING.md` |
 | Concrete role examples | `docs/ROLE_STRATEGY_EXAMPLES.md` |
+| Concrete starter role profiles | `examples/reviewer_roles/*.md` |
 | Git audit packet defaults | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` |
 | Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
 

@@ -46,6 +46,10 @@ templates/
   git_audit_handoff_packet.template.md ← handoff packet template
   reviewer_role_profile.template.md ← role profile template for external or internal reviewers
 
+examples/
+  reviewer_roles/
+    *.md                           ← 10 ready-to-adapt starter role profiles
+
 scripts/
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
 ```
@@ -75,6 +79,13 @@ If your project will define multiple reviewer or agent roles with different judg
 When doing so, define the role by judgment boundary first, not by tool name. For example, prefer `runtime correctness reviewer` over `Codex reviewer`, and `maintainability reviewer` over `Claude reviewer`. A CLI, subagent, or custom agent can then be listed as one possible executor of that role.
 
 If you want concrete starting points instead of a blank role profile, keep `docs/ROLE_STRATEGY_EXAMPLES.md` and adapt the examples that fit your repository.
+
+If you want a ready-made starter pack rather than starting from scratch, keep `examples/reviewer_roles/`. The template ships 10 formal role profiles split into:
+
+1. first batch: goal/acceptance, plan/checkpoint, runtime correctness, boundary/contract, git closeout, maintainability
+2. second batch: observability/failure-path, performance/benchmark, migration/compatibility, docs/spec drift
+
+In most repositories, the first batch should be adapted first. The second batch becomes first-class when the codebase starts to need stronger observability, performance discipline, compatibility sequencing, or doc/spec governance.
 
 ---
 
@@ -162,6 +173,7 @@ The following files are optional and can be removed for simpler projects:
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Team is familiar with the framework |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | You do not need formal reviewer or agent role splits |
 | `docs/ROLE_STRATEGY_EXAMPLES.md` | You do not need example reviewer families because you already have your own role model |
+| `examples/reviewer_roles/` | You want the role examples as guidance only and do not need concrete starter files |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | No external reviewer, multi-CLI, or resumable handoff workflow is needed |
 | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` | Same as above |
 | `templates/reviewer_role_profile.template.md` | Same as above |

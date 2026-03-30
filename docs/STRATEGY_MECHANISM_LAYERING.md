@@ -97,9 +97,11 @@ When adopting this pattern, repositories should keep at least:
 1. one TYPE-A doc that explains the strategy/mechanism split
 2. one TYPE-A example set that shows several role families, not just one tool split
 3. one role-profile template for formalizing reviewer roles
-4. one resumable workflow mechanism such as packet / receipt / handoff
+4. one concrete starter set for the most common first-class roles
+5. one resumable workflow mechanism such as packet / receipt / handoff
 
 See `docs/ROLE_STRATEGY_EXAMPLES.md` for a concrete example set.
+See `examples/reviewer_roles/` for a ready-to-adapt starter set of 10 formal role profiles.
 
 ## Role Profile Template
 

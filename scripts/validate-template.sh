@@ -53,6 +53,16 @@ check_file "templates/git_audit_receipt.template.md"
 check_file "templates/git_audit_handoff_packet.template.md"
 check_file "templates/reviewer_role_profile.template.md"
 check_file "scripts/git_audit_pipeline.py"
+check_file "examples/reviewer_roles/01_goal_acceptance_owner.md"
+check_file "examples/reviewer_roles/02_plan_checkpoint_owner.md"
+check_file "examples/reviewer_roles/03_runtime_correctness_reviewer.md"
+check_file "examples/reviewer_roles/04_boundary_contract_reviewer.md"
+check_file "examples/reviewer_roles/05_git_closeout_reviewer.md"
+check_file "examples/reviewer_roles/06_maintainability_reviewer.md"
+check_file "examples/reviewer_roles/07_observability_failure_path_reviewer.md"
+check_file "examples/reviewer_roles/08_performance_benchmark_reviewer.md"
+check_file "examples/reviewer_roles/09_migration_compatibility_reviewer.md"
+check_file "examples/reviewer_roles/10_docs_spec_drift_reviewer.md"
 
 # ── Required directories ──────────────────────────────────────────────────────
 echo ""
@@ -197,6 +207,11 @@ if ! grep -q "ROLE_STRATEGY_EXAMPLES.md" "${ROOT}/README.md"; then
   ERRORS=$((ERRORS + 1))
 fi
 
+if ! grep -q "examples/reviewer_roles" "${ROOT}/README.md"; then
+  echo "  MISSING: starter role profiles not surfaced in README.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
 if ! grep -q "strategy\\|mechanism\\|review role\\|reviewer split\\|codex\\|claude" "${ROOT}/.github/project-context.instructions.md"; then
   echo "  MISSING: strategy/mechanism trigger row not found in project-context.instructions.md"
   ERRORS=$((ERRORS + 1))
@@ -204,6 +219,11 @@ fi
 
 if ! grep -q "ROLE_STRATEGY_EXAMPLES.md" "${ROOT}/docs/ADOPTION_GUIDE.md"; then
   echo "  MISSING: role strategy examples doc not referenced in ADOPTION_GUIDE.md"
+  ERRORS=$((ERRORS + 1))
+fi
+
+if ! grep -q "examples/reviewer_roles" "${ROOT}/docs/ADOPTION_GUIDE.md"; then
+  echo "  MISSING: starter role profiles not referenced in ADOPTION_GUIDE.md"
   ERRORS=$((ERRORS + 1))
 fi
 
