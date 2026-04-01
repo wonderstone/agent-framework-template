@@ -89,6 +89,41 @@ scripts/
 
 ## Quick Start
 
+### Copy-Paste Adoption Prompt
+
+If you want another agent to copy this framework into a local application repository in one pass, paste the prompt below and replace the placeholders first.
+
+```text
+You are working in my application repository at <TARGET_REPO_PATH>.
+
+Use the local agent framework template at <TEMPLATE_REPO_PATH>.
+
+Goal:
+- bootstrap the agent framework from the template repo into this application repo
+- use project name <PROJECT_NAME>
+- use profile <minimal|standard|full>
+- use project type <backend-api|web-frontend|cli-tool|library|full-stack>
+- add optional capabilities only if requested: <closeout-audit runtime-guards git-hooks>
+
+Required steps:
+1. Run the template bootstrap script from <TEMPLATE_REPO_PATH> targeting <TARGET_REPO_PATH>.
+2. Keep the generated framework files in their template paths.
+3. Fill in the generated `.github/project-context.instructions.md` placeholders using this repo's real structure, commands, and protected paths.
+4. Leave unrelated application code untouched.
+5. Run validation from the target repo:
+  - `python3 scripts/validate_template.py`
+  - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
+6. Report:
+  - what files were added or changed
+  - what placeholders still need manual project-specific values
+  - what validation was run and whether it passed
+
+Constraints:
+- do not delete existing application files unless required by the framework setup and explicitly justified
+- prefer the standard profile unless I ask for a lighter or fuller setup
+- if doc-first execution should be the default for this repo, also wire `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`
+```
+
 ### Fastest setup
 
 Use the bootstrap script when you want a working starting point without manually copying files one by one:
