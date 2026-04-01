@@ -22,6 +22,7 @@ description: >
 | Doc | Purpose |
 |---|---|
 | `README.md` | Project entry point |
+| `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | [Repository-default doc-first planning rule and required planning surfaces] |
 | `ARCHITECTURE.md` | [System architecture — create if needed] |
 | `ROADMAP.md` | Phase planning and acceptance targets |
 | `session_state.md` | Cross-session state |
@@ -50,6 +51,7 @@ description: >
 |---|---|
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
+| `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
@@ -127,3 +129,4 @@ Project type: [fill in]
 ## Notes
 
 <!-- Add environment-specific notes: venv activation, service pre-checks, etc. -->
+<!-- If your repository adopts doc-first execution as the default, say so explicitly here so future sessions do not treat it as optional. -->

@@ -37,6 +37,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  DOC_FIRST_EXECUTION_GUIDELINES.md ← repository-default doc-first planning rule for non-trivial work
   LEFTOVER_UNIT_CONTRACT.md        ← how to classify and record partial work truthfully
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
@@ -46,6 +47,7 @@ docs/
   archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
+  doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   project-context.template.md      ← blank project adapter
   session_state.template.md        ← blank cross-session state file
@@ -141,6 +143,8 @@ Before any long-running or multi-step task, the agent should produce an executio
 - what scope, escalation, and state-update rules apply
 
 This confirmation is meant to reduce ambiguity once, not to force per-step micromanagement.
+
+If a repository wants roadmap/design-first execution to be the default for non-trivial work, it can also ship [`docs/DOC_FIRST_EXECUTION_GUIDELINES.md`](docs/DOC_FIRST_EXECUTION_GUIDELINES.md) from [`templates/doc_first_execution_guidelines.template.md`](templates/doc_first_execution_guidelines.template.md) and route doc-first triggers to it through the project adapter.
 
 ---
 
@@ -249,6 +253,7 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Concrete starter role profiles | `examples/reviewer_roles/*.md` |
 | Git audit packet defaults | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` |
 | Adoption bootstrap flow | `scripts/bootstrap_adoption.py` |
+| Doc-first execution default | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` + `templates/doc_first_execution_guidelines.template.md` |
 | Long-task execution contract | `templates/execution_contract.template.md` |
 | Closeout truth audit | `scripts/closeout_truth_audit.py` |
 | Runtime guard registry | `templates/runtime_surface_registry.template.py` + `scripts/runtime_surface_guardrails.py` |

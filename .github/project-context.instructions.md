@@ -28,6 +28,7 @@ description: >
 | `README.md` | Project entry point |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
+| `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and the reusable surfaces adopters should inherit |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
 | `templates/execution_contract.template.md` | Pre-execution confirmation contract for long-running tasks |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Guard-registry pattern for protecting active user-facing runtime paths |
@@ -58,6 +59,7 @@ When resuming a multi-step task, recover context in this order:
 |---|---|
 | `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
 | `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
+| `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
@@ -135,3 +137,5 @@ python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --proj
 
 - Use `python3` consistently in local commands to match CI and the current macOS environment.
 - Keep bootstrap smoke commands in `--dry-run` mode unless intentionally testing write behavior into a disposable target.
+- This template now treats executable doc-first planning as a first-class reusable surface: the source repo documents it locally, and the shipped templates let adopters turn it into their repository default for non-trivial work.
+- The reusable adopter asset for that policy is `templates/doc_first_execution_guidelines.template.md`; repositories that want doc-first mode by default should copy it into `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` and route future sessions to it through their project adapter.

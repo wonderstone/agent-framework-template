@@ -13,6 +13,16 @@
 
 ---
 
+## Planning Surfaces
+
+- Roadmap or design doc: [path]
+- Execution checklist: [path]
+- Validation doc: [path]
+- State doc: [path]
+- Rule: if this is a non-trivial task and these surfaces do not exist yet, create or update them before implementation begins
+
+---
+
 ## User Confirmation Checklist
 
 ### 1. Git Closeout Policy
@@ -35,6 +45,7 @@
 ### 3. Long-Task Execution Mode
 
 - Autonomous while-loop mode: [enabled / disabled]
+- Doc-first mode for non-trivial work: [enabled / disabled]
 - Standard check-in points:
   - [phase boundary]
   - [acceptance checkpoint]

@@ -67,6 +67,7 @@ docs/
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
+  doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   project-context.template.md      ← blank project adapter to fill in
   session_state.template.md        ← blank session state to fill in
@@ -115,6 +116,8 @@ Open `.github/project-context.instructions.md` and replace every `[placeholder]`
 Use `templates/project-context.template.md` as a blank starting point if preferred.
 
 If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+If you want doc-first execution to be the repository default for non-trivial work, also add `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` to the canonical docs table and keep the `guideline|guidelines|doc-first|execution checklist|planning mode` trigger mapped to it.
 
 If your project will define multiple reviewer or agent roles with different judgment responsibilities, keep `docs/STRATEGY_MECHANISM_LAYERING.md` and use `templates/reviewer_role_profile.template.md` to formalize them.
 
@@ -169,6 +172,7 @@ Your `docs/INDEX.md` starts with the core docs that exist. For a new project, th
 | Document | Description |
 |---|---|
 | `README.md` | Project entry point |
+| `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and required planning surfaces |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | How to adopt this framework |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to split role strategy from reusable workflow mechanism |
@@ -212,6 +216,27 @@ Rules 9 and 10 both write to `ROADMAP.md` (updating rows to `✅ YYYY-MM-DD`), s
 
 ---
 
+## Step 6A — Initialize Doc-First Execution Guidelines
+
+If you want non-trivial work to default to roadmap/design first, checklist second, implementation third, copy `templates/doc_first_execution_guidelines.template.md` to `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`.
+
+Customize these local references:
+
+- active roadmap or design doc path
+- execution checklist path
+- validation doc path
+- state-tracking doc path
+
+Then make the rule visible in three places:
+
+1. the repository's main instruction or policy surface
+2. `.github/project-context.instructions.md`
+3. the main entry README or module README that future sessions will read first
+
+This makes doc-first execution a repository default rather than a conversational preference.
+
+---
+
 ## Step 7 — Customize Rule 8 Footer Language (Optional)
 
 The default footer in `copilot-instructions.md` uses English. If your team works in another language, update the footer examples in Rule 8 accordingly.
@@ -250,6 +275,7 @@ If you want the smallest possible setup:
 
 docs/
   INDEX.md                         ← keep (update as docs grow)
+  DOC_FIRST_EXECUTION_GUIDELINES.md ← create from templates/doc_first_execution_guidelines.template.md if doc-first is your default
   archive/                         ← keep (ships empty)
 
 session_state.md                   ← create from templates/session_state.template.md

@@ -554,6 +554,25 @@ Single-step tasks skip planning entirely (Rule 16 constraint).
 | **Decomposition (Rule 15)** | If the plan reveals independent subtasks, Rule 15 decides whether to fan out |
 | **session_state.md** | The `## Plan` section holds the current approach, steps, and rationale |
 
+### Doc-First As A Repository Default
+
+Some repositories may elevate the planning layer into a doc-first execution policy.
+
+When that policy is active, the planning layer is no longer only an internal thought step written into `session_state.md`. It is also externalized into durable planning surfaces such as:
+
+1. a roadmap or design doc
+2. a file-level execution checklist
+3. a validation reference
+4. a state-tracking doc
+
+In that model, non-trivial implementation starts from those planning surfaces rather than from chat memory alone.
+
+This is not a new layer. It is a repository-level specialization of the planning layer.
+
+The global framework still supplies Rule 16 planning mechanics. The repository chooses whether to make doc-first planning the default execution posture for non-trivial work.
+
+If adopted, the project adapter and entry documentation should say so explicitly, so future sessions do not treat doc-first planning as optional.
+
 ### Why This Matters
 
 Without a planning layer, the progression loop (Rule 14) executes steps without a map — it can pick individually correct steps that collectively miss the goal. Planning gives the loop a starting direction, while still allowing revision as new information surfaces.

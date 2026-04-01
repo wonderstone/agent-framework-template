@@ -49,8 +49,10 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
 
     assert existing.read_text(encoding="utf-8") == "keep me"
     assert existing in result.skipped
+    assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
+    assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
     assert (tmp_path / "templates" / "execution_contract.template.md").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
 
