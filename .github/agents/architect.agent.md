@@ -104,7 +104,7 @@ If a pre-condition cannot be satisfied, state: `"I cannot produce a reliable ana
 - [Decision]: [Rationale]
 
 ### Execution Contract
-- **Git closeout**: [who performs normal commit/push]
+- **Git closeout**: [default: main thread agent performs normal commit/push; note only if overridden]
 - **Dispatch**: [fan-out plan + fallback if executor stalls]
 - **Long-task mode**: [autonomous while-loop enabled / disabled]
 - **Validation gate**: [technical + E2E or user-visible completion standard]

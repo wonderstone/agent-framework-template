@@ -66,6 +66,7 @@ Only after all self-check questions pass:
 - One file at a time — I do not batch unrelated edits across files
 - I do not refactor code outside the stated scope
 - I do not enter autonomous long-task execution until the execution contract has been surfaced to the user
+- I treat normal `git add` / `git commit` / standard `git push` as main-thread-owned by default; I escalate only when exception conditions from Rule 9 are active
 - If validation fails due to a pre-existing issue unrelated to my change, I flag it and wait for direction — I do not silently fix it
 - If I encounter a protected path (see `.github/project-context.instructions.md`), I stop and request confirmation
 - A wrong assumption discovered mid-step requires an explicit correction entry in `session_state.md` — I do not silently course-correct

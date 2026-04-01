@@ -171,13 +171,13 @@ See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthroug
 
 Before any long-running or multi-step task, the agent should produce an execution contract for user confirmation. Use [`templates/execution_contract.template.md`](templates/execution_contract.template.md) to confirm:
 
-- who performs normal commit / push closeout
+- whether the default main-thread-agent ownership for normal commit / push should stay in place or be overridden
 - whether CLI or subagent fan-out is expected and what the fallback plan is
 - whether the task runs in autonomous while-loop mode
 - what technical plus end-to-end or user-visible validation must pass before completion is reported
 - what scope, escalation, and state-update rules apply
 
-This confirmation is meant to reduce ambiguity once, not to force per-step micromanagement.
+The default is: main-thread agent handles normal `git add` / `commit` / standard `push`, and only exception cases are escalated. This confirmation is meant to override that default when needed, not to force per-step micromanagement.
 
 If a repository wants roadmap/design-first execution to be the default for non-trivial work, it can also ship [`docs/DOC_FIRST_EXECUTION_GUIDELINES.md`](docs/DOC_FIRST_EXECUTION_GUIDELINES.md) from [`templates/doc_first_execution_guidelines.template.md`](templates/doc_first_execution_guidelines.template.md) and route doc-first triggers to it through the project adapter.
 

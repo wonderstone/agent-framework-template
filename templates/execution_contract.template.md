@@ -27,7 +27,7 @@
 
 ### 1. Git Closeout Policy
 
-- Normal `git add` / `git commit` / standard `git push` path: [agent / main thread / user]
+- Normal `git add` / `git commit` / standard `git push` path: main thread agent (default; override only if this repository wants a different owner)
 - High-risk Git operations requiring explicit user confirmation:
   - `push --force`
   - rebase or reset of published history

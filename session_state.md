@@ -7,7 +7,7 @@
 
 ## Current Goal
 
-Review and close out the new doc-first execution uplift so the added planning rule is actually shipped, validated, and documented as part of the template surface.
+Promote main-thread ownership of normal commit/push from a repeated user preference into the template's default execution policy.
 
 ---
 
@@ -58,6 +58,7 @@ The remaining risk is semantic drift at adoption boundaries: manifest-driven ado
 
 ## Phase Notes
 
+- The template now treats normal `git add` / `git commit` / standard `git push` as main-thread-owned by default; only exception cases still escalate.
 - The template now ships a reusable doc-first execution guideline plus adoption and adapter guidance, so adopters can make roadmap/design-first execution a default repository policy instead of a local afterthought.
 - Bootstrap now writes `.github/agent-framework-manifest.json`, and the copied validator uses it to validate adopted repos against the selected profile/capability surface.
 - Optional git-hook scaffolding is covered end to end: installer, pre-commit closeout audit, pre-push runtime checks, root-commit pushes, and dirty-worktree rejection.
@@ -106,6 +107,7 @@ Agent cannot verify: downstream third-party AI tools honoring every rule consist
 
 ## Technical Insights
 
+- If a repo repeatedly wants the main thread to handle routine Git closeout, the durable fix is to encode that as the default execution-contract policy and reserve human escalation for exception cases only.
 - When a repository-level process rule proves repeatedly valuable in real use, the durable fix is to push it into the template's reusable surfaces such as templates, adoption guidance, and adapter defaults rather than keep it only as a project-local override.
 - New governance docs only become real product surface when validator, bootstrap, README, and project adapter all point at the same truth.
 - Rule-number drift is cheap to introduce and worth checking automatically.

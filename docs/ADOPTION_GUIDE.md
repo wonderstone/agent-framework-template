@@ -154,13 +154,13 @@ Before the first long-running task, copy `templates/execution_contract.template.
 
 At minimum, confirm:
 
-- who performs normal commit and push
+- whether the default main-thread-agent ownership for normal commit and push should remain in place or be overridden
 - whether fan-out to CLI or subagents is expected
 - what fallback path applies when an executor fails or stalls
 - whether the task runs in autonomous while-loop mode
 - what E2E or user-visible validation is required before the task can be reported complete
 
-This confirmation should happen once at task start, not before every file edit.
+The template default is that the main-thread agent performs normal commit/push and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
 
 ---
 

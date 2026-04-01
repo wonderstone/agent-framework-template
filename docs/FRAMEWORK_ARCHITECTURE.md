@@ -364,13 +364,13 @@ Within the boundary, the agent proceeds without per-step confirmation. Operation
 
 The template ships `templates/execution_contract.template.md` to standardize this confirmation step. The contract should explicitly answer:
 
-1. who handles normal `commit` and `push`
+1. whether the default main-thread-agent ownership for normal `commit` and `push` should remain in place or be overridden
 2. whether CLI or subagent fan-out is expected and what the fallback path is
 3. whether autonomous while-loop execution is enabled
 4. what technical and user-visible validation gates must pass before completion can be reported
 5. what files are in scope, which paths are protected, and which conditions force escalation
 
-This gives the user one high-leverage confirmation surface before the task enters autonomous execution.
+This gives the user one high-leverage confirmation surface before the task enters autonomous execution without re-opening routine Git authorization on every task. The framework default remains: main-thread agent handles normal commit/push, and only exception cases escalate.
 
 ### Interruption Tiers
 

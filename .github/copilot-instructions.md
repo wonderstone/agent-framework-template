@@ -164,6 +164,8 @@ When a subtask is confirmed done — **before discussing the next one**:
 
 ### Git Closeout (mandatory before next major task)
 
+Default policy: the main thread owns normal `git add`, `git commit`, and standard `git push`. Do not ask the user for routine authorization on those operations when the closeout boundary is coherent and no exception condition is active.
+
 1. `git status --short` — confirm scope and exclude unrelated dirty files
 2. Produce recommended commit message + file scope
 3. The main thread may execute normal `git add + git commit` once validation is clean and the closeout boundary is coherent
