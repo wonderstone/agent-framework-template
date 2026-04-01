@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Self-host the newest governance additions so Rule 25, runtime-surface protection, and leftover-unit guidance are reflected in bootstrap, validation, and root docs.
+Record the final local-only closeout state after shipping the execution-contract and governance-scaffolding follow-up.
 
 ---
 
 ## Working Hypothesis
 
-The remaining gap is integration, not design: the new docs already exist, but adopters and maintainers need them surfaced in README, project context, bootstrap, and validator checks to prevent silent drift.
+The remaining risk is semantic drift at adoption boundaries: manifest-driven adopted-repo validation and commit-scoped hook checks need to be explicit so the shipped capability behaves truthfully outside the template repo.
 
 **Confidence**: High
 
-**Evidence**: The new governance docs are now wired into the validator, bootstrap standard profile, README, and project adapters, and the focused validation suite passed after those changes.
+**Evidence**: The bootstrap now writes an adoption manifest, the copied validator switches into adopted-repo mode from that manifest, hook scaffolding is covered end to end, the independent evaluation pass returned PASS, and the full validation chain passed after the push-check fixes.
 
 **Contradictions**: None.
 
@@ -25,23 +25,23 @@ The remaining gap is integration, not design: the new docs already exist, but ad
 
 ## Plan
 
-**Approach**: Close the integration loop first, then leave runtime-surface automation as an explicit leftover until a real live surface exists.
+**Approach**: Ship runtime/closeout governance as opt-in executable scaffolding, then lock the adopter and hook boundaries down with manifest-driven validation plus commit-scoped push checks.
 
 **Steps**:
-1. Keep validator coverage enforcing the newest TYPE-A docs and rule-range sync.
-2. Keep bootstrap and project-context surfaces exposing the new docs.
-3. Keep runtime-surface protection documented as reference-only in this repository.
-4. Revisit concrete guard scripts only when an adopting repository has a stable live surface.
+1. Emit an adopter manifest during bootstrap so copied validation can stay self-contained.
+2. Validate adopted repos against the manifest-selected asset surface rather than template-root rules.
+3. Exercise git-hook scaffolding end to end, including installer, pre-commit, and pre-push behavior.
+4. Make push-check operate on pushed commit boundaries and reject dirty worktrees that would contaminate the result.
 
-**Why this approach**: It turns the governance additions into shipped, test-backed behavior without pretending this framework repo has a live runtime path of its own.
+**Why this approach**: It keeps the template honest as a product surface: adopters receive a validator that matches what they bootstrapped, and hook behavior is bounded to the same commit truth that git is about to publish.
 
 ---
 
 ## Active Work
 
-**Current Step**: Recording the rollover and the remaining explicit leftover.
+**Current Step**: Commit the remaining local-only state after pushing the main framework change set.
 
-**Next Planned Step**: Monitor whether a future release should ship generic closeout/runtime guard scripts or keep them as reference patterns.
+**Next Planned Step**: No further framework work is active once the remaining local files are committed.
 
 ---
 
@@ -49,27 +49,23 @@ The remaining gap is integration, not design: the new docs already exist, but ad
 
 - Structured validation passed via `python3 scripts/validate_template.py`.
 - All tests passed via `python3 -m pytest tests/ -q`.
-- `15 passed in 0.23s`, and the standard-profile bootstrap dry run succeeded via `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run`.
+- `30 passed in 3.16s`, and both standard and capability-aware bootstrap dry runs succeeded via `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run` and `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke-cap --project-name "Smoke" --profile standard --project-type cli-tool --capability closeout-audit --capability runtime-guards --capability git-hooks --dry-run`.
+- Independent evaluation returned `Verdict: PASS` after reviewing the manifest-driven validator path and hook edge-case coverage.
+- Framework change set was committed and pushed as `c2c83d8 feat: ship execution contracts and governance scaffolding`.
 
 ---
 
 ## Phase Notes
 
-- Wired `docs/RUNTIME_SURFACE_PROTECTION.md` and `docs/LEFTOVER_UNIT_CONTRACT.md` into the structured validator, README, root adapter, template adapter, and bootstrap standard profile.
-- Added regression checks for README rule-range drift and receipt-closeout rule-number drift.
-- Clarified that runtime-surface protection is a reference governance pattern in this repository, not a shipped live probe tool.
+- Bootstrap now writes `.github/agent-framework-manifest.json`, and the copied validator uses it to validate adopted repos against the selected profile/capability surface.
+- Optional git-hook scaffolding is covered end to end: installer, pre-commit closeout audit, pre-push runtime checks, root-commit pushes, and dirty-worktree rejection.
+- Push-check now uses pushed commit ranges or tip SHAs instead of staged diffs and suppresses hook-generated bytecode artifacts with `PYTHONDONTWRITEBYTECODE=1`.
 
 ---
 
 ## Leftover Units
 
-### runtime_surface_guardrails_template_repo
-
-- **why_stopped**: this repository has no active default user runtime path, so a generic live guard script would be synthetic rather than truthful.
-- **current_truth**: the governance pattern is documented and surfaced; validator/bootstrap now ship the docs, but no repo-local live guard script or hook installer exists.
-- **missing_gate**: a real protected runtime surface plus a repeatable live validator contract.
-- **next_reentry_action**: first decide whether a future template release should ship a generic skeleton guard script or keep pointing adopters to reference implementations.
-- **promotion_blocker**: cannot promote to shipped runtime enforcement until there is a concrete, non-synthetic live surface definition.
+- (none)
 
 ---
 
@@ -81,17 +77,18 @@ The remaining gap is integration, not design: the new docs already exist, but ad
 
 ## Mid-Session Corrections
 
-- Corrected the earlier assumption that the rule set stopped at Rule 24; the current top-level rules run through Rule 25 and root docs must follow that numbering.
+- Corrected the earlier assumption that the rule set stopped at Rule 24; the current top-level rules run through Rule 27 and root docs must follow that numbering.
+- Corrected the earlier assumption that push-check path selection alone was sufficient; commit-scoped push checks also need a clean working tree boundary and root-commit coverage to stay truthful.
 
 ---
 
 ## User Acceptance Criteria
 
-- [x] When a maintainer runs `python3 scripts/validate_template.py`, the newest governance docs are treated as required template surfaces.
-- [x] When a maintainer runs the focused bootstrap and validator tests, the standard profile covers the new docs and README/rule-number drift is caught.
-- [x] When a reader opens README or the root project context, Rule 25 and the two new governance docs are visible without searching the repo.
+- [x] When an adopter bootstraps a repo, the copied validator checks the selected profile/capabilities instead of template-root requirements.
+- [x] When an adopter enables hook scaffolding, installer, pre-commit, and pre-push behavior can be exercised end to end.
+- [x] When a pre-push runtime check runs, it evaluates pushed commit boundaries, including first-push/root-commit cases, and refuses dirty worktrees that would contaminate the result.
 
-End-to-end scenario: a maintainer edits governance docs, runs the validator and focused tests, and sees drift detected before release.
+End-to-end scenario: an adopter bootstraps a repo, runs the copied validator successfully, enables the optional hooks, and sees pre-commit/pre-push enforcement behave against the same commit truth git is about to publish.
 
 Agent cannot verify: downstream third-party AI tools honoring every rule consistently.
 
@@ -99,8 +96,9 @@ Agent cannot verify: downstream third-party AI tools honoring every rule consist
 
 ## Phase Decisions
 
-- Treat runtime-surface protection as a shipped governance pattern but not a repo-local executable subsystem until a real runtime surface exists.
-- Treat leftover units as first-class state, not implicit TODO debt.
+- Ship runtime and closeout governance as opt-in executable scaffolding rather than leaving them as documentation-only reference patterns.
+- Keep adopted-repo validation self-contained by freezing the bootstrapped asset surface in a manifest.
+- Treat dirty worktrees as out of bounds for commit-scoped push checks.
 
 ---
 
@@ -108,3 +106,4 @@ Agent cannot verify: downstream third-party AI tools honoring every rule consist
 
 - New governance docs only become real product surface when validator, bootstrap, README, and project adapter all point at the same truth.
 - Rule-number drift is cheap to introduce and worth checking automatically.
+- Commit-scoped hook checks need both path scoping and worktree boundary control; either half by itself is not enough.
