@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -50,7 +51,35 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert existing in result.skipped
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
+    assert (tmp_path / "templates" / "execution_contract.template.md").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
+
+
+def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:
+    result = bootstrap_repo(
+        target_dir=tmp_path,
+        project_name="Capability Demo",
+        profile="minimal",
+        capabilities=("closeout-audit", "runtime-guards", "git-hooks"),
+    )
+
+    assert (tmp_path / "scripts" / "closeout_truth_audit.py").exists()
+    assert (tmp_path / "scripts" / "runtime_surface_guardrails.py").exists()
+    assert (tmp_path / "scripts" / "install_git_hooks.sh").exists()
+    assert (tmp_path / ".githooks" / "pre-commit").exists()
+    assert (tmp_path / ".githooks" / "pre-push").exists()
+    assert (tmp_path / ".github" / "runtime_surface_registry.py").exists()
+    manifest = json.loads(
+        (tmp_path / ".github" / "agent-framework-manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["project_name"] == "Capability Demo"
+    assert manifest["profile"] == "minimal"
+    assert manifest["project_type"] == "cli-tool"
+    assert manifest["capabilities"] == ["closeout-audit", "runtime-guards", "git-hooks"]
+    assert ".github/agent-framework-manifest.json" in manifest["expected_files"]
+    assert "scripts/closeout_truth_audit.py" in manifest["expected_files"]
+    assert ".github/runtime_surface_registry.py" in manifest["expected_files"]
+    assert result.capabilities == ("closeout-audit", "runtime-guards", "git-hooks")
 
 
 def test_bootstrap_full_copies_examples_and_ci(tmp_path: Path) -> None:

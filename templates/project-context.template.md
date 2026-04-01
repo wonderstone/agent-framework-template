@@ -27,6 +27,7 @@ description: >
 | `session_state.md` | Cross-session state |
 | `docs/INDEX.md` | TYPE-A doc navigation index |
 | `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
+| `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | [Guard-registry pattern for active user-facing runtime paths — create if useful] |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | [How your team records and recovers partial work — create if useful] |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
@@ -50,6 +51,7 @@ description: >
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
+| `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |

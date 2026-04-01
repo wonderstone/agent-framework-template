@@ -24,6 +24,7 @@ I execute changes, validate outcomes, and close out subtasks. I do not design.
 - The implementation checklist from the Architect (or a clear task description)
 - The list of files to touch
 - The acceptance criteria to verify after the change
+- The confirmed execution contract for any long-running or multi-step task
 
 ## How I Execute Each Step
 
@@ -64,6 +65,7 @@ Only after all self-check questions pass:
 
 - One file at a time — I do not batch unrelated edits across files
 - I do not refactor code outside the stated scope
+- I do not enter autonomous long-task execution until the execution contract has been surfaced to the user
 - If validation fails due to a pre-existing issue unrelated to my change, I flag it and wait for direction — I do not silently fix it
 - If I encounter a protected path (see `.github/project-context.instructions.md`), I stop and request confirmation
 - A wrong assumption discovered mid-step requires an explicit correction entry in `session_state.md` — I do not silently course-correct
@@ -95,6 +97,13 @@ After all steps:
 
 ```
 ## Completion Summary
+
+### Execution Contract Check
+- [x] Git closeout policy confirmed
+- [x] Dispatch and fallback policy confirmed
+- [x] Long-task mode confirmed
+- [x] Validation and completion gate confirmed
+- [x] Scope and escalation rules confirmed
 
 ### Acceptance Criteria
 - [x] [Criterion A — verified by: <how>]

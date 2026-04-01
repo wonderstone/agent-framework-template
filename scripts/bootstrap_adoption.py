@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -259,6 +260,7 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
 @dataclass(frozen=True)
 class BootstrapResult:
     project_type: str
+    capabilities: tuple[str, ...]
     created: tuple[Path, ...]
     skipped: tuple[Path, ...]
     conflicts: tuple[Path, ...]
@@ -292,6 +294,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "templates/git_audit_handoff_packet.template.md",
         "templates/git_audit_receipt.template.md",
         "templates/git_audit_task_packet.template.md",
+        "templates/execution_contract.template.md",
         "templates/project-context.template.md",
         "templates/roadmap.template.md",
         "templates/session_state.template.md",
@@ -326,11 +329,35 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
     ),
 }
 
+CAPABILITY_COPY_PATHS: dict[str, tuple[str, ...]] = {
+    "closeout-audit": (
+        "scripts/closeout_truth_audit.py",
+    ),
+    "runtime-guards": (
+        "scripts/runtime_surface_guardrails.py",
+        "templates/runtime_surface_registry.template.py",
+        "docs/RUNTIME_SURFACE_PROTECTION.md",
+    ),
+    "git-hooks": (
+        ".githooks/pre-commit",
+        ".githooks/pre-push",
+        "scripts/install_git_hooks.sh",
+    ),
+}
+
 RENDERED_FILES: dict[str, str] = {
     ".github/project-context.instructions.md": "templates/project-context.template.md",
     "session_state.md": "templates/session_state.template.md",
     "ROADMAP.md": "templates/roadmap.template.md",
 }
+
+CAPABILITY_RENDERED_FILES: dict[str, dict[str, str]] = {
+    "runtime-guards": {
+        ".github/runtime_surface_registry.py": "templates/runtime_surface_registry.template.py",
+    }
+}
+
+MANIFEST_PATH = ".github/agent-framework-manifest.json"
 
 
 def _iter_profile_paths(profile: str) -> tuple[str, ...]:
@@ -341,6 +368,17 @@ def _iter_profile_paths(profile: str) -> tuple[str, ...]:
         if current == profile:
             break
     return tuple(selected)
+
+
+def _iter_capability_paths(capabilities: tuple[str, ...]) -> tuple[str, ...]:
+    selected: list[str] = []
+    for capability in capabilities:
+        selected.extend(CAPABILITY_COPY_PATHS[capability])
+    return tuple(selected)
+
+
+def _dedupe_paths(paths: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(dict.fromkeys(paths))
 
 
 def detect_project_type(target_dir: Path) -> str:
@@ -405,21 +443,53 @@ def _write_text(destination: Path, contents: str, *, force: bool, dry_run: bool)
     return True
 
 
+def _write_manifest(
+    destination: Path,
+    *,
+    project_name: str,
+    profile: str,
+    project_type: str,
+    capabilities: tuple[str, ...],
+    expected_files: tuple[str, ...],
+    force: bool,
+    dry_run: bool,
+) -> bool:
+    payload = {
+        "project_name": project_name,
+        "profile": profile,
+        "project_type": project_type,
+        "capabilities": list(capabilities),
+        "expected_files": list(expected_files),
+    }
+    return _write_text(
+        destination,
+        json.dumps(payload, indent=2) + "\n",
+        force=force,
+        dry_run=dry_run,
+    )
+
+
 def bootstrap_repo(
     *,
     target_dir: Path,
     project_name: str,
     profile: str,
     project_type: str | None = None,
+    capabilities: tuple[str, ...] = (),
     force: bool = False,
     dry_run: bool = False,
 ) -> BootstrapResult:
     chosen_project_type = project_type or detect_project_type(target_dir)
+    selected_capabilities = tuple(dict.fromkeys(capabilities))
     created: list[Path] = []
     skipped: list[Path] = []
     conflicts: list[Path] = []
 
-    for relative_path in _iter_profile_paths(profile):
+    planned_paths = _dedupe_paths(
+        (*_iter_profile_paths(profile), *_iter_capability_paths(selected_capabilities))
+    )
+
+    for relative_path in planned_paths:
         source = REPO_ROOT / relative_path
         destination = target_dir / relative_path
         copied = _copy_file(source, destination, force=force, dry_run=dry_run)
@@ -442,8 +512,53 @@ def bootstrap_repo(
             if destination.exists():
                 conflicts.append(destination)
 
+    for capability in selected_capabilities:
+        for destination_rel, source_rel in CAPABILITY_RENDERED_FILES.get(capability, {}).items():
+            source = REPO_ROOT / source_rel
+            destination = target_dir / destination_rel
+            contents = _render_template(source, project_name, chosen_project_type)
+            rendered = _write_text(destination, contents, force=force, dry_run=dry_run)
+            if rendered:
+                created.append(destination)
+            else:
+                skipped.append(destination)
+                if destination.exists():
+                    conflicts.append(destination)
+
+    manifest_destination = target_dir / MANIFEST_PATH
+    manifest_written = _write_manifest(
+        manifest_destination,
+        project_name=project_name,
+        profile=profile,
+        project_type=chosen_project_type,
+        capabilities=selected_capabilities,
+        expected_files=tuple(
+            dict.fromkeys(
+                [
+                    *planned_paths,
+                    *RENDERED_FILES.keys(),
+                    *[
+                        destination_rel
+                        for capability in selected_capabilities
+                        for destination_rel in CAPABILITY_RENDERED_FILES.get(capability, {}).keys()
+                    ],
+                    MANIFEST_PATH,
+                ]
+            )
+        ),
+        force=force,
+        dry_run=dry_run,
+    )
+    if manifest_written:
+        created.append(manifest_destination)
+    else:
+        skipped.append(manifest_destination)
+        if manifest_destination.exists():
+            conflicts.append(manifest_destination)
+
     return BootstrapResult(
         project_type=chosen_project_type,
+        capabilities=selected_capabilities,
         created=tuple(created),
         skipped=tuple(skipped),
         conflicts=tuple(conflicts),
@@ -468,6 +583,14 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Project preset to use for the rendered project-context file",
     )
     parser.add_argument(
+        "--capability",
+        dest="capabilities",
+        action="append",
+        choices=tuple(CAPABILITY_COPY_PATHS),
+        default=[],
+        help="Optional executable capability to include in addition to the selected profile",
+    )
+    parser.add_argument(
         "--force",
         action="store_true",
         help="Overwrite existing files instead of skipping them",
@@ -489,6 +612,7 @@ def main() -> int:
         project_name=args.project_name,
         profile=args.profile,
         project_type=args.project_type,
+        capabilities=tuple(args.capabilities),
         force=args.force,
         dry_run=args.dry_run,
     )
@@ -496,6 +620,8 @@ def main() -> int:
     action = "Would create" if args.dry_run else "Created"
     print(f"{action} {len(result.created)} file(s) for profile '{args.profile}'.")
     print(f"Project type preset: {result.project_type}")
+    if result.capabilities:
+        print(f"Capabilities: {', '.join(result.capabilities)}")
     print(f"Target repository: {target_dir}")
     for path in result.created:
         print(f"+ {path}")
@@ -518,6 +644,8 @@ def main() -> int:
     else:
         print("2. Run python3 scripts/validate_template.py from the target repository.")
         print("3. Do one bootstrap smoke task before adopting the workflow broadly.")
+    if result.capabilities:
+        print("4. Review any opt-in capability scaffolding before enabling it in production.")
     return 0
 
 

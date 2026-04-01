@@ -110,6 +110,26 @@ These are governance thresholds, not hard interrupts. Complete the current bound
 3. Keep only in `session_state.md`: current goal, working hypothesis, active work, recent receipt window (≤ 3), decisions, insights
 4. If the archive becomes a long-term reference, add a link back from the corresponding TYPE-A doc or from the summary section of `session_state.md`
 
+### Context Reset Protocol
+
+**Context compression is inferior to context reset.** When a session grows long, do not summarize the conversation — reset with a clean context window and structured re-entry from artifacts.
+
+Trigger a context reset when any of the following is true:
+
+- The session is approaching context limits and the task is not yet complete
+- A new executor (CLI or subagent) is picking up from a handoff packet (Rule 18/19)
+- A phase boundary is crossed and the next phase has different canonical docs
+
+**Reset entry sequence** — the new session reads these in order, nothing else:
+
+1. `.github/copilot-instructions.md` — operating rules (always loaded)
+2. `.github/project-context.instructions.md` — project adapter
+3. `session_state.md` — current goal, hypothesis, plan, and active work
+4. `tmp/git_audit/<task_slug>/handoff_packet.md` — resume point and blocker (if task is in progress)
+5. Only the files listed in the task packet's allowed-files — no speculative reading
+
+Do not re-read earlier conversation history. Do not summarize prior turns. Artifacts are the source of truth; chat history is not.
+
 ---
 
 ## Rule 8: Reply Footer (🔴 Mandatory)
@@ -311,6 +331,18 @@ This loop makes explicit the difference between "I finished a step" and "I am ma
 ## Rule 15: Decomposition and Dispatch Decision (🔴 Mandatory)
 
 Before proceeding serially on any multi-step task, run the decomposition decision. This replaces the informal dispatch guidance in Rule 5 with concrete, enforceable criteria.
+
+### Task Complexity Scale
+
+Before decomposing, classify the task by scale. This determines executor count and expected tool-call budget:
+
+| Scale | Characteristics | Executor count | Tool-call budget |
+|---|---|---|---|
+| **Simple** | Single concern, 1–2 files, outcome obvious | 1 (main thread) | 3–10 |
+| **Compound** | 2–4 independent concerns, clear file boundaries | 2–4 parallel executors | 10–20 per executor |
+| **Complex** | 5+ concerns, cross-module, multi-phase, or multi-day | 5–10+ executors across phases | 20+ per executor |
+
+State the scale before running the decomposition test. Scale drives the fan-out decision: Simple tasks skip fan-out. Compound and Complex tasks default to fan-out per the decomposition test below.
 
 ### Decomposition Test
 
@@ -684,6 +716,10 @@ Step N: [filename] — [validation result: PASS / FAIL / SKIP]
 
 This allows the main thread to detect whether an executor has stopped progressing.
 
+### Parallel Executor Ceiling
+
+Default: **5 concurrent executors** (CLI + subagent combined). Override by declaring a different ceiling in the Execution Boundary (Rule 20). Without an explicit override, 5 is the hard limit. If the decomposition would require more, decompose further or serialize. See Rule 27 for audit verification of this ceiling.
+
 ### Stuck Self-Declaration Format
 
 When an executor cannot continue, it emits this block before stopping:
@@ -727,6 +763,16 @@ UAC must be written in user-observable language, not technical language:
 | "When the user runs `cmd`, the output matches the expected format" | "Unit tests pass" |
 | "When the user opens the config file, the new key is present and documented" | "No lint errors" |
 | "When the user follows the setup steps in the README, the service starts" | "Coverage is 90%" |
+
+**Doc / config tasks** also require observable criteria. Use this pattern:
+
+| Task type | UAC example |
+|---|---|
+| Documentation change | "When the user reads `[doc]`, the described behavior matches the current code and no step is missing or contradicted" |
+| Config change | "When the user opens `[config file]`, the new key is present, its default value is correct, and the inline comment explains the expected values" |
+| Template change | "When a new project is bootstrapped with this template, the generated file contains `[expected content]` and the adoption guide step that references it still works" |
+
+For doc / config tasks with no runnable test: the agent must read the finished artifact against its stated intent and explicitly confirm the match in the UAC Evidence block. "Looks right" is not evidence — quote the specific line or section that satisfies each criterion.
 
 If the user has not specified success conditions: ask before proceeding. Do not proceed on a multi-step task without at least one UAC item.
 
@@ -939,3 +985,130 @@ Projects that adopt the full framework should wire this check into their pre-com
 | Rule 22 (UAC Gate) | UAC Evidence section is the natural home for receipt anchors |
 | Rule 21 (Dispatch Stability) | `DONE` terminal state requires an audit receipt — the audit receipt is the receipt anchor |
 | Rule 18 (Resumable Audit Assets) | Audit receipts serve double duty: they satisfy the receipt-anchor requirement and preserve resumability |
+
+---
+
+## Rule 26: Independent Evaluation (🔴 Mandatory)
+
+An agent that implements work and then evaluates its own output is not an evaluator — it is a self-reviewer. Self-review is structurally biased: agents consistently and confidently assess their own work as satisfactory, even when the output is mediocre or incorrect.
+
+For any task that produces user-facing output, a final evaluation pass must be performed by an agent or executor that did **not** produce the work.
+
+### When Independent Evaluation Is Required
+
+Independent evaluation is mandatory when any of the following is true:
+
+- The task produces output a user will directly interact with (UI, CLI output, API response, documentation)
+- The task involves a non-trivial implementation across 2+ files
+- The task is declared complete by the implementing agent and `Status: complete` is about to be written
+
+It is optional (but encouraged) for single-file internal refactors with no user-facing surface.
+
+### The Three-Role Model
+
+| Role | Responsibility | Can be the same agent? |
+|---|---|---|
+| **Planner** | Decomposes task, sets UAC, defines boundaries | Yes — Architect agent |
+| **Generator** | Implements the work within the declared boundary | Yes — Implementer agent |
+| **Evaluator** | Independently assesses output quality against UAC | **No** — must not be the Generator |
+
+The Evaluator role must be filled by:
+1. A separate CLI session (Rule 19 primary)
+2. A subagent spawned after the Generator has terminated (Rule 19 fallback)
+3. The main thread, only if both CLI and subagent are unavailable — and only after explicitly context-resetting (Rule 7) away from the Generator's session
+
+### What the Evaluator Does
+
+The Evaluator receives:
+- The task packet (frozen goal, UAC, allowed files)
+- The audit receipt from the Generator (what changed, validation run)
+- Read access to the changed files
+
+The Evaluator must independently answer:
+
+```
+Evaluation Report:
+- UAC coverage:      [which UAC items are satisfied by evidence, which are not]
+- Gap check:         [what would the user notice that the Generator's tests did not catch]
+- Verdict:           [PASS / CONDITIONAL / FAIL]
+- Conditions (if CONDITIONAL): [specific items the Generator must fix before closeout]
+- Blocking (if FAIL): [what must change before this can be re-evaluated]
+```
+
+**PASS** → Generator's audit receipt is countersigned; main thread may proceed to Git closeout (Rule 9).
+**CONDITIONAL** → Generator addresses conditions; Evaluator re-checks only those items.
+**FAIL** → Generator reworks; full evaluation repeats.
+
+### What the Evaluator Does NOT Do
+
+- Does not redesign the implementation
+- Does not rewrite the Generator's work
+- Does not expand scope beyond the frozen task packet
+- Does not pass work that fails UAC items in order to unblock progress
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 22 (UAC Gate) | The Evaluator's UAC coverage check replaces the Generator's self-assessed gap check as the authoritative record |
+| Rule 21 (Dispatch Stability) | `DONE` terminal state from a Generator is provisional until the Evaluator emits `PASS` or `CONDITIONAL` resolved |
+| Rule 25 (Receipt-Anchored Closeout) | The Evaluation Report is a receipt anchor; `PASS` verdict must appear in the audit receipt before `completed` is written |
+| Rule 9 (Git Closeout) | Main thread proceeds to commit only after Evaluator verdict is `PASS` or `CONDITIONAL` resolved |
+
+---
+
+## Rule 27: Policy Audit Trigger (🔵 On-Demand)
+
+Triggered by any of: `policy audit` · `framework check` · `framework health check` · `规则检查`
+
+When triggered, produce the audit table below against the **current task's actual state** — not against rule existence alone. A rule that exists but has not been activated for this task is ⚠️, not ✅.
+
+### Audit Output Format
+
+```
+## Framework Policy Audit — YYYY-MM-DD
+
+| # | Dimension            | Rule         | Status | Evidence                                              |
+|---|----------------------|--------------|--------|-------------------------------------------------------|
+| 1 | Git automation       | Rule 9 + EC §1  | ✅/⚠️/❌ | [EC §1 declared / not declared for this task]       |
+| 2 | CLI fan-out+fallback | Rule 15/19/21   | ✅/⚠️/❌ | [Fan-out plan with fallback declared / absent]      |
+| 3 | Long-task autonomous | Rule 20         | ✅/⚠️/❌ | [Execution Boundary declared / not declared]        |
+| 4 | E2E acceptance gate  | Rule 22/23      | ✅/⚠️/❌ | [UAC declared + toolchain verified / not done]      |
+| 5 | Context budget       | Rule 19/21      | ✅/⚠️/❌ | [Subtask sizing ≤5 files verified / not checked]    |
+| 6 | Phase notification   | Rule 8/14       | ✅/⚠️/❌ | [Footer at last phase boundary / missing]           |
+| 7 | Parallel ceiling     | Rule 21/27      | ✅/⚠️/❌ | [Concurrent executors ≤ ceiling / count unbounded]  |
+| 8 | Non-code completion  | Rule 22/24      | ✅/⚠️/❌ | [Observable criterion declared / absent]            |
+
+⚠️ items: state the gap and the immediate corrective action inline.
+❌ items: fix before continuing — do not proceed without resolving the gap.
+```
+
+### Status Definitions
+
+| Symbol | Meaning |
+|---|---|
+| ✅ | Rule exists AND has been activated / satisfied for this task with evidence |
+| ⚠️ | Rule exists but has not been declared / activated for this task yet |
+| ❌ | Rule does not exist, or is clearly violated in the current task state |
+
+### Dimension Evaluation Guide
+
+| # | ✅ Condition | ⚠️ Condition | ❌ Condition |
+|---|---|---|---|
+| 1 Git policy | EC §1 explicitly declares who owns `git add / commit / push` for this task | Task active but no Git policy declared | Force push or destructive op proceeded without escalation |
+| 2 CLI fallback | Fan-out plan names executor type and fallback path per Rule 19 | Task involves fan-out but fallback not declared | Both CLI and subagent failed without escalation to user |
+| 3 Autonomous mode | Execution Boundary block written before first action | Multi-step task running without boundary declaration | Agent interrupted user mid-task for routine non-blocker steps |
+| 4 E2E gate | UAC declared, includes ≥1 end-to-end scenario, toolchain verified runnable | Implementation started without UAC | Task declared complete without UAC evidence |
+| 5 Context budget | Each dispatched subtask ≤5 files; no executor reported context exhaustion | Dispatch planned but subtask file counts not verified | Subtask dispatched with >5 files or executor hit context limit mid-task |
+| 6 Phase notification | Footer emitted at each phase boundary during autonomous run | Phase boundary reached; footer deferred past next natural pause | No footer emitted in last 3+ replies during an active task |
+| 7 Parallel ceiling | Concurrent executors at or below the declared ceiling (default 5) | Fan-out planned but concurrent count not explicitly bounded | More than ceiling executors running simultaneously |
+| 8 Non-code completion | All doc / config deliverables have an observable completion criterion (e.g., "file exists and content matches spec") | Task has doc or config outputs with no stated completion criteria | Doc or config change declared done with no observable criterion |
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 20 (Long-Task Autonomous) | Execution Boundary declaration is the source of truth for dimensions 3 and 7 |
+| Rule 21 (Dispatch Stability) | Pre-Dispatch Readiness Gate feeds dimensions 2 and 5 |
+| Rule 22 (UAC Gate) | UAC declaration and evidence feed dimension 4 and 8 |
+| Rule 9 (Git Closeout) | Git Closeout policy feeds dimension 1; declared in Execution Contract before task starts |

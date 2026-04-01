@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if [[ -f "${ROOT}/scripts/closeout_truth_audit.py" ]]; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/closeout_truth_audit.py" --root "${ROOT}"
+fi
+
+if [[ -f "${ROOT}/scripts/runtime_surface_guardrails.py" && -f "${ROOT}/.github/runtime_surface_registry.py" ]]; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/runtime_surface_guardrails.py" staged-check --root "${ROOT}"
+fi

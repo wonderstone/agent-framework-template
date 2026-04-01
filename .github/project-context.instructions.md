@@ -29,6 +29,7 @@ description: >
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
+| `templates/execution_contract.template.md` | Pre-execution confirmation contract for long-running tasks |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Guard-registry pattern for protecting active user-facing runtime paths |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | How to classify, defer, and recover partial work truthfully |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanisms |
@@ -58,6 +59,7 @@ When resuming a multi-step task, recover context in this order:
 | `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
 | `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
+| `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `release\|version\|changelog\|upgrade notes` | `CHANGELOG.md` |
@@ -67,6 +69,7 @@ When resuming a multi-step task, recover context in this order:
 | `roadmap\|phase\|milestone\|current focus\|next phase` | `ROADMAP.md` |
 | `e2e\|toolchain\|acceptance criteria\|end-to-end` | Validation Toolchain section (this file) |
 | `flags\|config\|default values\|runtime override` | → check Runtime Config Locations |
+| `policy audit\|framework check\|framework health\|规则检查` | Rule 27 in `.github/copilot-instructions.md` |
 
 ## Validation Toolchain
 

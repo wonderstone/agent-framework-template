@@ -25,6 +25,12 @@ python scripts/bootstrap_adoption.py ../your-repo \
   --profile standard
 ```
 
+Optional capability flags:
+
+- `--capability closeout-audit` adds `scripts/closeout_truth_audit.py`
+- `--capability runtime-guards` adds the runtime guard runner plus `.github/runtime_surface_registry.py`
+- `--capability git-hooks` adds `.githooks/` and `scripts/install_git_hooks.sh`
+
 Profile guide:
 
 - `minimal` keeps only the core rules, state files, and doc index
@@ -37,7 +43,7 @@ Copy these files into your new repository, preserving their paths:
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–23)
+  copilot-instructions.md          ← operating rules (Rule 0–27)
   project-context.instructions.md  ← project adapter (fill in Step 2)
   RELEASE_TEMPLATE.md              ← release notes starting point
   agents/
@@ -61,6 +67,7 @@ docs/
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
+  execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   project-context.template.md      ← blank project adapter to fill in
   session_state.template.md        ← blank session state to fill in
   roadmap.template.md              ← blank ROADMAP to fill in
@@ -75,8 +82,18 @@ examples/
 
 scripts/
   bootstrap_adoption.py            ← bootstrap and profile-aware adoption helper
+  closeout_truth_audit.py          ← executable Rule 25 enforcement for truth-source closeout claims
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
+  install_git_hooks.sh             ← activates optional `.githooks/` in the adopter repo
+  runtime_surface_guardrails.py    ← registry-driven runtime guard runner
   validate_template.py             ← structured validator used locally and in CI
+
+.githooks/
+  pre-commit                       ← optional closeout/runtime guard entrypoint
+  pre-push                         ← optional runtime push-check entrypoint
+
+templates/
+  runtime_surface_registry.template.py ← runtime surface registry skeleton
 ```
 
 ---
@@ -125,6 +142,22 @@ Fill in:
 - **Acceptance Criteria**: the observable conditions that mark your first phase complete
 
 Leave everything else blank or with placeholder text until the first subtask is confirmed done.
+
+---
+
+## Step 3A — Confirm The Execution Contract
+
+Before the first long-running task, copy `templates/execution_contract.template.md` into your working notes, issue tracker, or task packet and confirm the execution model once with the user or task owner.
+
+At minimum, confirm:
+
+- who performs normal commit and push
+- whether fan-out to CLI or subagents is expected
+- what fallback path applies when an executor fails or stalls
+- whether the task runs in autonomous while-loop mode
+- what E2E or user-visible validation is required before the task can be reported complete
+
+This confirmation should happen once at task start, not before every file edit.
 
 ---
 
@@ -238,7 +271,15 @@ If you want to inspect the bootstrap plan before writing files, use:
 python scripts/bootstrap_adoption.py ../your-repo \
   --project-name "Your Project" \
   --profile standard \
+  --capability closeout-audit \
+  --capability runtime-guards \
   --dry-run
+```
+
+If you opt into hooks, activate them after bootstrap:
+
+```bash
+bash scripts/install_git_hooks.sh
 ```
 
 If you keep the resumable audit workflow, do a smoke run once:

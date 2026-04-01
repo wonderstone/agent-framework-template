@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if [[ -f "${ROOT}/scripts/runtime_surface_guardrails.py" && -f "${ROOT}/.github/runtime_surface_registry.py" ]]; then
+  extra_args=()
+  zero_sha="0000000000000000000000000000000000000000"
+
+  while read -r local_ref local_sha remote_ref remote_sha; do
+    if [[ -z "${local_sha:-}" || "${local_sha}" == "${zero_sha}" ]]; then
+      continue
+    fi
+    if [[ "${remote_sha:-$zero_sha}" == "${zero_sha}" ]]; then
+      extra_args+=("--commit-sha" "${local_sha}")
+    else
+      extra_args+=("--commit-range" "${remote_sha}..${local_sha}")
+    fi
+  done
+
+  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/runtime_surface_guardrails.py" push-check --root "${ROOT}" "${extra_args[@]}"
+fi

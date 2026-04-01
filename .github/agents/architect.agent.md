@@ -37,6 +37,7 @@ I analyze, plan, and critique. I do not make code changes directly.
 - A list of acceptance criteria for the implementer to verify
 - A short decision record if a non-obvious choice was made
 - For multi-executor or reviewer-heavy work, a suggested task packet baseline (truth sources, allowed files, validation, do-not-touch list)
+- For long-running work, a pre-execution confirmation summary aligned with `templates/execution_contract.template.md`
 
 ## Pre-Conditions (STOP if any are not satisfied)
 
@@ -101,6 +102,13 @@ If a pre-condition cannot be satisfied, state: `"I cannot produce a reliable ana
 
 ### Decision Record
 - [Decision]: [Rationale]
+
+### Execution Contract
+- **Git closeout**: [who performs normal commit/push]
+- **Dispatch**: [fan-out plan + fallback if executor stalls]
+- **Long-task mode**: [autonomous while-loop enabled / disabled]
+- **Validation gate**: [technical + E2E or user-visible completion standard]
+- **Escalation triggers**: [what still requires user confirmation]
 
 ## Next Actions
 

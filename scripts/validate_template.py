@@ -4,14 +4,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_FILES = (
+    ".githooks/pre-commit",
+    ".githooks/pre-push",
     ".gitignore",
     ".github/copilot-instructions.md",
     ".github/project-context.instructions.md",
@@ -43,15 +47,23 @@ REQUIRED_FILES = (
     "examples/demo_project/src/task_tracker.py",
     "examples/demo_project/tests/test_task_tracker.py",
     "scripts/bootstrap_adoption.py",
+    "scripts/closeout_truth_audit.py",
     "scripts/git_audit_pipeline.py",
+    "scripts/install_git_hooks.sh",
+    "scripts/runtime_surface_guardrails.py",
     "scripts/validate-template.sh",
     "scripts/validate_template.py",
+    "templates/execution_contract.template.md",
     "templates/project-context.template.md",
     "templates/reviewer_role_profile.template.md",
     "templates/roadmap.template.md",
+    "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
+    "tests/test_closeout_truth_audit.py",
     "tests/test_bootstrap_adoption.py",
     "tests/test_git_audit_pipeline.py",
+    "tests/test_hook_scaffolding.py",
+    "tests/test_runtime_surface_guardrails.py",
     "tests/test_validate_template.py",
 )
 
@@ -65,11 +77,13 @@ REQUIRED_SECTIONS = {
     "README.md": (
         "## Why This Exists",
         "## Quick Start",
+        "## Pre-Execution Confirmation",
         "## Example Workflow",
         "## Compatibility",
     ),
     "docs/ADOPTION_GUIDE.md": (
         "## Step 1 — Bootstrap Or Copy The Core Files",
+        "## Step 3A — Confirm The Execution Contract",
         "## Minimal Viable Setup",
         "## Next Upgrade Paths",
     ),
@@ -97,6 +111,9 @@ README_REQUIRED_REFERENCES = (
     "docs/COMPATIBILITY.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "templates/execution_contract.template.md",
+    "scripts/closeout_truth_audit.py",
+    "scripts/runtime_surface_guardrails.py",
 )
 
 DOC_LINK_PATHS = {
@@ -125,6 +142,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "ROADMAP.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "templates/execution_contract.template.md",
     "python3 -m pytest tests/ -q",
     "examples/demo_project/tmp/git_audit/",
 )
@@ -137,6 +155,8 @@ ROOT_PROJECT_CONTEXT_FORBIDDEN_SNIPPETS = (
     "./scripts/start.sh",
 )
 
+ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
+
 
 @dataclass(frozen=True)
 class ValidationIssue:
@@ -148,9 +168,29 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _load_bootstrap_module(root: Path):
+    import sys
+
+    module_path = root / "scripts" / "bootstrap_adoption.py"
+    spec = spec_from_file_location("bootstrap_adoption_validate", module_path)
+    assert spec is not None and spec.loader is not None
+    module = module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def _max_rule_number(text: str) -> int:
     matches = re.findall(r"^## Rule (\d+):", text, flags=re.MULTILINE)
     return max((int(value) for value in matches), default=0)
+
+
+def _rule_number_for_title(text: str, title: str) -> int | None:
+    pattern = re.compile(r"^## Rule (\d+):\s+(.+)$", flags=re.MULTILINE)
+    for value, found_title in pattern.findall(text):
+        if found_title.strip() == title:
+            return int(value)
+    return None
 
 
 def _markdown_links(text: str) -> list[str]:
@@ -232,15 +272,8 @@ def _validate_ci(root: Path) -> list[ValidationIssue]:
 
 
 def _validate_bootstrap(root: Path) -> list[ValidationIssue]:
-    from importlib.util import module_from_spec, spec_from_file_location
-    import sys
-
     module_path = root / "scripts" / "bootstrap_adoption.py"
-    spec = spec_from_file_location("bootstrap_adoption_validate", module_path)
-    assert spec is not None and spec.loader is not None
-    module = module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    module = _load_bootstrap_module(root)
 
     issues: list[ValidationIssue] = []
     seen: set[str] = set()
@@ -255,6 +288,21 @@ def _validate_bootstrap(root: Path) -> list[ValidationIssue]:
 
     if "project_type" not in _read(module_path):
         issues.append(ValidationIssue("bootstrap-feature-missing", "project_type support"))
+
+    if "capabilities" not in _read(module_path):
+        issues.append(ValidationIssue("bootstrap-feature-missing", "capability flags support"))
+
+    return issues
+
+
+def _validate_adopted_repo(root: Path) -> list[ValidationIssue]:
+    manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+    expected_files = manifest.get("expected_files", [])
+
+    issues: list[ValidationIssue] = []
+    for relative in sorted(expected_files):
+        if not (root / relative).exists():
+            issues.append(ValidationIssue("missing-adopted-asset", relative))
 
     return issues
 
@@ -288,8 +336,9 @@ def _validate_rule_sync(root: Path) -> list[ValidationIssue]:
 
 
 def _validate_receipt_closeout_references(root: Path) -> list[ValidationIssue]:
-    max_rule = _max_rule_number(_read(root / ".github/copilot-instructions.md"))
-    expected = f"Rule {max_rule} (Receipt-Anchored Closeout)"
+    rules_text = _read(root / ".github/copilot-instructions.md")
+    rule_number = _rule_number_for_title(rules_text, "Receipt-Anchored Closeout (🔴 Mandatory)")
+    expected = f"Rule {rule_number} (Receipt-Anchored Closeout)"
     issues: list[ValidationIssue] = []
 
     for relative_path in (
@@ -306,6 +355,9 @@ def _validate_receipt_closeout_references(root: Path) -> list[ValidationIssue]:
 
 
 def validate_repo(root: Path) -> list[ValidationIssue]:
+    if (root / ADOPTER_MANIFEST_PATH).is_file():
+        return _validate_adopted_repo(root)
+
     checks = (
         _validate_required_paths,
         _validate_sections,

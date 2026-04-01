@@ -14,14 +14,14 @@ The failure mode is subtle: the feature "passes tests" (because the tests were w
 
 ## Template Status In This Repository
 
-This framework repository documents the pattern but does not ship a generic `runtime_execution_guardrails.py`, hook installer, or live smoke probes of its own.
+This framework repository now ships a generic `runtime_surface_guardrails.py`, hook installer, and registry skeleton as opt-in scaffolding.
 
-That is intentional: this repository is a framework package, not an application with an active default user runtime path. The concrete guard script belongs in an adopting repository once it has a real live surface to protect.
+That boundary is still intentional: this repository is a framework package, not an application with an active default user runtime path. The shipped scripts are reusable scaffolding, not an assertion that this repository itself has a live runtime surface to protect.
 
 Use this document in one of two ways:
 
-1. implement the pattern in your repository when you have a real runtime path and a repeatable live validator
-2. record it as a leftover unit until the runtime surface and validation boundary are stable enough to justify enforcement
+1. bootstrap the executable scaffolding into your repository when you have a real runtime path and a repeatable live validator
+2. keep the scaffolding disabled and record the surface as a leftover unit until the runtime surface and validation boundary are stable enough to justify enforcement
 
 ---
 
@@ -158,6 +158,14 @@ Create or extend a guard registry script (see `scripts/runtime_execution_guardra
 ### Step 6 — Install hooks
 
 Wire the guard script into `.githooks/pre-commit` and `.githooks/pre-push`. Provide an `install_git_hooks.sh` script so that any new contributor can activate the guards with a single command.
+
+This template now ships those pieces as opt-in capability assets:
+
+- `scripts/runtime_surface_guardrails.py`
+- `templates/runtime_surface_registry.template.py`
+- `.githooks/pre-commit`
+- `.githooks/pre-push`
+- `scripts/install_git_hooks.sh`
 
 ---
 

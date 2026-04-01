@@ -28,6 +28,8 @@ The repository now also includes a **productization surface** around that model:
 2. `scripts/validate_template.py` checks structural integrity beyond simple string greps
 3. `examples/demo_project/` shows a tiny adopted repository with code, tests, and committed audit artifacts
 4. `docs/COMPATIBILITY.md`, `CHANGELOG.md`, `VERSION`, and `.github/RELEASE_TEMPLATE.md` make release and support expectations explicit
+5. `templates/execution_contract.template.md` gives the agent a standard pre-execution confirmation surface for long tasks
+6. opt-in executable governance capabilities now exist for closeout truth audit, runtime surface guardrails, and hook installation
 
 ---
 
@@ -65,6 +67,8 @@ The repository now also includes a **productization surface** around that model:
 
 **Does NOT contain**: detailed architectural explanations or implementation logic. It is a navigation index, not a reference document.
 
+**On-demand principle**: Layer 2 is the discovery index, not the full knowledge base. Loading it does not mean loading everything it references. The agent reads only the entries relevant to the current task — speculative pre-loading of all canonical docs inflates context without benefit.
+
 ---
 
 ## Layer 3 — Canonical Docs
@@ -78,6 +82,8 @@ The repository now also includes a **productization surface** around that model:
 **Contains**: the authoritative explanation for a specific topic (network, architecture, agent design, etc.).
 
 **Does NOT substitute for**: reading the actual code. When docs and code conflict, code wins.
+
+**On-demand principle**: load one canonical doc at a time, only when a confirmed topic match occurs. Do not pre-load all docs in `docs/INDEX.md` at session start. Each doc loaded consumes context budget that would otherwise be available for code reading. Prefer narrow, triggered loads over broad upfront loads — this mirrors the Tool Search pattern: discover on demand, not in bulk.
 
 ---
 
@@ -339,6 +345,8 @@ When all acceptance criteria in a phase are ✅:
 
 Multi-step tasks are the primary operational mode. The framework's default execution posture is autonomous forward progress — not wait-and-confirm. This posture is established by Rule 20 in `.github/copilot-instructions.md`.
 
+Before entering that mode, the agent should emit a short execution contract for user confirmation. This is a one-time agreement on execution style, not a request for per-step permission.
+
 ### Execution Boundary
 
 At task start, the agent declares an execution boundary that defines:
@@ -351,6 +359,18 @@ At task start, the agent declares an execution boundary that defines:
 | Check-in point | Phase boundary, acceptance criteria met, or explicit blocker |
 
 Within the boundary, the agent proceeds without per-step confirmation. Operations such as reading files, loading the project adapter, running validation commands, and writing state documents are pre-authorized and do not produce STOP events.
+
+### Execution Contract
+
+The template ships `templates/execution_contract.template.md` to standardize this confirmation step. The contract should explicitly answer:
+
+1. who handles normal `commit` and `push`
+2. whether CLI or subagent fan-out is expected and what the fallback path is
+3. whether autonomous while-loop execution is enabled
+4. what technical and user-visible validation gates must pass before completion can be reported
+5. what files are in scope, which paths are protected, and which conditions force escalation
+
+This gives the user one high-leverage confirmation surface before the task enters autonomous execution.
 
 ### Interruption Tiers
 

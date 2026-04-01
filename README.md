@@ -20,7 +20,7 @@ This template exists to make those failure modes harder by default. It gives tea
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–25, always loaded)
+  copilot-instructions.md          ← operating rules (Rule 0–27, always loaded)
   project-context.instructions.md  ← project adapter (fill in for your project)
   RELEASE_TEMPLATE.md              ← lightweight release notes template
   workflows/
@@ -46,6 +46,7 @@ docs/
   archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
+  execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   project-context.template.md      ← blank project adapter
   session_state.template.md        ← blank cross-session state file
   roadmap.template.md              ← blank ROADMAP with phase/subtask structure
@@ -53,6 +54,7 @@ templates/
   git_audit_receipt.template.md    ← audit receipt template
   git_audit_handoff_packet.template.md ← handoff packet template
   reviewer_role_profile.template.md ← formal role definition for reviewer or agent splits
+  runtime_surface_registry.template.py ← registry skeleton for runtime surface guard definitions
 
 examples/
   reviewer_roles/
@@ -69,9 +71,16 @@ examples/
 
 scripts/
   bootstrap_adoption.py           ← bootstraps minimal / standard / full adoption into another repo
+  closeout_truth_audit.py         ← diff-aware receipt-anchor audit for truth-source closeout claims
+  install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
+  runtime_surface_guardrails.py   ← registry-driven runner for runtime surface staged/live checks
   validate-template.sh             ← checks template integrity (run after setup)
   validate_template.py             ← structured validator used by CI and local checks
   git_audit_pipeline.py            ← generates task packet / receipt / handoff assets
+
+.githooks/
+  pre-commit                      ← optional hook that runs closeout audit and staged runtime guards
+  pre-push                        ← optional hook that runs runtime push checks
 ```
 
 ---
@@ -87,6 +96,12 @@ python scripts/bootstrap_adoption.py ../your-repo \
   --project-name "Your Project" \
   --profile standard
 ```
+
+Optional capabilities:
+
+- `--capability closeout-audit` — ship executable receipt-anchor auditing
+- `--capability runtime-guards` — ship runtime guard runner plus registry skeleton
+- `--capability git-hooks` — ship `.githooks/` and installer without forcing activation
 
 Profiles:
 
@@ -112,6 +127,20 @@ cp templates/session_state.template.md      your-repo/session_state.md
 ### Full setup
 
 See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthrough.
+
+---
+
+## Pre-Execution Confirmation
+
+Before any long-running or multi-step task, the agent should produce an execution contract for user confirmation. Use [`templates/execution_contract.template.md`](templates/execution_contract.template.md) to confirm:
+
+- who performs normal commit / push closeout
+- whether CLI or subagent fan-out is expected and what the fallback plan is
+- whether the task runs in autonomous while-loop mode
+- what technical plus end-to-end or user-visible validation must pass before completion is reported
+- what scope, escalation, and state-update rules apply
+
+This confirmation is meant to reduce ambiguity once, not to force per-step micromanagement.
 
 ---
 
@@ -147,7 +176,7 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 
 **Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
 
-**Enforcement rules** — rules 0–25 include explicit STOP conditions, recovery/progression hooks, user-acceptance gating, validation-toolchain prerequisites, leftover-state discipline, and receipt-anchored closeout constraints. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state, unverifiable acceptance criteria, or closeout claims without evidence.
+**Enforcement rules** — rules 0–27 include explicit STOP conditions, recovery/progression hooks, user-acceptance gating, validation-toolchain prerequisites, leftover-state discipline, receipt-anchored closeout constraints, independent evaluation, and policy-audit activation. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state, unverifiable acceptance criteria, or closeout claims without evidence.
 
 **Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
 
@@ -168,7 +197,9 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 
 **Resumable git audit workflow** — when work is split across external Codex, subagents, or multiple CLI sessions, the agent does not rely on chat history alone. It creates a task packet before fan-out, records audit receipts after scoped execution, and emits a handoff packet when a session is interrupted. This behavior is governed by Rule 18 and the runbook at `docs/runbooks/resumable-git-audit-pipeline.md`.
 
-**Runtime surface protection** — [`docs/RUNTIME_SURFACE_PROTECTION.md`](docs/RUNTIME_SURFACE_PROTECTION.md) describes the guard-registry pattern for repositories that have live user-facing runtime paths. This template ships the governance pattern and reference guidance; the concrete guard script and live probes remain adopter-specific until a repository has a real runtime surface to protect.
+**Receipt-anchored closeout audit** — `scripts/closeout_truth_audit.py` turns Rule 25 into a diff-aware executable check. It inspects staged or working-tree diffs and fails when truth-source completion claims appear without a receipt anchor in the same batch.
+
+**Runtime surface protection** — [`docs/RUNTIME_SURFACE_PROTECTION.md`](docs/RUNTIME_SURFACE_PROTECTION.md) now pairs the governance pattern with opt-in executable scaffolding. The template ships a generic guard runner, registry skeleton, and optional hooks, while adopters still provide the real surfaces, banned phrases, focused tests, and live validators.
 
 **Leftover unit contract** — [`docs/LEFTOVER_UNIT_CONTRACT.md`](docs/LEFTOVER_UNIT_CONTRACT.md) defines how to classify partial work, record why it stopped, and preserve a clean re-entry point instead of leaving vague TODO debt behind.
 
@@ -218,6 +249,10 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Concrete starter role profiles | `examples/reviewer_roles/*.md` |
 | Git audit packet defaults | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` |
 | Adoption bootstrap flow | `scripts/bootstrap_adoption.py` |
+| Long-task execution contract | `templates/execution_contract.template.md` |
+| Closeout truth audit | `scripts/closeout_truth_audit.py` |
+| Runtime guard registry | `templates/runtime_surface_registry.template.py` + `scripts/runtime_surface_guardrails.py` |
+| Optional git hooks | `.githooks/` + `scripts/install_git_hooks.sh` |
 | Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
 
 ---
