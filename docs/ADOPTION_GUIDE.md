@@ -8,18 +8,38 @@ Step-by-step guide for adopting this agent framework in a new project.
 
 - GitHub repository (new or existing)
 - A coding assistant that reads `.github/copilot-instructions.md` (GitHub Copilot, Cursor, Augment, etc.)
-- Bash (to run `scripts/validate-template.sh` after setup)
+- Python 3.11+ (to run the bootstrap, audit helper, and validation scripts)
+- Bash is optional — `scripts/validate-template.sh` is a thin wrapper that calls `scripts/validate_template.py`; you can run either
 
 ---
 
-## Step 1 — Copy the Core Files
+## Step 1 — Bootstrap Or Copy The Core Files
+
+### Recommended: bootstrap the target repository
+
+Run this from the template repository:
+
+```bash
+python scripts/bootstrap_adoption.py ../your-repo \
+  --project-name "Your Project" \
+  --profile standard
+```
+
+Profile guide:
+
+- `minimal` keeps only the core rules, state files, and doc index
+- `standard` is the recommended default for most repositories and includes CI plus validation tooling
+- `full` adds reviewer role examples, strategy docs, and the committed demo project
+
+### Manual alternative
 
 Copy these files into your new repository, preserving their paths:
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–11)
+  copilot-instructions.md          ← operating rules (Rule 0–23)
   project-context.instructions.md  ← project adapter (fill in Step 2)
+  RELEASE_TEMPLATE.md              ← release notes starting point
   agents/
     architect.agent.md             ← analysis/planning agent
     implementer.agent.md           ← execution/validation agent
@@ -31,8 +51,11 @@ docs/
   INDEX.md                         ← TYPE-A doc navigation index
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
+  COMPATIBILITY.md                 ← verified surfaces and known limits
+  LEFTOVER_UNIT_CONTRACT.md        ← how to record truthful partial-work state
   STRATEGY_MECHANISM_LAYERING.md   ← keep if you want formal reviewer or agent role splits
   ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
+  RUNTIME_SURFACE_PROTECTION.md    ← keep if your project has active runtime paths to protect
   runbooks/
     resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
   archive/                         ← empty dir for TYPE-C docs (keep it)
@@ -51,7 +74,9 @@ examples/
     *.md                           ← 10 ready-to-adapt starter role profiles
 
 scripts/
+  bootstrap_adoption.py            ← bootstrap and profile-aware adoption helper
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
+  validate_template.py             ← structured validator used locally and in CI
 ```
 
 ---
@@ -200,7 +225,21 @@ ROADMAP.md                         ← create from templates/roadmap.template.md
 
 Everything else is additive.
 
-After setup, run `bash scripts/validate-template.sh` from the repo root to confirm no required files are missing.
+After setup, run the structured validator from the repo root to confirm no required files are missing:
+
+```bash
+python scripts/validate_template.py
+# or equivalently: bash scripts/validate-template.sh  (thin wrapper for the above)
+```
+
+If you want to inspect the bootstrap plan before writing files, use:
+
+```bash
+python scripts/bootstrap_adoption.py ../your-repo \
+  --project-name "Your Project" \
+  --profile standard \
+  --dry-run
+```
 
 If you keep the resumable audit workflow, do a smoke run once:
 
@@ -214,6 +253,20 @@ python scripts/git_audit_pipeline.py init-task \
   --validation "- bash scripts/validate-template.sh" \
   --acceptance-boundary "- task packet exists"
 ```
+
+---
+
+## Next Upgrade Paths
+
+Start with the smallest shape that matches your team today, then grow into the heavier workflow only when you need it.
+
+| Starting point | Add next when you need... |
+|---|---|
+| `minimal` profile | cross-session state, stronger docs routing, and a repeatable bootstrap path |
+| `standard` profile | reviewer specialization, committed demo patterns, and CI-enforced integrity |
+| `full` profile | domain-specific role governance, packet-heavy audits, and internal operating standardization |
+
+If you are unsure, begin with `standard`. It gives the best balance of real guardrails without the full reviewer-role surface area.
 
 ---
 
@@ -237,4 +290,4 @@ python scripts/git_audit_pipeline.py init-task \
 
 **session_state.md is out of sync**: treat the actual code as truth; update session_state.md to match, not the other way around.
 
-**validate-template.sh fails with missing checks**: re-run after copying the latest `copilot-instructions.md` and `scripts/` from this template repository.
+**Validation fails with missing checks**: re-run `python scripts/validate_template.py` after copying the latest `copilot-instructions.md` and `scripts/` from this template repository. `validate-template.sh` is a bash wrapper for the same command.

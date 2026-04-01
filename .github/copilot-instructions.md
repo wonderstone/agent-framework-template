@@ -1,6 +1,8 @@
 # Agent Operating Rules
 
 > Behavior rules only. Project-specific facts live in `.github/project-context.instructions.md`.
+>
+> **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
 
 ---
 
@@ -14,14 +16,7 @@ User memory, judgment, or technical descriptions may be wrong. When a user state
 
 For potentially outdated information (paths, versions, ports): state the conflict, then ask which is current.
 
-### Pre-operation Validation Sequence
-
-Before any large-impact operation (refactor, delete, overwrite, config change):
-
-1. **Read** the relevant file/config — do not act on descriptions alone
-2. **Verify** the assumption matches the actual state
-3. **Execute** the change
-4. **Report** what was changed and what was found
+Pre-action verification (read → verify → execute → report) is formalized in **Rule 12**.
 
 ---
 
@@ -57,12 +52,12 @@ When a keyword appears in the user's message:
 
 ## Rule 4: Validation After Every Change (🔴 Mandatory)
 
-| Change scope | Minimum validation |
-|---|---|
-| Single file | Check diagnostics / lint for that file |
-| Single module | Run focused test suite for that module |
-| Cross-module or public contract | Run workspace-level static check |
-| Before commit | Static check clean, or known issues documented |
+| Change scope | Minimum validation | Toolchain tier (Rule 23) |
+|---|---|---|
+| Single file | Check diagnostics / lint for that file | Unit |
+| Single module | Run focused test suite for that module | Unit + Integration |
+| Cross-module or public contract | Run workspace-level static check | Integration + E2E |
+| Before commit | Static check clean, or known issues documented | All tiers |
 
 **Forbidden**: making a code change and immediately starting the next change without any validation.
 
@@ -70,18 +65,9 @@ When a keyword appears in the user's message:
 
 ## Rule 5: Dispatch Decision Disclosure (🔴 Mandatory)
 
-When a task can be split into 2+ independent scopes — each with its own owner files, validation, and summarizable result — evaluate dispatch before proceeding serially.
+When a task can be split into 2+ independent scopes, evaluate dispatch before proceeding serially. The disclosure is user-visible — not just in the footer.
 
-**Required disclosure** (user-visible, not just footer):
-
-```
-Dispatch Decision:
-- Decision: [fan-out / hybrid routing / no fan-out]
-- Why: [reason or exemption condition]
-- Next: [executor assignments or "main thread serial"]
-```
-
-**Valid no-dispatch reasons**: change is concentrated in one file · strong sequential dependency · still in locating phase · missing stable validation boundary · high-risk destructive operation.
+Full decomposition criteria, serial exemptions, executor assignment, and disclosure format: **Rule 15**.
 
 ---
 
@@ -104,6 +90,25 @@ Dispatch Decision:
 - Update `session_state.md` when: sub-phase completes · major decision made · task interrupted · current goal diverges from actual state
 - **Technical Insights** section: permanent — never auto-delete; supersede explicitly
 - If `session_state.md` exceeds ~100 lines: archive old phase content to `docs/archive/`
+
+### Rollover Triggers (perform at the next checkpoint — do not interrupt mid-task)
+
+Rollover is required when **any one** of these conditions is true:
+
+1. `session_state.md` exceeds ~100 lines or is visibly beyond two readable screens
+2. The "Active Work" section has multiple date-appended blocks stacking up
+3. The recent receipt window holds more than 3 entries and older entries no longer affect current decisions
+4. A phase has completed but its full receipt log is still in `session_state.md`
+5. The file contains content from a phase that has been marked ✅ in ROADMAP
+
+These are governance thresholds, not hard interrupts. Complete the current bounded step first, then roll over at the next natural checkpoint.
+
+### Minimal Rollover Procedure
+
+1. Copy old phase narrative and excess receipts to a new TYPE-C archive doc (`docs/archive/Phase_N_<Name>_YYYY-MM-DD.md`)
+2. Write the date and scope at the top of the archive doc
+3. Keep only in `session_state.md`: current goal, working hypothesis, active work, recent receipt window (≤ 3), decisions, insights
+4. If the archive becomes a long-term reference, add a link back from the corresponding TYPE-A doc or from the summary section of `session_state.md`
 
 ---
 
@@ -133,7 +138,7 @@ The focus field must never be omitted, even when handling a side task.
 When a subtask is confirmed done — **before discussing the next one**:
 
 1. ROADMAP row: `○`/`🔄` → `✅ YYYY-MM-DD`
-2. Acceptance criteria: `[ ]` → `[x]`
+2. Acceptance criteria: `[ ]` → `[x]` — at least one UAC item must be verified per Rule 22 before marking complete
 3. `session_state.md`: move item from "Active Work" → "Completed This Phase"
 4. Footer: set `Next` to the next subtask
 
@@ -141,8 +146,14 @@ When a subtask is confirmed done — **before discussing the next one**:
 
 1. `git status --short` — confirm scope and exclude unrelated dirty files
 2. Produce recommended commit message + file scope
-3. Execute `git add + git commit` only if user has authorized; otherwise ask
-4. **Never** auto `git push` without explicit user authorization
+3. The main thread may execute normal `git add + git commit` once validation is clean and the closeout boundary is coherent
+4. The main thread may execute a normal `git push` after commit when hard gates pass and no exception condition is active
+5. Escalate to the user instead of proceeding when any exception condition is active:
+   - history-rewriting or destructive Git actions are required (`push --force`, branch deletion, reset, rebase with published history)
+   - the target remote or target branch is ambiguous or differs from the expected closeout path
+   - unrelated dirty files or an incoherent commit boundary remain in the working tree
+   - required hard gates failed or validation evidence does not match the diff
+   - protected paths or release-sensitive operations are involved
 
 ---
 
@@ -158,7 +169,7 @@ When all acceptance criteria are ✅:
 
 ---
 
-## Rule 11: Cognitive Reasoning Loop
+## Rule 11: Cognitive Reasoning Loop (🔴 Mandatory)
 
 Before committing to an approach for any task involving code changes, multi-file edits, API modifications, architectural decisions, or anything with non-obvious scope — run this lightweight reasoning cycle:
 
@@ -177,13 +188,15 @@ Before committing to an approach for any task involving code changes, multi-file
 
 **Low-confidence rule**: do not act on a Low-confidence hypothesis without surfacing the uncertainty to the user first.
 
-Track the current hypothesis and confidence in `session_state.md` under **Working Hypothesis**. This rule runs alongside — not instead of — the Pre-operation Validation Sequence in Rule 0.
+**Inside a declared execution boundary (Rule 20)**: Low-confidence on a reversible step → proceed with `Alignment: uncertain` flagged, do not stop. Low-confidence on an irreversible or high-blast-radius decision → hard stop regardless of boundary.
+
+Track the current hypothesis and confidence in `session_state.md` under **Working Hypothesis**. This rule runs alongside — not instead of — the Pre-Action Self-Check Gate in Rule 12.
 
 ---
 
 ## Rule 12: Pre-Action Self-Check Gate (🔴 Mandatory)
 
-Before any file edit, destructive operation, config change, or commit — run this three-step gate. Do not skip or abbreviate it.
+Before any file edit, destructive operation, config change, or commit — run this three-step gate. Do not skip or abbreviate it. This gate absorbs the pre-operation validation sequence from Rule 0: it covers read → verify → execute → report for all large-impact operations.
 
 ### Step 1 — THINK
 State the action you are about to take and why, in one sentence.
@@ -231,7 +244,7 @@ Add an entry to `session_state.md` under **Mid-Session Corrections**:
 |---|---|
 | Wrong assumption | Re-read the source of truth; explicitly revise the hypothesis |
 | Invalid change | Revert or correct before continuing; do not layer fixes on top of errors |
-| Missing context | STOP — request the missing information; do not substitute guesses |
+| Missing context | Inside execution boundary (Rule 20): attempt to resolve from code first; stop only if genuinely unresolvable. Outside boundary: STOP — request the missing information; do not substitute guesses |
 | Conflicting project context | Escalate to the user; do not silently choose one source over another |
 | Scope exceeded | Stop the current change; confirm revised scope before resuming |
 
@@ -252,6 +265,8 @@ After every completed subtask — before composing the reply — run this progre
 5. UPDATE       → Write Current Step + Next Planned Step in session_state.md
 6. REPORT       → End every substantial reply with a ## Next Actions section
 ```
+
+> **Inside a declared execution boundary (Rule 20):** `stop and ask` is the last resort — not a peer option with `continue` and `decompose`. Prefer decomposing or continuing with `Alignment: uncertain` before stopping.
 
 ### Decision Rules
 
@@ -299,15 +314,16 @@ Before proceeding serially on any multi-step task, run the decomposition decisio
 
 ### Decomposition Test
 
-A task qualifies for decomposition when **all three** of the following are true:
+Fan-out is the **default** when both of the following are true:
 
 | Criterion | Test |
 |---|---|
 | **Independent owner files** | Each subtask touches a distinct, non-overlapping set of files |
-| **Independent validation** | Each subtask can be validated without running the others first |
 | **Summarizable result** | Each subtask produces a result that can be stated in one sentence |
 
-If any criterion fails → proceed serially. State the criterion that failed.
+Both criteria met → fan-out, unless a serial exemption is declared explicitly.
+Independent validation is desirable but not a gate — parallel tasks validate independently by design.
+Either criterion fails → proceed serially. State which criterion failed.
 
 ### Role Assignment Rules
 
@@ -327,21 +343,21 @@ Decomposition Decision:
 - Subtasks: [list each subtask and its owner file set]
 - Validation: [how each subtask is independently validated]
 - Role: [Architect / Implementer / main thread for each]
-- Why serial was rejected: [which criterion passed and which serial exemption did not apply]
+- Executor: [CLI (primary) / subagent (fallback) for each — per Rule 19]
 ```
 
-When serial is chosen, state the exemption:
+When serial is chosen, state the exemption explicitly:
 
 ```
-Proceeding serially — [criterion that failed / exemption reason]
+Proceeding serially — [criterion that failed: no independent owner files / no summarizable result
+                       / sequential dependency / high-risk op / locating phase]
 ```
 
-### Serial Exemptions (valid reasons to stay serial)
+### Serial Exemptions (must be declared explicitly when fan-out criteria are met)
 
 - Strong sequential dependency (output of step N is input to step N+1)
 - High-risk or destructive operation (safer to validate each step before proceeding)
 - Still in the locating/reading phase (scope not yet established)
-- Single file or single module (decomposition adds no value)
 
 ---
 
@@ -368,7 +384,7 @@ Before executing any multi-step task that is non-trivial, the agent MUST produce
 
 ### Plan Format
 
-A plan is short. Maximum 5 steps. Write it in `session_state.md`:
+A plan is short. Maximum 5 steps **per layer**. Write it in `session_state.md`. Tasks requiring more than 5 steps are decomposed into sub-plans via Rule 15 — each sub-plan has its own 5-step maximum, and Rule 14's progression loop drives execution across sub-plans sequentially.
 
 ```markdown
 ## Plan
@@ -519,3 +535,407 @@ Use the canonical runbook and generator:
 4. If interrupted, create a handoff packet before switching executor
 5. Run hard gates
 6. Return to main-thread owner review for final acceptance and Git closeout
+
+---
+
+## Rule 19: Executor Selection Order (🔴 Mandatory)
+
+For bounded execution tasks after fan-out, assign executors in this order:
+
+| Priority | Executor | Use when |
+|---|---|---|
+| 1 — primary | CLI (external session) | Default for all bounded execution tasks |
+| 2 — fallback | Subagent (internal spawn) | CLI has hit a terminal failure condition |
+
+### Fallback Trigger Conditions
+
+Switch from CLI to subagent only when one of the following is **confirmed**, not assumed:
+
+- Token limit reached: CLI context exhausted mid-task, cannot continue in the same session
+- CLI unresponsive: repeated non-recoverable errors after one retry attempt
+- CLI session cannot be resumed and a handoff packet has already been written
+
+### Fallback Protocol
+
+1. Write a handoff packet **before** switching executor type
+2. Pass the same task packet to the subagent — do not reconstruct scope from memory
+3. Record `Executor Change: CLI → subagent` in the handoff packet with the trigger reason
+4. If both fail: escalate to user; do not re-attempt without explicit direction
+
+### Escalate to user when
+
+- Both CLI and subagent fail on the same task
+- Failure cause is ambiguous (not clearly a token or availability issue)
+- The fallback subagent also hits context limits
+
+### Why CLI first
+
+CLIs run in isolated sessions with their own context windows, keeping bounded execution out of the main thread's context budget. Subagents share the parent context and should be reserved for cases where CLI is unavailable or has failed.
+
+### Constraint
+
+This rule governs runtime executor selection only. It does not change how role judgment is defined — roles remain defined in the strategy layer independent of executor type (see `docs/STRATEGY_MECHANISM_LAYERING.md`).
+
+---
+
+## Rule 20: Long-Task Autonomous Execution (🔵 Primary Mode)
+
+Multi-step tasks are the **primary operational mode**. The default execution posture is autonomous forward progress. Human interruption is reserved for genuine blockers — not routine procedural steps.
+
+Short, interrupt-heavy loops degrade work quality: context is lost between turn-arounds, re-engagement adds latency, and safety is better served by a clear boundary declaration upfront than by reactive per-step confirmation.
+
+### Execution Boundary Declaration
+
+At the start of any multi-step task, declare an execution boundary **before the first action**:
+
+```
+Execution Boundary:
+- Authorized scope:  [file set or module scope]
+- Authorized ops:    read · edit · lint · test · state updates · fan-out to CLI
+- Hard stops:        [protected paths / destructive git / scope conflict / Low-confidence irreversible decision]
+- Check-in point:    [phase boundary / acceptance criteria met / explicit blocker reached]
+```
+
+Within the declared boundary, proceed without per-step confirmation.
+
+### Pre-Authorized Operations (no confirmation needed within boundary)
+
+- Reading any file in the authorized scope
+- Loading `.github/project-context.instructions.md` and canonical docs
+- Running lint, type checks, and test commands defined in the project adapter
+- Writing to `session_state.md`, `docs/archive/`, and task artifact locations
+- Fan-out to CLI executors (Rule 19) within the declared scope
+- Moving items between ROADMAP rows and `session_state.md` sections
+
+### Hard Stops (always interrupt — boundary declaration does not override)
+
+Stop and wait for human input when any of the following is true:
+
+- A target path is listed under Protected Paths
+- A destructive or history-rewriting git operation is required
+- Two sources conflict and the conflict cannot be resolved by reading code
+- Confidence is Low on a decision that is irreversible or high-blast-radius
+- Scope has grown materially beyond the declared boundary
+
+### Deferred Check-Ins (batch at phase boundary — do not interrupt mid-task)
+
+Collect and surface at the next natural pause point, not immediately:
+
+- Minor uncertainty that does not block the next step (`Alignment: uncertain`)
+- Validation warnings that are pre-existing and unrelated to the current change
+- Observations about adjacent code worth addressing later
+
+### Interaction with Other Rules
+
+| Rule | Behavior inside a declared boundary |
+|---|---|
+| Rule 11 (cognitive reasoning) | Low-confidence on reversible step → proceed with `Alignment: uncertain` flagged; Low-confidence on irreversible/high-blast-radius decision → hard stop |
+| Rule 12 (self-check) | File reads and adapter loading are auto-resolved — do not surface as STOP |
+| Rule 13 (failure recovery) | Missing context → attempt to resolve from code before stopping; stop only if genuinely unresolvable |
+| Rule 14 (progression) | `stop and ask` is the last resort, not the default for uncertain next steps |
+| Rule 17 (reality check) | `uncertain` alignment → flag in Next Actions and continue; `misaligned` → stop |
+
+---
+
+## Rule 21: Dispatch Stability Protocol (🔴 Mandatory)
+
+Every dispatched task must be sent with a verified task packet and must terminate in an explicit state. Silent stopping is not a valid outcome. This rule applies to all CLI and subagent executors dispatched under Rule 15 and Rule 19.
+
+### Pre-Dispatch Readiness Gate
+
+Before freezing the task packet and dispatching any executor, verify all four conditions. Do not dispatch if any condition fails.
+
+| Condition | Check | If it fails |
+|---|---|---|
+| Observable acceptance criteria | Criteria can be verified without human judgment (test passes, lint clean, file exists) | Rewrite criteria before dispatching |
+| Bounded file scope | Specific files or a named module — not "the backend" or "relevant files" | Narrow the scope or decompose further |
+| Unambiguous entry point | Executor knows the first concrete action without asking | Add a `Start here:` line to the task packet |
+| Explicit do-not-touch list | Files outside scope are named or the boundary is stated | Add a `Do not touch:` line to the task packet |
+
+### Task Sizing Constraint
+
+Maximum **5 files** per dispatched subtask. This prevents context window exhaustion mid-execution.
+
+> This limit applies to tasks dispatched to external executors (CLI or subagent). It does not apply to the main thread operating within its own declared execution boundary (Rule 20).
+
+If a dispatched subtask would require touching more than 5 files:
+1. Decompose it into smaller subtasks, each under the limit
+2. Or flag it as serial (with rationale) and handle it on the main thread
+
+### Terminal State Contract
+
+Every dispatched executor must end in exactly one of three states. No executor may stop without emitting a terminal state.
+
+| State | Meaning | Required output |
+|---|---|---|
+| `DONE` | Acceptance criteria met | Audit receipt written; validation evidence included |
+| `STUCK` | Cannot proceed without external input | Handoff packet written; blocker stated; work-so-far documented |
+| `ESCALATE` | Discovered something that changes task scope | Handoff packet written; finding stated; original scope preserved |
+
+**Silent stopping is treated as `STUCK`** by the main thread. The main thread must not wait indefinitely — if no terminal state is received after the expected scope is exhausted, write a handoff packet and escalate.
+
+### Progress Signal (required for tasks > 3 file edits)
+
+After each file change, emit a one-line progress signal:
+
+```
+Step N: [filename] — [validation result: PASS / FAIL / SKIP]
+```
+
+This allows the main thread to detect whether an executor has stopped progressing.
+
+### Stuck Self-Declaration Format
+
+When an executor cannot continue, it emits this block before stopping:
+
+```
+STUCK
+- Was doing:    [current action]
+- Blocker:      [what cannot be resolved without external input]
+- Done so far:  [files changed, validation state]
+- Resume from:  [next step if blocker is resolved]
+```
+
+Then writes a handoff packet (Rule 18) and stops. The main thread routes to the next executor (Rule 19) or escalates to the user.
+
+---
+
+## Rule 22: User Acceptance Gate (🔴 Mandatory)
+
+Technical validation confirms the code is correct. User acceptance confirms the work satisfies the user's intent. These are not the same check. Passing lint and tests is necessary but not sufficient — it does not constitute task completion.
+
+No task is declared `Status: complete` until User Acceptance Criteria (UAC) have been declared upfront, validated end-to-end, and each item has evidence — not assumption.
+
+### UAC Declaration (before implementation starts)
+
+At task intake — before writing any code — elicit and record UAC in the acceptance criteria section or `session_state.md`:
+
+```
+User Acceptance Criteria:
+- [ ] When [user does X], [user observes Y]
+- [ ] When [user does X], [user observes Y]
+
+End-to-end scenario: [complete user journey from entry point to expected outcome]
+
+Agent cannot verify: [items the agent cannot simulate — flagged for user testing]
+```
+
+UAC must be written in user-observable language, not technical language:
+
+| ✅ Valid | ❌ Invalid |
+|---|---|
+| "When the user runs `cmd`, the output matches the expected format" | "Unit tests pass" |
+| "When the user opens the config file, the new key is present and documented" | "No lint errors" |
+| "When the user follows the setup steps in the README, the service starts" | "Coverage is 90%" |
+
+If the user has not specified success conditions: ask before proceeding. Do not proceed on a multi-step task without at least one UAC item.
+
+### End-to-End Validation Requirement
+
+At least one UAC item must cover the complete user journey — from the user's entry point to the observable outcome. Point checks on individual components do not satisfy this requirement.
+
+### UAC Evidence at Completion
+
+Before declaring `Status: complete`, provide evidence for each UAC item:
+
+```
+UAC Evidence:
+- [x] [criterion] — verified by: [command run / output observed / file produced]
+- [ ] [criterion] — cannot verify: [reason] — flagged for user testing
+```
+
+For UAC items the agent cannot simulate (GUI interaction, external dependency, physical environment): flag them explicitly. Do not claim DONE for unverifiable items — declare `Status: complete` only after all verifiable items have evidence and all unverifiable items are flagged.
+
+### The Gap Check (mandatory before closing)
+
+Before closing any task, explicitly answer: **"What would the user notice that our tests would not catch?"**
+
+Common gaps:
+
+- Integration path the unit tests mock away
+- Output format is syntactically correct but not usable as-is
+- Feature works in isolation but breaks in the expected usage sequence
+- Default values pass tests but are wrong for real-world use
+- Documentation or examples do not match the actual behavior
+
+If the answer is non-empty: add a UAC check for each gap, or flag it for user testing before declaring complete.
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 16 (Planning) | UAC is elicited during planning, before implementation steps are written |
+| Rule 17 (Reality Check) | Reality check evidence must cite UAC results — technical test passage alone does not satisfy it |
+| Rule 9 (Subtask Completion) | A subtask checkpoint requires at least one UAC item verified, not just technical validation |
+| Rule 21 (Dispatch Stability) | `DONE` terminal state requires UAC evidence included in the audit receipt |
+
+---
+
+## Rule 23: Validation Toolchain Prerequisite (🔴 Mandatory)
+
+User Acceptance Criteria (Rule 22) can only be executed if the project has the appropriate tools installed. A UAC item that cannot be run is not a verification — it is a wish. Tooling setup is implementation work, not optional preparation.
+
+This rule runs at two moments:
+1. **At project adoption**: establish the full toolchain before any feature work begins
+2. **At task intake**: verify the toolchain covers all UAC items for this task before writing any code
+
+### Validation Tiers
+
+| Tier | Purpose | Mocks acceptable? |
+|---|---|---|
+| **Unit** | Isolated function or component behavior | Yes |
+| **Integration** | Cross-component or cross-service behavior | Minimize; no mocks on user-facing paths |
+| **End-to-end** | Complete user journey from entry point to observable outcome | No |
+
+The E2E tier is the direct prerequisite for Rule 22 UAC execution. Without it, end-to-end UAC items cannot be verified.
+
+### Tool Selection by Project Type
+
+| Project type | Unit | Integration | End-to-end |
+|---|---|---|---|
+| Web frontend | Jest / Vitest | React Testing Library / Vue Test Utils | Playwright / Cypress |
+| Backend API | pytest / Jest | httpx / supertest (real HTTP) | Postman+Newman / curl script |
+| CLI tool | pytest / Jest | subprocess invocation | Full command invocation + output assertion |
+| Library / SDK | pytest / Jest | Example usage tests | Consumer integration test |
+| Full-stack | Per layer | API contract test | Browser + API combined |
+
+Select from this table or document an equivalent. Do not leave the E2E tier empty for any project where a user-facing interaction path exists.
+
+### Pre-Task Toolchain Check
+
+Before writing UAC for any task, answer:
+
+| Question | If NO |
+|---|---|
+| Is there an E2E tool installed and runnable for this project? | Declare a toolchain setup subtask — this runs before implementation |
+| Can each UAC item be executed by an existing tool? | Set up the missing tool, or rewrite the UAC item to be executable |
+| Are integration tests using real dependencies on user-facing paths? | Replace the mocks before proceeding |
+
+If any answer is NO, the toolchain setup subtask must complete before implementation begins. Do not treat toolchain setup as optional or deferred.
+
+### Documentation Requirement
+
+Record the validated toolchain in `.github/project-context.instructions.md` under **Validation Toolchain**. This makes it part of the project adapter (Layer 2) — available to all agents on every task without re-eliciting.
+
+Add `e2e|toolchain|acceptance` to the Critical Topic Triggers table in the project adapter, pointing to the Validation Toolchain section.
+
+If adopting a new project, `scripts/bootstrap_adoption.py` generates a first-pass project adapter (including a Validation Toolchain section pre-populated for the chosen profile). Treat the generated values as starting points and confirm them before running any task.
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 22 (UAC Gate) | Toolchain is the prerequisite; UAC cannot be executed without it |
+| Rule 4 (Validation After Change) | Validation commands must reference the declared toolchain tiers |
+| Rule 16 (Planning) | When toolchain is missing, tool setup appears as the first step in the plan — before any feature step |
+| Rule 21 (Dispatch Stability) | Task packets must include the toolchain commands for their validation tier |
+
+---
+
+## Rule 24: Scope Entry Classification and Leftover Contract (🔴 Mandatory)
+
+Work that is partially done but not formally recorded is invisible debt. This rule makes stopping partway an explicit, auditable state — not a failure to be hidden.
+
+### Before Entering Any New Scope
+
+Before implementing anything in a new module section, feature area, or validation surface — run a scope entry classification. Answer these four questions and write the answers down (in `session_state.md` or the task packet):
+
+1. **What is this scope?** — one sentence identifying the boundary (`slice_id`, e.g., `auth_token_refresh_api`)
+2. **What are the entry points and owner files?** — which files own this scope
+3. **What is the minimum validation?** — the lowest acceptable verification before claiming this scope is done
+4. **What is its current state?** — choose exactly one:
+
+| State | Meaning |
+|---|---|
+| `ready_for_full_execution` | All gates can be satisfied; proceed fully |
+| `ready_for_partial_execution` | Some gates can be satisfied; proceed within a bounded scope |
+| `implementation_complete_live_blocked` | Code done; a live or external gate is currently blocked by environment or dependency |
+| `do_not_enter_yet` | Scope boundary is not stable, or minimum validation surface does not exist |
+
+**If you cannot determine which state applies, the scope is `do_not_enter_yet`.** Record it as a leftover and move on. Do not begin implementation on an unclassifiable scope.
+
+### When Stopping Partway
+
+Any scope that does not reach `ready_for_full_execution` at the end of a session must be recorded as a **leftover unit** with these five fields:
+
+```
+Leftover: [slice_id]
+- why_stopped:        [real reason — not "TODO"]
+- current_truth:      [what verifiably exists today]
+- missing_gate:       [specific check still needed]
+- next_reentry_action:[first concrete action on re-entry]
+- promotion_blocker:  [condition that must change before this can be promoted or declared complete]
+```
+
+### Hard Rules
+
+- **Forbidden**: writing "TODO", "will finish later", or leaving a scope half-described with no leftover record
+- **Forbidden**: entering implementation on a scope that has not been classified
+- **Forbidden**: declaring a scope `completed` or `accepted` when only focused tests pass but the live or integration gate is missing — that state is `implementation_complete_live_blocked`, not done
+- **Allowed**: recording a leftover and moving on when ROI is insufficient to continue this sprint
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 16 (Planning) | Planning asks "what steps to take"; scope classification asks "what state is the work in" — run classification before planning |
+| Rule 18 (Resumable Audit) | Handoff packets cover tactical session interruptions; leftover units cover strategic deferrals that survive phase rotation |
+| Rule 25 (Receipt-Anchored Closeout) | `implementation_complete_live_blocked` cannot be written as "completed" — Rule 25 enforces this at the diff level |
+| Rule 22 (UAC Gate) | UAC defines acceptance conditions; scope classification defines which state the scope is currently in relative to those conditions |
+
+Full concept documentation: `docs/LEFTOVER_UNIT_CONTRACT.md`
+
+---
+
+## Rule 25: Receipt-Anchored Closeout (🔴 Mandatory)
+
+Writing "completed", "accepted", or "status=passed" in a truth source is a **claim** — not a fact. A claim without a receipt anchor is indistinguishable from a placeholder.
+
+### The Rule
+
+When any of the following strings appear as **new additions** in `session_state.md`, `ROADMAP.md`, or docs:
+
+```
+completed · accepted · status=passed · done · verified · all criteria met
+```
+
+The **same batch of changes** must include at least one receipt anchor from this list:
+
+```
+request_id=   ·   turn_id=   ·   session_id=   ·   stream_session_id=
+status=passed ·   All tests passed ·   Live smoke passed ·   N passed
+```
+
+### Why This Matters
+
+Without this rule, truth sources accumulate "paper completions" — tasks that look done in the state file but have no evidence trail. This is especially dangerous for multi-executor or multi-session work, where the next session cannot distinguish real completion from an optimistic claim.
+
+### What Counts as a Receipt Anchor
+
+A receipt anchor is **any verifiable artifact that proves the claimed state existed**:
+
+| Anchor type | Examples |
+|---|---|
+| Test run output | `5 passed`, `All tests passed`, pytest exit 0 |
+| Live execution ID | `request_id=abc123`, `session_id=xyz` |
+| Live smoke result | `Live smoke passed`, validator exit 0 |
+| User confirmation | Explicit user sign-off recorded in the same diff |
+
+### What Does NOT Count
+
+- "Should be working" or "looks correct" without evidence
+- Passing lint or type checks alone (technical validation, not acceptance)
+- Assumptions carried forward from a previous session
+
+### Enforcement
+
+Projects that adopt the full framework should wire this check into their pre-commit hook using a script analogous to `scripts/closeout_truth_audit.py` (see `docs/RUNTIME_SURFACE_PROTECTION.md`). Until automated, the agent must self-enforce: before writing any closeout claim, confirm the receipt anchor exists in the same diff.
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 9 (Subtask Completion) | A subtask checkpoint requires at least one UAC item verified — that verification output is the receipt |
+| Rule 22 (UAC Gate) | UAC Evidence section is the natural home for receipt anchors |
+| Rule 21 (Dispatch Stability) | `DONE` terminal state requires an audit receipt — the audit receipt is the receipt anchor |
+| Rule 18 (Resumable Audit Assets) | Audit receipts serve double duty: they satisfy the receipt-anchor requirement and preserve resumability |

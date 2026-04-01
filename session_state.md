@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Upgrade this template so strategy-layer role definitions, example role families, starter role profiles, and mechanism-layer recovery workflows are all first-class framework capabilities.
+Self-host the newest governance additions so Rule 25, runtime-surface protection, and leftover-unit guidance are reflected in bootstrap, validation, and root docs.
 
 ---
 
 ## Working Hypothesis
 
-The best next step is not just a generic strategy/mechanism explanation, but a concrete starter set of formal role profiles so repositories can immediately adapt a first batch and second batch of first-class roles.
+The remaining gap is integration, not design: the new docs already exist, but adopters and maintainers need them surfaced in README, project context, bootstrap, and validator checks to prevent silent drift.
 
 **Confidence**: High
 
-**Evidence**: Runic shows that Codex-vs-Claude responsibility split is a strategy concern, while packet/receipt/handoff and hard gates are mechanism concerns; broader examples like git closeout, protocol boundary, performance, observability, and migration review make the strategy layer more reusable; a repository still benefits from concrete starter files rather than prose-only examples.
+**Evidence**: The new governance docs are now wired into the validator, bootstrap standard profile, README, and project adapters, and the focused validation suite passed after those changes.
 
 **Contradictions**: None.
 
@@ -25,40 +25,51 @@ The best next step is not just a generic strategy/mechanism explanation, but a c
 
 ## Plan
 
-**Approach**: Extend the template so it carries both the resumable mechanism layer and a formal strategy-layer model with concrete reviewer-family examples and starter role-profile files.
+**Approach**: Close the integration loop first, then leave runtime-surface automation as an explicit leftover until a real live surface exists.
 
 **Steps**:
-1. Add a TYPE-A strategy/mechanism layering doc and a reviewer role profile template.
-2. Add a TYPE-A example pack covering multiple reviewer families.
-3. Add a starter set of concrete role-profile example files for the first batch and second batch.
-4. Surface the new abstraction and examples in README, architecture, adoption, index, and project adapter triggers.
-5. Extend validation checks so the new framework layer cannot drift silently.
-6. Re-run template validation and focused tests.
+1. Keep validator coverage enforcing the newest TYPE-A docs and rule-range sync.
+2. Keep bootstrap and project-context surfaces exposing the new docs.
+3. Keep runtime-surface protection documented as reference-only in this repository.
+4. Revisit concrete guard scripts only when an adopting repository has a stable live surface.
 
-**Why this approach**: The template should not force every adopter to rediscover the difference between reviewer meaning and workflow durability on their own.
+**Why this approach**: It turns the governance additions into shipped, test-backed behavior without pretending this framework repo has a live runtime path of its own.
 
 ---
 
 ## Active Work
 
-**Current Step**: Starter role-profile set is complete and validated; preparing real-project adoption.
+**Current Step**: Recording the rollover and the remaining explicit leftover.
 
-**Next Planned Step**: Reuse the generalized template in a real project and instantiate the starter profiles in a consumer repository.
+**Next Planned Step**: Monitor whether a future release should ship generic closeout/runtime guard scripts or keep them as reference patterns.
 
 ---
 
-## Completed This Phase
+## Recent Receipts
 
-- Read the template's canonical rule, architecture, adoption, index, state, and validation surfaces to identify the correct upgrade points.
-- Confirmed the template had no existing packet / receipt / handoff workflow, so the upgrade must add canonical assets rather than merge with a prior owner.
-- Added a canonical runbook, packet templates, generator CLI, and focused tests for resumable git audit work.
-- Wired the new workflow through README, framework architecture, adoption guide, project adapter triggers, agent role contracts, and template validation.
-- Re-ran focused pytest and `bash scripts/validate-template.sh`; both now pass.
-- Added a TYPE-A strategy/mechanism layering doc and a reviewer role profile template so domain-specific reviewer splits can reuse the same mechanism layer.
-- Added a TYPE-A role strategy example pack covering runtime correctness, maintainability, git closeout, protocol boundary, state/checkpoint integrity, performance, observability, migration, and docs/spec drift reviewer families.
-- Decided the template should ship a concrete starter set of role profiles, not just prose examples, and to split them into a first batch of 6 and a second batch of 4.
-- Added a concrete starter set of 10 formal role-profile files under `examples/reviewer_roles/` and wired them into README, adoption guidance, adapter navigation, and validation.
-- Re-ran `bash scripts/validate-template.sh` and `python3 -m pytest tests/test_git_audit_pipeline.py -q`; both passed after the starter-set addition.
+- Structured validation passed via `python3 scripts/validate_template.py`.
+- All tests passed via `python3 -m pytest tests/ -q`.
+- `15 passed in 0.23s`, and the standard-profile bootstrap dry run succeeded via `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run`.
+
+---
+
+## Phase Notes
+
+- Wired `docs/RUNTIME_SURFACE_PROTECTION.md` and `docs/LEFTOVER_UNIT_CONTRACT.md` into the structured validator, README, root adapter, template adapter, and bootstrap standard profile.
+- Added regression checks for README rule-range drift and receipt-closeout rule-number drift.
+- Clarified that runtime-surface protection is a reference governance pattern in this repository, not a shipped live probe tool.
+
+---
+
+## Leftover Units
+
+### runtime_surface_guardrails_template_repo
+
+- **why_stopped**: this repository has no active default user runtime path, so a generic live guard script would be synthetic rather than truthful.
+- **current_truth**: the governance pattern is documented and surfaced; validator/bootstrap now ship the docs, but no repo-local live guard script or hook installer exists.
+- **missing_gate**: a real protected runtime surface plus a repeatable live validator contract.
+- **next_reentry_action**: first decide whether a future template release should ship a generic skeleton guard script or keep pointing adopters to reference implementations.
+- **promotion_blocker**: cannot promote to shipped runtime enforcement until there is a concrete, non-synthetic live surface definition.
 
 ---
 
@@ -70,31 +81,30 @@ The best next step is not just a generic strategy/mechanism explanation, but a c
 
 ## Mid-Session Corrections
 
-- (none)
+- Corrected the earlier assumption that the rule set stopped at Rule 24; the current top-level rules run through Rule 25 and root docs must follow that numbering.
 
 ---
 
-## Acceptance Criteria
+## User Acceptance Criteria
 
-- [x] The template ships a canonical resumable git audit runbook, packet templates, and generator CLI.
-- [x] The template also ships a strategy-layer doc and role-profile template for formal reviewer / agent role splits.
-- [x] The template ships a concrete example pack that goes beyond two CLI identities and covers multiple reviewer families.
-- [x] The template ships a concrete starter set of 10 role-profile examples split into first-batch and second-batch roles.
-- [x] The new workflow and abstraction are surfaced in README, adoption docs, project adapter triggers, and framework architecture.
-- [x] Template validation checks and focused tests pass after the starter-role-profile addition.
+- [x] When a maintainer runs `python3 scripts/validate_template.py`, the newest governance docs are treated as required template surfaces.
+- [x] When a maintainer runs the focused bootstrap and validator tests, the standard profile covers the new docs and README/rule-number drift is caught.
+- [x] When a reader opens README or the root project context, Rule 25 and the two new governance docs are visible without searching the repo.
+
+End-to-end scenario: a maintainer edits governance docs, runs the validator and focused tests, and sees drift detected before release.
+
+Agent cannot verify: downstream third-party AI tools honoring every rule consistently.
 
 ---
 
 ## Phase Decisions
 
-- Treat resumable git audit as a framework capability, not a project-specific recipe, so adopters inherit both the docs and the mechanism layer.
-- Treat reviewer identity and reviewer workflow as separate concerns: role meaning lives in the strategy layer, packet/receipt/handoff and hard-gate durability live in the mechanism layer.
-- Treat the first six roles as the default first-class starter set for most repositories, with observability, performance, migration, and docs/spec drift as the second batch.
+- Treat runtime-surface protection as a shipped governance pattern but not a repo-local executable subsystem until a real runtime surface exists.
+- Treat leftover units as first-class state, not implicit TODO debt.
 
 ---
 
 ## Technical Insights
 
-- Framework upgrades only stick when they are reflected in rules, docs, templates, scripts, and validation together; single-layer additions decay quickly.
-- Role specialization is reusable framework material only when it is decoupled from the recovery mechanism that survives tool failure or token exhaustion.
-- Concrete role families improve the strategy layer itself, because they expose judgments that would otherwise stay overloaded inside one vague "reviewer" role.
+- New governance docs only become real product surface when validator, bootstrap, README, and project adapter all point at the same truth.
+- Rule-number drift is cheap to introduce and worth checking automatically.

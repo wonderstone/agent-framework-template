@@ -22,6 +22,13 @@ The framework also distinguishes **strategy** from **mechanism**:
 1. strategy answers: which agent / CLI / reviewer is responsible for what kind of judgment
 2. mechanism answers: how that work is frozen, validated, handed off, and recovered
 
+The repository now also includes a **productization surface** around that model:
+
+1. `scripts/bootstrap_adoption.py` turns adoption into a profile-aware initialization step
+2. `scripts/validate_template.py` checks structural integrity beyond simple string greps
+3. `examples/demo_project/` shows a tiny adopted repository with code, tests, and committed audit artifacts
+4. `docs/COMPATIBILITY.md`, `CHANGELOG.md`, `VERSION`, and `.github/RELEASE_TEMPLATE.md` make release and support expectations explicit
+
 ---
 
 ## Layer 1 — Operating Rules
@@ -203,6 +210,108 @@ With the split:
 
 ---
 
+## User Acceptance Gate
+
+Technical validation (lint, type checks, unit tests) confirms the code is correct. User acceptance confirms the work satisfies the user's intent. These are distinct checks — passing one does not imply the other.
+
+Rule 22 in `.github/copilot-instructions.md` makes user acceptance a mandatory gate, not an afterthought.
+
+### The Problem This Solves
+
+Agents tend to close tasks based on technical correctness: tests pass, lint is clean, no type errors. This produces work that is technically valid but behaviorally wrong from the user's perspective — wrong defaults, non-human-readable output, integration paths that unit tests mock away. The agent declares DONE; the user finds it broken.
+
+The root cause is that acceptance criteria are written in technical language, by the agent, at implementation time. UAC fixes this by requiring criteria to be written in user-observable language, elicited from the user, before implementation begins.
+
+### UAC Lifecycle
+
+```
+Task intake
+   ↓
+UAC Declaration — written in user-observable language before any code is written
+   ↓
+Implementation
+   ↓
+End-to-end validation — at least one complete user journey verified
+   ↓
+Gap check — "what would the user notice that our tests would not catch?"
+   ↓
+UAC Evidence — per-item evidence cited (not assumed); unverifiable items flagged
+   ↓
+Status: complete
+```
+
+### UAC vs Technical Validation
+
+| Dimension | Technical validation | User acceptance |
+|---|---|---|
+| Written by | Agent | Elicited from user at task intake |
+| Language | Technical (test pass, lint clean) | Behavioral (user does X, user sees Y) |
+| Coverage | Individual components | Complete end-to-end journey |
+| Verified by | Automated tools | Agent simulation + explicit gap check |
+| Timing | After each change | Before declaring complete |
+
+### The Gap Check
+
+Before closing any task, the agent must answer: **"What would the user notice that our tests would not catch?"** This surfaces the class of failures most likely to reach the user: integration paths that are mocked in tests, output that is syntactically valid but not usable, features that work in isolation but break in context.
+
+---
+
+## Validation Toolchain Prerequisite
+
+Rule 22 (User Acceptance Gate) requires end-to-end validation. End-to-end validation requires tooling. Rule 23 in `.github/copilot-instructions.md` makes toolchain setup a mandatory prerequisite — not optional preparation.
+
+### Why Tooling Must Be Selected Upfront
+
+Tooling chosen late creates two failure modes:
+1. **UAC items are unverifiable** — the agent writes acceptance criteria it cannot execute, then declares DONE based on unit tests
+2. **Wrong tool for the project type** — a Playwright setup is useless for a pure CLI tool; an httpx integration test is insufficient for a browser-rendered frontend
+
+Tooling must be selected at project adoption time, matched to the actual project type, and documented in the project adapter so every agent can access it.
+
+### Validation Tiers
+
+```
+Unit        → isolated component behavior; mocks acceptable
+Integration → cross-component behavior; no mocks on user-facing paths
+End-to-end  → complete user journey; no mocks
+```
+
+The E2E tier is the direct prerequisite for UAC execution. A project without an E2E tool cannot satisfy Rule 22.
+
+### Tool Selection by Project Type
+
+| Project type | E2E tool |
+|---|---|
+| Web frontend | Playwright / Cypress |
+| Backend API | Postman+Newman / curl script |
+| CLI tool | Full command invocation + output assertion |
+| Library / SDK | Consumer integration test |
+| Full-stack | Browser + API combined |
+
+Full tier breakdown (Unit + Integration + E2E) is in Rule 23.
+
+### Where the Toolchain Lives
+
+The validated toolchain is recorded in `.github/project-context.instructions.md` under **Validation Toolchain**. This places it in Layer 2 (Project Adapter) — loaded at task start, available to all agents without re-eliciting.
+
+Bootstrap presets now help teams get to that state faster: `scripts/bootstrap_adoption.py` can render a first-pass project adapter for `backend-api`, `web-frontend`, `cli-tool`, `library`, or `full-stack` repositories. The generated values are starting points and still require project-specific confirmation.
+
+### Toolchain Setup as Implementation Work
+
+When a required toolchain tier is missing, the agent declares a setup subtask and completes it before any feature implementation step. Toolchain setup is not deferred. A task plan that skips toolchain setup when the toolchain is incomplete is invalid.
+
+### Validation Contracts In This Repository
+
+This template repository now validates itself in three layers:
+
+1. `scripts/validate_template.py` checks required assets, key sections, cross-doc references, CI expectations, and bootstrap coverage
+2. `python -m pytest tests/ -q` exercises the bootstrap helper, audit generator, and validator itself
+3. `.github/workflows/ci.yml` runs the structured validator, the tests, and bootstrap smoke commands on supported Python versions
+
+This does not eliminate project-specific verification, but it does reduce drift between the repository's claims and the assets it ships.
+
+---
+
 ## Completion Checkpoints
 
 When a subtask is confirmed done, the agent executes a 4-step atomic ritual **before** discussing the next subtask:
@@ -222,7 +331,81 @@ When all acceptance criteria in a phase are ✅:
 2. **Promote**: durable insights → appropriate TYPE-A docs
 3. **Rotate**: clear phase content from `session_state.md`; load next phase criteria
 4. **Mark**: ROADMAP.md row → `✅ YYYY-MM-DD`
-5. **Git closeout**: commit, then ask before pushing
+5. **Git closeout**: main thread commits and normally pushes after hard gates pass; only exception cases are escalated
+
+---
+
+## Long-Task Autonomous Execution
+
+Multi-step tasks are the primary operational mode. The framework's default execution posture is autonomous forward progress — not wait-and-confirm. This posture is established by Rule 20 in `.github/copilot-instructions.md`.
+
+### Execution Boundary
+
+At task start, the agent declares an execution boundary that defines:
+
+| Field | Content |
+|---|---|
+| Authorized scope | File set or module scope covered by this task |
+| Authorized ops | Read, edit, lint, test, state updates, CLI fan-out |
+| Hard stops | Protected paths, destructive git, scope conflict, Low-confidence irreversible decision |
+| Check-in point | Phase boundary, acceptance criteria met, or explicit blocker |
+
+Within the boundary, the agent proceeds without per-step confirmation. Operations such as reading files, loading the project adapter, running validation commands, and writing state documents are pre-authorized and do not produce STOP events.
+
+### Interruption Tiers
+
+```
+Tier 1 — Auto-proceed (no human needed):
+  file reads · adapter loading · lint / test runs · state doc writes · CLI fan-out
+
+Tier 2 — Batch at phase boundary (do not interrupt mid-task):
+  Alignment: uncertain · pre-existing warnings · adjacent observations
+
+Tier 3 — Hard stop (always interrupt, boundary cannot override):
+  protected paths · destructive git ops · unresolvable source conflict ·
+  Low-confidence irreversible decision · material scope expansion
+```
+
+### Interaction with Other Mechanisms
+
+| Mechanism | Behavior inside a declared boundary |
+|---|---|
+| Self-check gate (Rule 12) | File reads and adapter loading auto-resolve — not surfaced as STOP |
+| Failure recovery (Rule 13) | Missing context → resolve from code first; stop only if genuinely unresolvable |
+| Progression loop (Rule 14) | `stop and ask` is last resort, not default for uncertain next steps |
+| Reality check (Rule 17) | `uncertain` → flag and continue; `misaligned` → stop |
+
+### Why This Is the Primary Mode
+
+Short, interrupt-heavy loops degrade work quality. Context is lost between human turn-arounds, re-engagement adds latency, and reactive per-step confirmation is less safe than a clear boundary declared upfront. A well-declared boundary gives the agent permission to move and the human a precise contract for when they will be called.
+
+---
+
+## Demo And Release Surfaces
+
+The framework now ships explicit assets for evaluation and rollout, not just operational rules.
+
+### Demo Repository
+
+`examples/demo_project/` exists to answer the question "what does an adopted repository actually look like?" It includes:
+
+1. a customized project adapter
+2. a small code and test surface
+3. a ROADMAP and session-state file
+4. committed task packet, audit receipt, and handoff packet artifacts
+
+This is intentionally small. The goal is comprehension, not realism at production scale.
+
+### Release Surface
+
+The repository also includes lightweight release assets:
+
+1. `VERSION` — current framework version
+2. `CHANGELOG.md` — notable changes by release
+3. `.github/RELEASE_TEMPLATE.md` — release note starter for maintainers
+4. `docs/COMPATIBILITY.md` — verified surfaces, intended integrations, and known limits
+
+These files do not change the framework's behavior directly. They exist to make adoption, support, and upgrade conversations more reliable.
 
 ---
 
@@ -231,16 +414,57 @@ When all acceptance criteria in a phase are ✅:
 Before proceeding serially on a multi-step task, the agent evaluates whether to fan out:
 
 ```
-Can the task be split into 2+ scopes where ALL of the following are true for each scope?
+Can the task be split into 2+ scopes where BOTH of the following are true for each scope?
   □ independent owner file set
-  □ independent validation command
   □ independent summarizable result
-  □ no sequential dependency on another scope
-    → YES: evaluate fan-out (external agent / internal subagent / main thread)
-    → NO:  proceed serially; state the exemption reason
+    → YES: fan-out by default; assign CLI executors first (Rule 19); declare any serial exemption explicitly
+    → NO:  proceed serially; state which criterion failed
 ```
 
+Fan-out is the default when both criteria are met. Independent validation is desirable but not a gate.
+
 The dispatch decision is always disclosed in the user-visible reply, not just in the footer.
+
+---
+
+## Dispatch Stability
+
+Dispatch can get stuck in two phases: before the task packet is sent (underspecified) or during execution (executor stops without signaling). Rule 21 in `.github/copilot-instructions.md` addresses both.
+
+### Pre-Dispatch Readiness Gate
+
+Before any executor is dispatched, the task packet must satisfy four conditions:
+
+| Condition | Why it matters |
+|---|---|
+| Observable acceptance criteria | Executor can self-determine completion without human input |
+| Bounded file scope (≤ 5 files) | Prevents context window exhaustion mid-task |
+| Unambiguous entry point | Executor knows the first concrete action |
+| Explicit do-not-touch list | Prevents silent scope creep |
+
+A task packet that fails any condition is not dispatched. The main thread rewrites it first.
+
+### Terminal State Contract
+
+Every executor must end in one of three explicit states:
+
+```
+DONE      → acceptance criteria met; audit receipt written
+STUCK     → cannot proceed; handoff packet written; blocker stated
+ESCALATE  → scope has changed; handoff packet written; finding stated
+```
+
+Silent stopping is treated as `STUCK`. The main thread does not wait indefinitely — absence of a terminal state after expected scope triggers a handoff and fallback to the next executor (Rule 19).
+
+### Progress Signal
+
+For tasks touching more than 3 files, the executor emits a one-line signal after each file change:
+
+```
+Step N: [filename] — [PASS / FAIL / SKIP]
+```
+
+This makes executor liveness visible to the main thread without requiring polling.
 
 ---
 
@@ -431,13 +655,12 @@ REPORT      → ## Next Actions in the reply (includes Alignment field)
 When the "IDENTIFY" step reveals a next step that is compound, the agent runs the decomposition test:
 
 ```
-All subtasks have independent owner files?    YES → fan-out eligible
-All subtasks have independent validation?     YES → fan-out eligible
-All subtasks produce summarizable results?    YES → fan-out → apply role assignment
-Any criterion fails?                          NO  → proceed serially, state why
+All subtasks have independent owner files?    YES →
+All subtasks produce summarizable results?    YES → fan-out (default); assign CLI first (Rule 19)
+Either criterion fails?                        NO → proceed serially; state which criterion failed
 ```
 
-Fan-out uses the Architect for design-uncertain or multi-option tasks and the Implementer for bounded execution tasks.
+Fan-out uses the Architect for design-uncertain or multi-option tasks and the Implementer for bounded execution tasks. Within each role, CLI is the primary executor and subagent is the fallback (Rule 19).
 
 ### Why This Matters
 

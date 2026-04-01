@@ -13,6 +13,9 @@
 | `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanism |
 | `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples spanning multiple development-stage responsibilities |
+| `docs/COMPATIBILITY.md` | What is validated in this repository and what adopters still need to verify locally |
+| `docs/RUNTIME_SURFACE_PROTECTION.md` | Surface guard registry pattern: protecting user-facing runtime paths from placeholder regression |
+| `docs/LEFTOVER_UNIT_CONTRACT.md` | Leftover unit contract: how to record, classify, and recover partial work truthfully |
 
 ## Project (create these for your project)
 
@@ -35,5 +38,5 @@
 
 ---
 
-*Last updated: [fill in when your project first uses this index]*
+*Last updated: 2026-04-01 — added RUNTIME_SURFACE_PROTECTION.md, LEFTOVER_UNIT_CONTRACT.md*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

@@ -4,12 +4,27 @@ A minimal, reusable GitHub Copilot agent framework. Drop it into any project to 
 
 ---
 
+## Why This Exists
+
+Most agent setups fail in one of three ways:
+
+- the rules live only in chat history
+- the project-specific truth sources are never made explicit
+- multi-step work cannot survive a reviewer swap or interrupted CLI session
+
+This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
+
+---
+
 ## What's Included
 
 ```
 .github/
-  copilot-instructions.md          ← operating rules (Rule 0–18, always loaded)
+  copilot-instructions.md          ← operating rules (Rule 0–25, always loaded)
   project-context.instructions.md  ← project adapter (fill in for your project)
+  RELEASE_TEMPLATE.md              ← lightweight release notes template
+  workflows/
+    ci.yml                         ← validates integrity and tests on push / PR
   agents/
     architect.agent.md             ← analysis / planning / critique agent
     implementer.agent.md           ← execution / validation / change agent
@@ -21,8 +36,11 @@ docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
+  COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  LEFTOVER_UNIT_CONTRACT.md        ← how to classify and record partial work truthfully
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
+  RUNTIME_SURFACE_PROTECTION.md    ← guard-registry pattern for live user-facing paths
   runbooks/
     resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
   archive/                         ← TYPE-C docs (phase reports, analyses)
@@ -50,7 +68,9 @@ examples/
     10_docs_spec_drift_reviewer.md ← second-batch strategy role
 
 scripts/
+  bootstrap_adoption.py           ← bootstraps minimal / standard / full adoption into another repo
   validate-template.sh             ← checks template integrity (run after setup)
+  validate_template.py             ← structured validator used by CI and local checks
   git_audit_pipeline.py            ← generates task packet / receipt / handoff assets
 ```
 
@@ -58,7 +78,23 @@ scripts/
 
 ## Quick Start
 
-### Minimal setup (3 files)
+### Fastest setup
+
+Use the bootstrap script when you want a working starting point without manually copying files one by one:
+
+```bash
+python scripts/bootstrap_adoption.py ../your-repo \
+  --project-name "Your Project" \
+  --profile standard
+```
+
+Profiles:
+
+- `minimal` — core rules, state files, and doc index only
+- `standard` — recommended default; adds agents, framework docs, validation, audit tooling, and CI
+- `full` — adds reviewer-role examples, strategy docs, and the committed demo project
+
+### Manual minimal setup
 
 ```bash
 # 1. Copy the core rules
@@ -76,6 +112,17 @@ cp templates/session_state.template.md      your-repo/session_state.md
 ### Full setup
 
 See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthrough.
+
+---
+
+## Example Workflow
+
+If you want one concrete path instead of reading the full framework first:
+
+1. Run `python scripts/bootstrap_adoption.py ../your-repo --project-name "Your Project" --profile standard`
+2. Open the generated `.github/project-context.instructions.md` and replace the default commands
+3. Run `python3 scripts/validate_template.py`
+4. Review [`examples/demo_project/`](examples/demo_project/) for a tiny adopted repository with a committed packet / receipt / handoff cycle
 
 ---
 
@@ -100,7 +147,7 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 
 **Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
 
-**Enforcement rules** — rules 0–18 include explicit STOP conditions and recovery/progression hooks. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state.
+**Enforcement rules** — rules 0–25 include explicit STOP conditions, recovery/progression hooks, user-acceptance gating, validation-toolchain prerequisites, leftover-state discipline, and receipt-anchored closeout constraints. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state, unverifiable acceptance criteria, or closeout claims without evidence.
 
 **Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
 
@@ -120,6 +167,10 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 - Technical decisions and durable insights
 
 **Resumable git audit workflow** — when work is split across external Codex, subagents, or multiple CLI sessions, the agent does not rely on chat history alone. It creates a task packet before fan-out, records audit receipts after scoped execution, and emits a handoff packet when a session is interrupted. This behavior is governed by Rule 18 and the runbook at `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+**Runtime surface protection** — [`docs/RUNTIME_SURFACE_PROTECTION.md`](docs/RUNTIME_SURFACE_PROTECTION.md) describes the guard-registry pattern for repositories that have live user-facing runtime paths. This template ships the governance pattern and reference guidance; the concrete guard script and live probes remain adopter-specific until a repository has a real runtime surface to protect.
+
+**Leftover unit contract** — [`docs/LEFTOVER_UNIT_CONTRACT.md`](docs/LEFTOVER_UNIT_CONTRACT.md) defines how to classify partial work, record why it stopped, and preserve a clean re-entry point instead of leaving vague TODO debt behind.
 
 **Strategy layer vs mechanism layer** — the template now makes an explicit distinction between:
 
@@ -148,6 +199,8 @@ Works with any AI coding assistant that loads `.github/copilot-instructions.md`:
 - Windsurf
 - Any tool that respects `.github/copilot-instructions.md` or a configurable system prompt
 
+Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verified in this repository versus what adopters still need to validate locally.
+
 ---
 
 ## Customization Points
@@ -164,10 +217,11 @@ Works with any AI coding assistant that loads `.github/copilot-instructions.md`:
 | Concrete role examples | `docs/ROLE_STRATEGY_EXAMPLES.md` |
 | Concrete starter role profiles | `examples/reviewer_roles/*.md` |
 | Git audit packet defaults | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` |
+| Adoption bootstrap flow | `scripts/bootstrap_adoption.py` |
 | Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
 
 ---
 
 ## License
 
-[Add your license here]
+MIT

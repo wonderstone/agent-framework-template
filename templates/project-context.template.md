@@ -26,6 +26,9 @@ description: >
 | `ROADMAP.md` | Phase planning and acceptance targets |
 | `session_state.md` | Cross-session state |
 | `docs/INDEX.md` | TYPE-A doc navigation index |
+| `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
+| `docs/RUNTIME_SURFACE_PROTECTION.md` | [Guard-registry pattern for active user-facing runtime paths — create if useful] |
+| `docs/LEFTOVER_UNIT_CONTRACT.md` | [How your team records and recovers partial work — create if useful] |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
 
@@ -46,10 +49,34 @@ description: >
 |---|---|
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
+| `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
+| `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
+| `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |
 | `audit\|handoff\|receipt\|packet\|reviewer\|git closeout` | `docs/runbooks/resumable-git-audit-pipeline.md` |
 | `roadmap\|phase\|milestone` | `ROADMAP.md` |
+| `e2e\|toolchain\|acceptance criteria\|end-to-end` | Validation Toolchain section (this file) |
 | `[your topic]` | `[your doc path]` |
+
+## Validation Toolchain
+
+<!-- Required by Rule 23. Fill before any feature work begins.            -->
+<!-- Project type: web-frontend / backend-api / cli-tool / library / full-stack -->
+
+Project type: [fill in]
+
+| Tier | Tool | Command |
+|---|---|---|
+| Unit | [pytest / Jest / Vitest / etc.] | `[command]` |
+| Integration | [httpx / supertest / React Testing Library / etc.] | `[command]` |
+| End-to-end | [Playwright / Cypress / Newman / curl script / etc.] | `[command]` |
+
+```bash
+# Run full suite (all tiers in sequence)
+# [single command or script]
+```
+
+<!-- If any tier is missing, declare a toolchain setup task before feature work. -->
 
 ## Build and Test Commands
 

@@ -109,7 +109,7 @@ After all steps:
 ### Git Closeout
 - Staged: [files]
 - Commit message: `[type]: [description]`
-- Status: committed / awaiting authorization
+- Status: committed and pushed / committed, awaiting exception resolution / blocked
 
 ## Next Actions
 

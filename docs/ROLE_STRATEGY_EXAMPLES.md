@@ -22,6 +22,8 @@ The role decides **what to judge**. The mechanism decides **how the judgment par
 
 The template also ships a concrete starter pack under `examples/reviewer_roles/`. Those files turn the role families below into ready-to-adapt profiles instead of leaving them only as prose examples.
 
+If you want to see how these roles fit into a repository instead of reading them in isolation, inspect `examples/demo_project/`. The demo does not implement every role, but it shows the surrounding assets those roles expect: project context, roadmap, session state, code, tests, and audit artifacts.
+
 Recommended adoption order:
 
 1. first batch: goal/acceptance owner, plan/checkpoint owner, runtime correctness reviewer, boundary/contract reviewer, git closeout reviewer, maintainability reviewer
@@ -89,6 +91,12 @@ Possible executors:
 1. main-thread reviewer
 2. external reviewer with bounded diff-only scope
 
+Authority boundary:
+
+1. this role reviews closeout readiness and commit boundary quality
+2. main-thread owner normally executes final commit and normal push after this role reports readiness
+3. this role should escalate only when closeout is not ready or a higher-risk Git action is requested
+
 Primary focus:
 
 1. whether the diff still matches the frozen packet
@@ -106,6 +114,13 @@ Best used for:
 1. pre-commit inspection
 2. selective staging decisions
 3. phase closeout checks
+4. deciding whether the main thread can safely proceed to commit/push without further cleanup
+
+Release-adjacent assets that pair well with this role:
+
+1. `CHANGELOG.md`
+2. `VERSION`
+3. `.github/RELEASE_TEMPLATE.md`
 
 ## 4. Protocol Boundary Reviewer
 
@@ -251,6 +266,10 @@ Non-goals:
 1. rewriting docs for style only
 
 Best used for:
+1. keeping architecture docs aligned after framework upgrades
+2. checking adoption docs after bootstrap changes
+3. reviewing runbooks and demo artifacts after workflow changes
+4. catching stale release or compatibility guidance
 
 1. public contract changes
 2. architecture shifts

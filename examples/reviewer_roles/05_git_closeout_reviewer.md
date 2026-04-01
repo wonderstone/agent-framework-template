@@ -10,6 +10,8 @@
 
 Ensure the final diff, staged set, validation evidence, and commit boundary still match the frozen task packet.
 
+The role is a reviewer, not the default Git operator: its normal output is a readiness judgment for the main thread, which normally performs commit and push after hard gates pass.
+
 ## Primary Focus
 
 - whether the diff matches the frozen scope
@@ -28,13 +30,14 @@ Ensure the final diff, staged set, validation evidence, and commit boundary stil
 - task packet or equivalent frozen scope
 - validation receipts or test outputs
 - intended commit boundary
+- changelog / version / release note context when the closeout is part of a framework release
 
 ## Output Contract
 
 - include/exclude recommendation for changed files
 - closeout risks
 - recommended commit boundary
-- statement of readiness or non-readiness for commit
+- statement of readiness or non-readiness for main-thread commit/push
 
 ## Blocking Issue Standard
 
@@ -47,6 +50,10 @@ Should avoid scope expansion; it may only request narrow cleanup needed for a sa
 ## Executor Notes
 
 This role becomes essential once work is split across multiple agents, worktrees, or CLI sessions.
+
+By default, use this role to review and prepare closeout, then let the main thread perform the actual commit and normal push path unless an exception condition requires escalation.
+
+When the change is release-facing, this role should also check that `CHANGELOG.md`, `VERSION`, and any release note draft stay aligned with the shipped diff.
 
 ## Notes
 

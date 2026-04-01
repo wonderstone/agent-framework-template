@@ -122,6 +122,37 @@ Examples of fields worth freezing:
 5. blocking vs optional output shape
 6. whether the role can propose scope expansion
 
+## Executor Selection Policy
+
+The strategy layer defines which role is needed. The mechanism layer defines how work is frozen and recovered. Neither layer specifies which concrete tool runs the role at runtime — that is the executor selection policy.
+
+### Priority Order
+
+| Priority | Executor | Use when |
+|---|---|---|
+| 1 — primary | CLI (external session) | Default for all bounded execution tasks |
+| 2 — fallback | Subagent (internal spawn) | CLI has hit a terminal failure condition |
+
+### When to fall back to subagent
+
+Fall back only when one of the following is **confirmed**:
+
+1. CLI token limit reached mid-task — context exhausted, cannot continue in the same session
+2. CLI unresponsive — repeated non-recoverable errors after one retry
+3. CLI session cannot be resumed and a handoff packet has been written
+
+### Why the priority matters
+
+CLIs run in isolated sessions with their own context windows. Using a CLI keeps bounded execution outside the main thread's context budget. Subagents share the parent context and are reserved as a fallback, not a default.
+
+### What does not change
+
+Role identity, judgment criteria, and blocking standards are defined in the strategy layer and do not change when the executor type changes. A runtime correctness reviewer has the same focus whether implemented by a CLI or a subagent.
+
+This policy is enforced at runtime by Rule 19 in `.github/copilot-instructions.md`.
+
+---
+
 ## Design Rule
 
 When introducing a new external reviewer, internal subagent, or domain-specific agent implementation:

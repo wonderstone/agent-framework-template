@@ -1,0 +1,85 @@
+from __future__ import annotations
+
+import importlib.util
+import shutil
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO_ROOT / "scripts" / "validate_template.py"
+SPEC = importlib.util.spec_from_file_location("validate_template", MODULE_PATH)
+assert SPEC is not None
+assert SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+ValidationIssue = MODULE.ValidationIssue
+validate_repo = MODULE.validate_repo
+
+
+def test_validate_repo_passes_for_current_repository() -> None:
+    issues = validate_repo(REPO_ROOT)
+
+    assert issues == []
+
+
+def test_validate_repo_reports_missing_required_file(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+    (repo_copy / "LICENSE").unlink()
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("missing-file", "LICENSE") in issues
+
+
+def test_validate_repo_reports_root_project_context_placeholder(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    original = project_context.read_text(encoding="utf-8")
+    project_context.write_text(
+        original.replace("# agent-framework-template — Project Context", "# [Project Name] — Project Context", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("root-context-placeholder", "[Project Name]") in issues
+
+
+def test_validate_repo_reports_readme_rule_range_mismatch(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    readme = repo_copy / "README.md"
+    readme.write_text(
+        readme.read_text(encoding="utf-8").replace("Rule 0–25", "Rule 0–24"),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("readme-rule-range-mismatch", "Rule 0–25") in issues
+
+
+def test_validate_repo_reports_receipt_closeout_rule_mismatch(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    runtime_doc = repo_copy / "docs" / "RUNTIME_SURFACE_PROTECTION.md"
+    runtime_doc.write_text(
+        runtime_doc.read_text(encoding="utf-8").replace(
+            "Rule 25 (Receipt-Anchored Closeout)",
+            "Rule 24 (Receipt-Anchored Closeout)",
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "receipt-closeout-rule-mismatch", "docs/RUNTIME_SURFACE_PROTECTION.md"
+    ) in issues
