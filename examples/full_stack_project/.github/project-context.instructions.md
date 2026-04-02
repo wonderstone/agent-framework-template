@@ -38,6 +38,39 @@ Package manager: npm + pip
 | Lint (frontend) | `npm run lint:web` | `file` | `declared-unverified` | Stop after frontend lint when task scope is local | Recommended |
 | Lint (backend) | `ruff check backend tests` | `file` | `declared-unverified` | Stop after backend lint when task scope is local | Recommended |
 
+### Runtime Evidence
+
+| Evidence surface | Applies to | Priority | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Logs | `frontend and backend runtimes` | `second` | `declared-unverified` | Fall back to the narrower service log that owns the failing surface | Keep service-specific evidence discoverable without duplicating the whole map |
+| Health check | `backend service` | `first` | `declared-unverified` | Fall back to journey smoke if the service health path is missing | `curl http://localhost:8000/health` |
+| Smoke path | `primary full-stack journey` | `first` | `declared-unverified` | Stop and report if the journey cannot be exercised honestly | `npm run test:smoke` |
+
+## User Surface Map
+
+| Surface name | Owner path | Sensitive | Fastest repro path | Primary evidence source | Notes |
+|---|---|---|---|---|---|
+| `primary full-stack journey` | `frontend/` + `backend/` | `no` | `open /login -> create record -> verify dashboard summary` | `Smoke path` | Cross-layer happy path |
+| `auth or payment journey` | `frontend/` + `backend/` | `yes` | `[sensitive user journey]` | `Logs` | Sensitive because it crosses trust boundaries and user data surfaces |
+
+## Security-Sensitive Surfaces And Escalation
+
+Sensitive path declarations:
+
+| Path or surface | Why sensitive |
+|---|---|
+| `backend/auth/` | auth and permission boundary |
+| `.env` | shared secret and environment trust boundary |
+| `frontend/src/routes/login*` | sensitive entry path for authentication-related journeys |
+
+Escalation rule:
+
+1. automatically escalate failure tracking when an impacted user surface is marked `Sensitive = yes`
+2. automatically escalate when a failure touches a declared sensitive path, config surface, secret surface, or trust-boundary surface
+3. after escalation, require the failure artifact to record:
+   impacted trust boundary, relevant config or secret surface, and at least one negative-path or misuse-path validation claim
+4. human classification may upgrade severity further, but should not be the only trigger
+
 ## Build and Test Commands
 
 ```bash

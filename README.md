@@ -37,6 +37,8 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design for traceability and recovery layout
+  AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history behind that design
   DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design for the Developer Toolchain contract
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and tradeoffs behind that contract
   DOC_FIRST_EXECUTION_GUIDELINES.md ← repository-default doc-first planning rule for non-trivial work
@@ -51,7 +53,9 @@ docs/
 templates/
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  failure_packet.template.md       ← progressive runtime failure packet
   project-context.template.md      ← blank project adapter
+  root_cause_note.template.md      ← closeout note for cause-suspected vs cause-established recovery
   session_state.template.md        ← blank cross-session state file
   roadmap.template.md              ← blank ROADMAP with phase/subtask structure
   git_audit_task_packet.template.md ← task packet template for resumable audit work
@@ -255,6 +259,8 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 
 Bootstrap-generated adopters now also receive a manifest-declared Developer Toolchain required-core contract. That lets the copied validator hard-fail missing or malformed core fields while still leaving optional enrichment surfaces advisory.
 
+**Traceability and recovery layout** — [`docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md`](docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md) defines how adopters should lay out `User Surface Map`, `Runtime Evidence`, `failure_packet`, and `root_cause_note` surfaces so future agents can reconstruct failures instead of patching blindly. [`docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md`](docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md) keeps the reasoning and tradeoffs behind that layout visible.
+
 **Leftover unit contract** — [`docs/LEFTOVER_UNIT_CONTRACT.md`](docs/LEFTOVER_UNIT_CONTRACT.md) defines how to classify partial work, record why it stopped, and preserve a clean re-entry point instead of leaving vague TODO debt behind.
 
 **Strategy layer vs mechanism layer** — the template now makes an explicit distinction between:
@@ -307,6 +313,8 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Adoption bootstrap flow | `scripts/bootstrap_adoption.py` |
 | Doc-first execution default | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` + `templates/doc_first_execution_guidelines.template.md` |
 | Long-task execution contract | `templates/execution_contract.template.md` |
+| Runtime failure capture | `templates/failure_packet.template.md` |
+| Root-cause closeout note | `templates/root_cause_note.template.md` |
 | Closeout truth audit | `scripts/closeout_truth_audit.py` |
 | Runtime guard registry | `templates/runtime_surface_registry.template.py` + `scripts/runtime_surface_guardrails.py` |
 | Optional git hooks | `.githooks/` + `scripts/install_git_hooks.sh` |

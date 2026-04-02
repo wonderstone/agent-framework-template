@@ -42,6 +42,7 @@ description: >
 |---|---|
 | `architecture\|design\|command flow` | `docs/ARCHITECTURE.md` |
 | `audit\|handoff\|receipt\|packet\|git closeout` | `docs/runbooks/demo-workflow.md` |
+| `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map` | `docs/runbooks/demo-workflow.md` |
 | `roadmap\|phase\|milestone` | `ROADMAP.md` |
 | `current focus\|hypothesis\|blocker` | `session_state.md` |
 | `developer toolchain\|diagnostics\|repro path\|verification status` | Developer Toolchain section (this file) |
@@ -75,6 +76,39 @@ Package manager: pip
 | Repro path | `python -m src.task_tracker --demo` | `service` | `verified-working` | Use the demo command output as the user-visible repro | Shortest user-visible flow |
 | Build | `python -m compileall src tests` | `module` | `verified-working` | Stop after build blockers are cleared when runnable proof is unnecessary | No packaging step beyond compile check |
 | Lint | `python -m compileall src tests` | `file` | `verified-working` | Stop after static blockers are cleared when task scope is local | Demo keeps lint surface lightweight |
+
+### Runtime Evidence
+
+| Evidence surface | Applies to | Priority | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Logs | `demo CLI execution` | `first` | `verified-working` | Fall back to stderr capture or stop and report missing runtime evidence | The demo command output is the primary runtime evidence surface |
+| Health check | `demo command` | `first` | `verified-working` | Stop and report if the command cannot run honestly | `python -m src.task_tracker --demo` |
+| Smoke path | `primary user flow` | `first` | `verified-working` | Fall back to logs and stop if the visible CLI path cannot be exercised honestly | The smoke path is the same as the user-visible demo path |
+
+## User Surface Map
+
+| Surface name | Owner path | Sensitive | Fastest repro path | Primary evidence source | Notes |
+|---|---|---|---|---|---|
+| `demo task listing flow` | `src/task_tracker.py` | `no` | `python -m src.task_tracker --demo` | `Logs` | Main user-visible CLI walkthrough |
+| `audit recovery workflow` | `tmp/git_audit/` and `docs/runbooks/demo-workflow.md` | `yes` | inspect committed packet / receipt / handoff files and rerun the demo command | `Logs` | Sensitive because it demonstrates traceability and recovery truth to adopters |
+
+## Security-Sensitive Surfaces And Escalation
+
+Sensitive path declarations:
+
+| Path or surface | Why sensitive |
+|---|---|
+| `tmp/git_audit/` | audit and handoff truth surface |
+| `session_state.md` | cross-session source of truth |
+| `.github/project-context.instructions.md` | long-lived repository truth for future sessions |
+
+Escalation rule:
+
+1. automatically escalate failure tracking when an impacted user surface is marked `Sensitive = yes`
+2. automatically escalate when a failure touches a declared sensitive path, config surface, secret surface, or trust-boundary surface
+3. after escalation, require the failure artifact to record:
+   impacted trust boundary, relevant config or secret surface, and at least one negative-path or misuse-path validation claim
+4. human classification may upgrade severity further, but should not be the only trigger
 
 ## Build and Test Commands
 
@@ -117,3 +151,4 @@ python -m src.task_tracker --demo
 ## Notes
 
 - This demo keeps everything local and file-based so the workflow is easy to inspect.
+- If runtime behavior breaks during demo work, open a failure packet first and add a root-cause note before claiming the issue is fully understood.

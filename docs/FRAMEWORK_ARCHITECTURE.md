@@ -30,6 +30,7 @@ The repository now also includes a **productization surface** around that model:
 4. `docs/COMPATIBILITY.md`, `CHANGELOG.md`, `VERSION`, and `.github/RELEASE_TEMPLATE.md` make release and support expectations explicit
 5. `templates/execution_contract.template.md` gives the agent a standard pre-execution confirmation surface for long tasks
 6. opt-in executable governance capabilities now exist for closeout truth audit, runtime surface guardrails, and hook installation
+7. traceability-and-recovery surfaces now define how adopter repositories should preserve user-surface ownership, runtime evidence, failure state, and root-cause closeout truth
 
 ---
 
@@ -62,12 +63,51 @@ The repository now also includes a **productization surface** around that model:
 - Critical topic → canonical doc mapping
 - Protected paths
 - Build/test commands
+- User Surface Map and security-sensitive surface declarations
+- Runtime evidence ownership inside Developer Toolchain
 - Runtime config locations
 - Dangerous operations policy
 
 **Does NOT contain**: detailed architectural explanations or implementation logic. It is a navigation index, not a reference document.
 
 **On-demand principle**: Layer 2 is the discovery index, not the full knowledge base. Loading it does not mean loading everything it references. The agent reads only the entries relevant to the current task — speculative pre-loading of all canonical docs inflates context without benefit.
+
+### Traceability Surfaces In Layer 2
+
+The project adapter is now also the default home for the repository's long-lived traceability layout.
+
+That means Layer 2 may carry:
+
+1. `User Surface Map`
+2. security-sensitive surface declarations
+3. automatic security escalation rule
+4. the `Runtime Evidence` sub-section inside `Developer Toolchain`
+
+This is intentional.
+
+These are repository truths that future sessions should discover early, before they guess at repro paths, evidence sources, or escalation boundaries.
+
+By contrast:
+
+1. `failure_packet` is event truth, not repository truth
+2. `root_cause_note` is recovery closeout truth, not repository truth
+
+Those belong in task or incident artifacts, not in the adapter itself.
+
+### Why This Layout Matters
+
+Without this split, AI-assisted repositories tend to scatter critical debugging truth across:
+
+1. terminal scrollback
+2. chat memory
+3. ad hoc runbooks
+4. stale architecture docs
+
+The framework now prefers a clearer division:
+
+1. Layer 2 holds durable routing truth
+2. task or incident artifacts hold case-specific failure truth
+3. closeout artifacts hold recovery and residual-risk truth
 
 ---
 
