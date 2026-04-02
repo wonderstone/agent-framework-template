@@ -65,7 +65,7 @@ When a keyword appears in the user's message:
 
 ## Rule 5: Dispatch Decision Disclosure (🔴 Mandatory)
 
-When a task can be split into 2+ independent scopes, evaluate dispatch before proceeding serially. The disclosure is user-visible — not just in the footer.
+When a task can be split into 2+ independent scopes, evaluate dispatch before proceeding serially. The disclosure is user-visible — not just in the status line.
 
 Full decomposition criteria, serial exemptions, executor assignment, and disclosure format: **Rule 15**.
 
@@ -132,24 +132,82 @@ Do not re-read earlier conversation history. Do not summarize prior turns. Artif
 
 ---
 
-## Rule 8: Reply Footer (🔴 Mandatory)
+## Rule 8: Progress Status Line And Closeout Boundary (🔴 Mandatory)
 
-Every reply ends with a status line. No exceptions.
+Every in-progress substantive reply ends with a status line.
 
 **Mid-task (compact)**:
 ```
-📍 Focus: <current focus> | Now: <action> | Next: <next step>
+• 当前在做: <action> | 下一步: <next step>
 ```
 
-**Final reply (full)**:
+Use the longer focus-bearing variant only when needed:
 ```
-📍 Focus: <current focus> | Now: <action> | Next: <next step>
-Phase N — <Name>: ✅ done · 【active】 · ○ pending
+• 当前聚焦: <focus> | 正在做: <action> | 下一步: <next step>
 ```
 
-**Idle**: `📍 Idle | No active task`
+**Idle**: `• 空闲 Idle | 无 active task`
 
-The focus field must never be omitted, even when handling a side task.
+The focus field is optional for routine updates and should be added only when it prevents ambiguity.
+
+### Final Closeout Binding (🔴 Mandatory)
+
+When a task is actually complete, the visible closeout content belongs in the final response body or in the host-provided closeout action payload.
+
+The final closeout visual rule is:
+
+1. keep the closeout body concise
+2. place one Markdown divider `---` before the final footer
+3. use exactly one final footer with the built-in marker
+
+```
+📍 当前聚焦: <final focus> | 已完成: <delivered outcome> | 下一步: <none / next / blocker>
+```
+
+For hosts that expose `task_complete` or an equivalent closeout action:
+
+1. prepare the final closeout summary
+2. put the closeout content into the final user-visible body or the closeout action payload
+3. trigger the closeout action
+
+Do not use the final `📍` footer anywhere else in the same task.
+
+`Continued with Autopilot` or similar platform continuation markers do not count as completion signals.
+
+Operational rule: if the host exposes a dedicated closeout action, treat that action as the machine-facing completion signal. Any human-facing closeout summary should appear before that call or be folded into its payload.
+
+### Closeout Irreversibility Rule (🔴 Mandatory)
+
+The closeout boundary is irreversible once the host-provided closeout action has fired.
+
+Once the agent reaches closeout:
+
+1. it must not produce further user-visible prose for that task
+2. it must not reopen explanation, summary, apology, or clarification text
+3. it must not emit a second closeout action
+
+If the agent is not certain that it is at the true closeout boundary, it must not trigger closeout yet.
+
+### Hook Repair Protocol (🔴 Mandatory)
+
+If a platform hook or system message reports that the only missing action is a host-provided closeout call after a visible final closeout has already been sent, the repair path is fixed:
+
+1. do not send any new user-visible text
+2. do not restate the answer
+3. do not emit another progress line, status line, or closeout wrapper
+4. add only the missing closeout action
+
+If a hook appears after an internal batch update during a while-style long task, that is evidence the agent took a wrong closeout path too early. In that case, revise future behavior by keeping later batch completions as progress updates only.
+
+### Long-Loop Non-Closeout Rule (🔴 Mandatory)
+
+If the user has declared a while-style, long-running, or batch-by-batch task, then finishing one module, one slice, one review batch, or one sub-pass does **not** count as task completion unless the user explicitly defined that sub-batch as the closeout boundary.
+
+In that situation:
+
+1. use progress updates, not final closeout
+2. do not trigger host closeout actions at internal batch boundaries
+3. reserve final closeout for the declared true boundary, a real blocker, or an explicit user-requested checkpoint
 
 ---
 
@@ -160,7 +218,7 @@ When a subtask is confirmed done — **before discussing the next one**:
 1. ROADMAP row: `○`/`🔄` → `✅ YYYY-MM-DD`
 2. Acceptance criteria: `[ ]` → `[x]` — at least one UAC item must be verified per Rule 22 before marking complete
 3. `session_state.md`: move item from "Active Work" → "Completed This Phase"
-4. Footer: set `Next` to the next subtask
+4. Status line / closeout summary: update `Next` or the final closeout summary appropriately
 
 ### Git Closeout (mandatory before next major task)
 
@@ -295,7 +353,7 @@ After every completed subtask — before composing the reply — run this progre
 | State | Required action |
 |---|---|
 | Goal complete, all criteria ✅ | Declare done; run Phase Graduation Protocol (Rule 10) |
-| Goal not complete, next step is clear | Continue serially; state next step in footer and Next Actions |
+| Goal not complete, next step is clear | Continue serially; state next step in the status line and Next Actions |
 | Goal not complete, next step requires decomposition | Apply Rule 15; fan out or serialize with explicit rationale |
 | Blocked by external input or ambiguity | STOP; state the blocker in "Blocker / Decision Needed" in session_state.md; ask the user |
 
@@ -1077,7 +1135,7 @@ When triggered, produce the audit table below against the **current task's actua
 | 3 | Long-task autonomous | Rule 20         | ✅/⚠️/❌ | [Execution Boundary declared / not declared]        |
 | 4 | E2E acceptance gate  | Rule 22/23      | ✅/⚠️/❌ | [UAC declared + toolchain verified / not done]      |
 | 5 | Context budget       | Rule 19/21      | ✅/⚠️/❌ | [Subtask sizing ≤5 files verified / not checked]    |
-| 6 | Phase notification   | Rule 8/14       | ✅/⚠️/❌ | [Footer at last phase boundary / missing]           |
+| 6 | Phase notification   | Rule 8/14       | ✅/⚠️/❌ | [Status line or closeout summary at last phase boundary / missing] |
 | 7 | Parallel ceiling     | Rule 21/27      | ✅/⚠️/❌ | [Concurrent executors ≤ ceiling / count unbounded]  |
 | 8 | Non-code completion  | Rule 22/24      | ✅/⚠️/❌ | [Observable criterion declared / absent]            |
 
@@ -1102,7 +1160,7 @@ When triggered, produce the audit table below against the **current task's actua
 | 3 Autonomous mode | Execution Boundary block written before first action | Multi-step task running without boundary declaration | Agent interrupted user mid-task for routine non-blocker steps |
 | 4 E2E gate | UAC declared, includes ≥1 end-to-end scenario, toolchain verified runnable | Implementation started without UAC | Task declared complete without UAC evidence |
 | 5 Context budget | Each dispatched subtask ≤5 files; no executor reported context exhaustion | Dispatch planned but subtask file counts not verified | Subtask dispatched with >5 files or executor hit context limit mid-task |
-| 6 Phase notification | Footer emitted at each phase boundary during autonomous run | Phase boundary reached; footer deferred past next natural pause | No footer emitted in last 3+ replies during an active task |
+| 6 Phase notification | Status line or closeout summary emitted at each phase boundary during autonomous run | Phase boundary reached; update deferred past next natural pause | No status line in last 3+ substantive replies during an active task |
 | 7 Parallel ceiling | Concurrent executors at or below the declared ceiling (default 5) | Fan-out planned but concurrent count not explicitly bounded | More than ceiling executors running simultaneously |
 | 8 Non-code completion | All doc / config deliverables have an observable completion criterion (e.g., "file exists and content matches spec") | Task has doc or config outputs with no stated completion criteria | Doc or config change declared done with no observable criterion |
 

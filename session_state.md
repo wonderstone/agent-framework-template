@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Promote main-thread ownership of normal commit/push from a repeated user preference into the template's default execution policy.
+Promote the aligned progress/closeout visual contract plus preference-drift auditing into the template's default adoption surface.
 
 ---
 
 ## Working Hypothesis
 
-The remaining risk is semantic drift at adoption boundaries: manifest-driven adopted-repo validation and commit-scoped hook checks need to be explicit so the shipped capability behaves truthfully outside the template repo.
+The remaining governance drift is not missing docs but missing automatic enforcement: the template should ship one reusable audit that catches regressions in progress/footer contract wording both at the template root and in manifest-based adopter repos.
 
 **Confidence**: High
 
-**Evidence**: The bootstrap now writes an adoption manifest, the copied validator switches into adopted-repo mode from that manifest, hook scaffolding is covered end to end, the independent evaluation pass returned PASS, and the full validation chain passed after the push-check fixes.
+**Evidence**: The template already has manifest-driven adopted-repo validation, shipped progress/closeout companion docs, and a standard bootstrap profile. That makes the progress/footer contract a good fit for a snippet-based audit that can run both locally and in copied repos.
 
 **Contradictions**: None.
 
@@ -25,27 +25,29 @@ The remaining risk is semantic drift at adoption boundaries: manifest-driven ado
 
 ## Plan
 
-**Approach**: Ship runtime/closeout governance as opt-in executable scaffolding, then lock the adopter and hook boundaries down with manifest-driven validation plus commit-scoped push checks.
+**Approach**: Align the template's Rule 8, companion docs, and execution contract to the preferred visual contract, then ship a standalone preference-drift audit and wire it into both template-root and adopted-repo validation.
 
 **Steps**:
-1. Emit an adopter manifest during bootstrap so copied validation can stay self-contained.
-2. Validate adopted repos against the manifest-selected asset surface rather than template-root rules.
-3. Exercise git-hook scaffolding end to end, including installer, pre-commit, and pre-push behavior.
-4. Make push-check operate on pushed commit boundaries and reject dirty worktrees that would contaminate the result.
+1. Align Rule 8 and companion templates to `•` for progress and a single final `📍` footer.
+2. Add a reusable `scripts/preference_drift_audit.py` for known regressions in progress/closeout wording.
+3. Wire the audit into `scripts/validate_template.py` for both root and manifest-based adopted repos.
+4. Distribute the audit through the standard bootstrap profile and keep regression coverage in tests.
 
-**Why this approach**: It keeps the template honest as a product surface: adopters receive a validator that matches what they bootstrapped, and hook behavior is bounded to the same commit truth that git is about to publish.
+**Why this approach**: It keeps the preferred communication contract from drifting back into memory-only guidance and makes future adopters inherit the same executable safeguard by default.
 
 ---
 
 ## Active Work
 
-**Current Step**: Commit the remaining local-only state after pushing the main framework change set.
+**Current Step**: Align the template's progress/closeout contract and ship the corresponding drift audit as part of the standard governance surface.
 
-**Next Planned Step**: No further framework work is active once the remaining local files are committed.
+**Next Planned Step**: Validate the upgraded template locally and through bootstrap, then close out if the new audit path is green.
 
 ---
 
 ## Recent Receipts
+
+- Preference drift audit landed at the template root, local structured validation passed, standalone drift audit passed, and a real standard bootstrap repo also passed its copied validator.
 
 - Template-level doc-first rule uplift added: repository guideline added, reusable template asset added, adoption guide and template surfaces updated.
 - Structured validation passed via `python3 scripts/validate_template.py`.

@@ -158,9 +158,17 @@ At minimum, confirm:
 - whether fan-out to CLI or subagents is expected
 - what fallback path applies when an executor fails or stalls
 - whether the task runs in autonomous while-loop mode
+- what one progress unit is for while-mode work
+- what the true closeout boundary is for while-mode work
 - what E2E or user-visible validation is required before the task can be reported complete
 
-The template default is that the main-thread agent performs normal commit/push and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
+The template default is that the main-thread agent performs normal commit and push, and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
+
+When you confirm the execution contract, also confirm the communication surface:
+
+- routine in-progress replies use `• 当前在做: ... | 下一步: ...`
+- the longer focus-bearing variant is only for ambiguous cases
+- final closeout uses exactly one `📍` footer and places `---` immediately before it
 
 ---
 
@@ -237,9 +245,9 @@ This makes doc-first execution a repository default rather than a conversational
 
 ---
 
-## Step 7 — Customize Rule 8 Footer Language (Optional)
+## Step 7 — Customize Rule 8 Status Line Language (Optional)
 
-The default footer in `copilot-instructions.md` uses English. If your team works in another language, update the footer examples in Rule 8 accordingly.
+The default in-progress status line in `copilot-instructions.md` uses English. If your team works in another language, update the Rule 8 examples to match.
 
 ---
 

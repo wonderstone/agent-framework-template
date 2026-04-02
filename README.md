@@ -230,6 +230,7 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 - Current goal
 - Working hypothesis, confidence level, and supporting evidence
 - Active work and what's completed this phase
+- For while-style work, the progress unit, true closeout boundary, and host closeout action
 - Mid-session corrections (mistakes and course corrections)
 - Acceptance criteria
 - Technical decisions and durable insights
@@ -255,7 +256,15 @@ The template also ships a concrete example set in `docs/ROLE_STRATEGY_EXAMPLES.m
 
 If you want something more concrete than a doc example list, the template now also ships a starter set of 10 formal role profiles under `examples/reviewer_roles/`. The first batch covers goal/acceptance, plan/checkpointing, correctness, boundary/contracts, git closeout, and maintainability. The second batch covers observability/failure-paths, performance, migration/compatibility, and docs/spec drift.
 
-**Completion checkpoints** — when a subtask is confirmed done, the agent updates ROADMAP, session state, acceptance criteria, and the reply footer before moving on.
+**Completion checkpoints** — when a subtask is confirmed done, the agent updates ROADMAP, session state, acceptance criteria, and the current status line or closeout summary before moving on.
+
+**Progress vs closeout formatting** — [`docs/PROGRESS_UPDATE_TEMPLATE.md`](docs/PROGRESS_UPDATE_TEMPLATE.md) defines the stable shape for in-progress while-loop updates, and [`docs/CLOSEOUT_SUMMARY_TEMPLATE.md`](docs/CLOSEOUT_SUMMARY_TEMPLATE.md) defines the stable final closeout shape for hosts that expose a terminal action such as `task_complete`.
+
+The current visual contract is:
+
+- routine in-progress replies use `• 当前在做: ... | 下一步: ...`
+- use `• 当前聚焦: ... | 正在做: ... | 下一步: ...` only when the focus needs to be explicit
+- final closeout keeps exactly one `📍` footer and places `---` immediately before it
 
 ---
 
@@ -281,7 +290,7 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Topic → doc routing | `project-context.instructions.md` → Critical Topic Triggers |
 | Build/test commands | `project-context.instructions.md` → Build and Test Commands |
 | Protected paths | `project-context.instructions.md` → Protected Paths |
-| Footer language | `copilot-instructions.md` → Rule 8 |
+| Status-line language | `copilot-instructions.md` → Rule 8 |
 | Agent roles/format | `.github/agents/*.agent.md` |
 | Strategy-vs-mechanism guidance | `docs/STRATEGY_MECHANISM_LAYERING.md` |
 | Concrete role examples | `docs/ROLE_STRATEGY_EXAMPLES.md` |

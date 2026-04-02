@@ -34,6 +34,27 @@ def test_validate_repo_passes_for_current_repository() -> None:
     assert issues == []
 
 
+def test_validate_repo_reports_preference_drift(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    readme = repo_copy / "README.md"
+    readme.write_text(
+        readme.read_text(encoding="utf-8").replace(
+            "- routine in-progress replies use `• 当前在做: ... | 下一步: ...`",
+            "- routine in-progress replies use `📍 Focus: ... | Now: ... | Next: ...`",
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-preference-snippet",
+        "README.md: - routine in-progress replies use `• 当前在做: ... | 下一步: ...`",
+    ) in issues
+
+
 def test_validate_repo_reports_missing_required_file(tmp_path: Path) -> None:
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)

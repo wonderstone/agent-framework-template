@@ -290,6 +290,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/RUNTIME_SURFACE_PROTECTION.md",
         "docs/runbooks/resumable-git-audit-pipeline.md",
         "scripts/git_audit_pipeline.py",
+        "scripts/preference_drift_audit.py",
         "scripts/validate-template.sh",
         "scripts/validate_template.py",
         "templates/git_audit_handoff_packet.template.md",

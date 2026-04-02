@@ -6,9 +6,16 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from preference_drift_audit import audit_repo as audit_preference_drift
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,11 +38,13 @@ REQUIRED_FILES = (
     "LICENSE",
     "VERSION",
     "docs/ADOPTION_GUIDE.md",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/COMPATIBILITY.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/FRAMEWORK_ARCHITECTURE.md",
     "docs/INDEX.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
@@ -51,6 +60,7 @@ REQUIRED_FILES = (
     "scripts/closeout_truth_audit.py",
     "scripts/git_audit_pipeline.py",
     "scripts/install_git_hooks.sh",
+    "scripts/preference_drift_audit.py",
     "scripts/runtime_surface_guardrails.py",
     "scripts/validate-template.sh",
     "scripts/validate_template.py",
@@ -89,6 +99,11 @@ REQUIRED_SECTIONS = {
         "## Minimal Viable Setup",
         "## Next Upgrade Paths",
     ),
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md": (
+        "## Recommended Template",
+        "## Global State Field",
+        "## Default Recommendation",
+    ),
     "docs/FRAMEWORK_ARCHITECTURE.md": (
         "## State Model",
         "## Resumable Audit Artifacts",
@@ -100,6 +115,11 @@ REQUIRED_SECTIONS = {
         "## Integration Notes",
         "## Known Limits",
     ),
+    "docs/PROGRESS_UPDATE_TEMPLATE.md": (
+        "## Recommended Template",
+        "## Rules For Good Use",
+        "## Default Recommendation",
+    ),
     "examples/demo_project/README.md": (
         "## Scenario",
         "## Demo Layout",
@@ -110,10 +130,12 @@ REQUIRED_SECTIONS = {
 README_REQUIRED_REFERENCES = (
     "scripts/bootstrap_adoption.py",
     "examples/demo_project/",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/COMPATIBILITY.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/execution_contract.template.md",
     "scripts/closeout_truth_audit.py",
@@ -132,10 +154,12 @@ DOC_LINK_PATHS = {
 INDEX_REQUIRED_ROWS = (
     "docs/FRAMEWORK_ARCHITECTURE.md",
     "docs/ADOPTION_GUIDE.md",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/COMPATIBILITY.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
@@ -146,6 +170,8 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "Project type: library",
     "ROADMAP.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "templates/doc_first_execution_guidelines.template.md",
@@ -342,6 +368,75 @@ def _validate_rule_sync(root: Path) -> list[ValidationIssue]:
     return issues
 
 
+def _validate_session_state_template(root: Path) -> list[ValidationIssue]:
+    text = _read(root / "templates/session_state.template.md")
+    issues: list[ValidationIssue] = []
+    required_snippets = (
+        "**Current Step**:",
+        "**Next Planned Step**:",
+        "**Progress Unit**:",
+        "**True Closeout Boundary**:",
+        "**Host Closeout Action**:",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-session-state-snippet", snippet))
+    return issues
+
+
+def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
+    text = _read(root / "templates/execution_contract.template.md")
+    issues: list[ValidationIssue] = []
+    required_snippets = (
+        "## Optional Fast-Start Block",
+        "Execution Boundary:",
+        "Working Hypothesis:",
+        "Decomposition Decision:",
+        "## Long-Loop Closeout Contract",
+        "Progress unit:",
+        "True closeout boundary:",
+        "Intermediate batch rule:",
+        "Host closeout rule:",
+        "Maximum file scope per dispatched subtask:",
+        "Parallel ceiling:",
+        "Progress unit for while-mode tasks:",
+        "True closeout boundary for while-mode tasks:",
+        "Intermediate batches may trigger progress updates only:",
+        "Host closeout action reserved for the true boundary only:",
+        "Bootstrap-mode allowance:",
+        "User Acceptance Criteria (UAC):",
+        "End-to-end scenario:",
+        "If full E2E is not yet possible:",
+        "Gap check before closeout:",
+        "Host closeout action available:",
+        "Platform continuation markers to ignore as completion signals:",
+        "Status line rule:",
+        "Final closeout summary lives in:",
+        "Closeout summary template:",
+        "Progress update template:",
+        "Status-line / closeout-summary rule understood:",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-execution-contract-snippet", snippet))
+    return issues
+
+
+def _validate_closeout_rule_guards(root: Path) -> list[ValidationIssue]:
+    text = _read(root / ".github/copilot-instructions.md")
+    issues: list[ValidationIssue] = []
+    required_snippets = (
+        "### Closeout Irreversibility Rule (🔴 Mandatory)",
+        "### Hook Repair Protocol (🔴 Mandatory)",
+        "it must not emit a second closeout action",
+        "add only the missing closeout action",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-closeout-guard-snippet", snippet))
+    return issues
+
+
 def _validate_receipt_closeout_references(root: Path) -> list[ValidationIssue]:
     rules_text = _read(root / ".github/copilot-instructions.md")
     rule_number = _rule_number_for_title(rules_text, "Receipt-Anchored Closeout (🔴 Mandatory)")
@@ -361,9 +456,15 @@ def _validate_receipt_closeout_references(root: Path) -> list[ValidationIssue]:
     return issues
 
 
+def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
+    return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
+
+
 def validate_repo(root: Path) -> list[ValidationIssue]:
     if (root / ADOPTER_MANIFEST_PATH).is_file():
-        return _validate_adopted_repo(root)
+        issues = _validate_adopted_repo(root)
+        issues.extend(_validate_preference_drift(root))
+        return issues
 
     checks = (
         _validate_required_paths,
@@ -375,6 +476,10 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_bootstrap,
         _validate_root_project_context,
         _validate_rule_sync,
+        _validate_session_state_template,
+        _validate_execution_contract,
+        _validate_closeout_rule_guards,
+        _validate_preference_drift,
         _validate_receipt_closeout_references,
     )
     issues: list[ValidationIssue] = []
