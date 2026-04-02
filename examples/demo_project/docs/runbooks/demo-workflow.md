@@ -14,8 +14,9 @@ python scripts/bootstrap_adoption.py ../demo-task-tracker \
 ## Customize
 
 1. Replace the generated project context with repo-specific paths and commands.
-2. Add a tiny code surface and at least one test.
-3. Fill `ROADMAP.md` and `session_state.md` with the first real phase.
+2. Fill the Developer Toolchain section honestly, using explicit `none` where a surface does not exist.
+3. Add a tiny code surface and at least one test.
+4. Fill `ROADMAP.md` and `session_state.md` with the first real phase.
 
 ## Audit Flow
 

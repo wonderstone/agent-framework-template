@@ -42,9 +42,30 @@
 
 ---
 
+## Phase 3 — Strengthen Developer Toolchain Contract
+
+**Goal**: Turn Developer Toolchain from a reminder-only surface into a manifest-backed, structurally enforced contract with a richer multi-runtime reference path.
+
+**Status**: ✅ 2026-04-03
+
+| Item | Status |
+|---|---|
+| Add manifest-declared required-core Developer Toolchain contract | ✅ 2026-04-03 |
+| Hard-fail malformed or missing Developer Toolchain core for new adopters | ✅ 2026-04-03 |
+| Add richer multi-runtime full-stack reference example | ✅ 2026-04-03 |
+
+**Acceptance Criteria**:
+- [x] Newly bootstrapped adopters carry a manifest block that declares the Developer Toolchain required-core contract.
+- [x] The copied validator hard-fails missing or malformed required-core Developer Toolchain fields for manifest-based adopters.
+- [x] Multi-runtime repositories have a shipped reference example that demonstrates qualified surface labels and a full-stack repro path.
+- [x] Root validation, full regression tests, and adopted-repo smoke validation all pass after the rollout.
+
+---
+
 ## Completed Phases
 
 | Phase | Completed |
 |---|---|
 | Phase 1 — Productize The Template | 2026-04-01 |
 | Phase 2 — Self-Host And Release Closeout | 2026-04-01 |
+| Phase 3 — Strengthen Developer Toolchain Contract | 2026-04-03 |

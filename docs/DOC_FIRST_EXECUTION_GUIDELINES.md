@@ -15,7 +15,7 @@ For this repository, the default mode is:
 3. execute against the written plan
 4. update the plan or checklist before changing direction
 
-This means non-trivial work should begin from executable documentation, not from chat memory alone.
+Non-trivial work should therefore begin from executable documentation, not from chat memory alone.
 
 ## What Counts As Non-Trivial
 
@@ -42,6 +42,7 @@ At minimum, the planning artifact must include:
 5. validation commands
 6. user-visible acceptance criteria
 7. stop conditions, non-goals, or explicit deferrals
+8. for while-style tasks, the progress unit, true closeout boundary, and checkpoint rule
 
 If those elements are absent, the plan is not implementation-ready.
 
@@ -60,6 +61,7 @@ This means:
 - the checklist says what to build next, in which files, in which order
 - the validation doc says how truth is checked
 - the state doc says what the current step is right now
+- while-style tasks distinguish internal progress checkpoints from the true closeout boundary before execution starts
 
 ## Default Agent Behavior
 
@@ -68,10 +70,25 @@ When the user asks for a new phase, subsystem, or meaningful behavior change, th
 1. update or create the roadmap or design truth first
 2. create or update the execution checklist next
 3. sync validation commands and entry docs
-4. update current state tracking
-5. begin implementation only after those planning surfaces exist
+4. freeze the progress unit, check-in point, and true closeout boundary for while-style work
+5. update current state tracking
+6. begin implementation only after those planning surfaces exist
 
 Do not ask the user to choose between doc-first and code-first for non-trivial work unless they explicitly request a lighter-weight path.
+
+## While-Style Task Stability Rule
+
+If the task will run in a while-style or autonomous multi-batch loop, the planning surfaces must explicitly say:
+
+1. what counts as one execution unit
+2. what event counts as a progress checkpoint
+3. what event permits final closeout
+
+Minimum rule:
+
+- finishing one module, slice, review pass, or batch is a progress update only unless the user explicitly declared it the closeout boundary
+- final closeout is allowed only at the true boundary, an explicit blocker, or a user-requested checkpoint
+- if the host exposes a closeout action such as `task_complete`, reserve it for that true boundary only
 
 ## Document Update Rule
 
@@ -84,10 +101,12 @@ Forbidden behavior:
 1. treating chat history as the only implementation plan
 2. keeping the real execution order only in the agent's head
 3. leaving file-level scope or validation commands unspecified for a multi-step task
+4. entering while-style execution without a written distinction between progress checkpoints and the true closeout boundary
+5. treating internal batch completion as permission to emit final closeout
 
 ## Template Implications
 
-Because this repository is itself a template, the rule must exist in reusable surfaces rather than only as local preference.
+Because this repository is itself a template, the rule must exist in reusable surfaces rather than only as a local preference.
 
 That means:
 

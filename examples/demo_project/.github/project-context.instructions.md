@@ -44,6 +44,7 @@ description: >
 | `audit\|handoff\|receipt\|packet\|git closeout` | `docs/runbooks/demo-workflow.md` |
 | `roadmap\|phase\|milestone` | `ROADMAP.md` |
 | `current focus\|hypothesis\|blocker` | `session_state.md` |
+| `developer toolchain\|diagnostics\|repro path\|verification status` | Developer Toolchain section (this file) |
 
 ## Validation Toolchain
 
@@ -59,6 +60,21 @@ Project type: cli-tool
 # Run full suite (all tiers in sequence)
 pytest tests/ -q && python -m src.task_tracker --demo
 ```
+
+## Developer Toolchain
+
+Primary language: Python
+
+Package manager: pip
+
+| Surface | Command or source | Scope | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Diagnostics | `python -m compileall src tests` | `module` | `verified-working` | Stop after compile blockers are cleared unless broader proof is required | Fast syntax check for the demo CLI |
+| Run | `python -m src.task_tracker --demo` | `service` | `verified-working` | Inspect stderr and stop if the demo entrypoint fails | Primary local CLI run path |
+| Health or smoke | `python -m src.task_tracker --demo` | `service` | `verified-working` | Stop and report if the demo command cannot run honestly | The same command acts as the smoke path |
+| Repro path | `python -m src.task_tracker --demo` | `service` | `verified-working` | Use the demo command output as the user-visible repro | Shortest user-visible flow |
+| Build | `python -m compileall src tests` | `module` | `verified-working` | Stop after build blockers are cleared when runnable proof is unnecessary | No packaging step beyond compile check |
+| Lint | `python -m compileall src tests` | `file` | `verified-working` | Stop after static blockers are cleared when task scope is local | Demo keeps lint surface lightweight |
 
 ## Build and Test Commands
 

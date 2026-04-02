@@ -52,6 +52,12 @@
 
 **Next Planned Step**: [What the agent will do after this step completes — one sentence]
 
+**Progress Unit**: [module / batch / slice / review pass / n/a]
+
+**True Closeout Boundary**: [full task complete / explicit blocker / user-requested checkpoint / n/a]
+
+**Host Closeout Action**: [none / `task_complete` / other]
+
 ---
 
 ## Completed This Phase

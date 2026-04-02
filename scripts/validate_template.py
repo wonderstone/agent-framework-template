@@ -38,8 +38,11 @@ REQUIRED_FILES = (
     "LICENSE",
     "VERSION",
     "docs/ADOPTION_GUIDE.md",
+    "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/COMPATIBILITY.md",
+    "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+    "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/FRAMEWORK_ARCHITECTURE.md",
     "docs/INDEX.md",
@@ -48,6 +51,7 @@ REQUIRED_FILES = (
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
+    "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
     "examples/demo_project/README.md",
     "examples/demo_project/.github/project-context.instructions.md",
@@ -66,8 +70,10 @@ REQUIRED_FILES = (
     "scripts/validate_template.py",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/execution_contract.template.md",
+    "templates/failure_packet.template.md",
     "templates/project-context.template.md",
     "templates/reviewer_role_profile.template.md",
+    "templates/root_cause_note.template.md",
     "templates/roadmap.template.md",
     "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
@@ -132,6 +138,8 @@ README_REQUIRED_REFERENCES = (
     "examples/demo_project/",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/COMPATIBILITY.md",
+    "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+    "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
@@ -159,9 +167,13 @@ INDEX_REQUIRED_ROWS = (
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/COMPATIBILITY.md",
+    "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
+    "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+    "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
 )
 
@@ -170,8 +182,13 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "Project type: library",
     "ROADMAP.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+    "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+    "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+    "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
+    "## Developer Toolchain",
+    "Primary language: Python",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "templates/doc_first_execution_guidelines.template.md",
@@ -195,6 +212,68 @@ ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
 class ValidationIssue:
     kind: str
     detail: str
+
+
+@dataclass(frozen=True)
+class ValidationAdvisory:
+    kind: str
+    detail: str
+
+
+@dataclass(frozen=True)
+class DeveloperToolchainEntry:
+    surface: str
+    surface_kind: str
+    command_or_source: str
+    scope: str
+    status: str
+    fallback_or_stop: str
+    notes: str
+
+
+DEVELOPER_TOOLCHAIN_ALLOWED_SCOPES = {"file", "module", "service", "full-stack"}
+DEVELOPER_TOOLCHAIN_ALLOWED_STATUSES = {
+    "declared-unverified",
+    "verified-working",
+    "known-broken",
+    "not-applicable",
+}
+DEVELOPER_TOOLCHAIN_ALLOWED_SURFACE_KINDS = {
+    "Diagnostics",
+    "Run",
+    "Health or smoke",
+    "Repro path",
+    "Build",
+    "Lint",
+    "Format",
+    "Logs or inspection",
+    "Debug",
+}
+DEVELOPER_TOOLCHAIN_REQUIRED_SURFACES = (
+    "Diagnostics",
+    "Run",
+    "Health or smoke",
+    "Repro path",
+)
+DEVELOPER_TOOLCHAIN_RECOMMENDED_SURFACES = (
+    "Build",
+    "Lint",
+)
+LIVE_RUNTIME_PROJECT_TYPES = {"backend-api", "web-frontend", "cli-tool", "full-stack"}
+DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT = {
+    "version": "v1",
+    "enforcement": "required-core",
+    "required_top_level_fields": ["Primary language", "Package manager"],
+    "required_surface_kinds": [
+        "Diagnostics",
+        "Run",
+        "Health or smoke",
+        "Repro path",
+        "Build",
+    ],
+    "recommended_surface_kinds": ["Lint"],
+    "allow_surface_qualifiers": True,
+}
 
 
 def _read(path: Path) -> str:
@@ -228,6 +307,79 @@ def _rule_number_for_title(text: str, title: str) -> int | None:
 
 def _markdown_links(text: str) -> list[str]:
     return re.findall(r"\[[^\]]+\]\((?!https?://|mailto:|#)([^)]+)\)", text)
+
+
+def _extract_markdown_section(text: str, heading: str) -> str | None:
+    heading_match = re.search(rf"^## {re.escape(heading)}\s*$", text, flags=re.MULTILINE)
+    if heading_match is None:
+        return None
+
+    start = heading_match.end()
+    next_heading = re.search(r"^## ", text[start:], flags=re.MULTILINE)
+    if next_heading is None:
+        return text[start:]
+    return text[start : start + next_heading.start()]
+
+
+def _extract_project_type(text: str) -> str | None:
+    match = re.search(r"^Project type:\s*(.+)$", text, flags=re.MULTILINE)
+    if match is None:
+        return None
+    return match.group(1).strip()
+
+
+def _clean_table_cell(value: str) -> str:
+    return value.strip().strip("`")
+
+
+def _canonical_surface_kind(value: str) -> str:
+    return re.sub(r"\s*\([^)]*\)\s*$", "", value.strip())
+
+
+def _surface_is_qualified(value: str) -> bool:
+    return _canonical_surface_kind(value) != value.strip()
+
+
+def _parse_developer_toolchain_entries(text: str) -> tuple[str | None, str | None, list[DeveloperToolchainEntry]]:
+    section = _extract_markdown_section(text, "Developer Toolchain")
+    if section is None:
+        return None, None, []
+
+    primary_language_match = re.search(r"^Primary language:\s*(.+)$", section, flags=re.MULTILINE)
+    package_manager_match = re.search(r"^Package manager:\s*(.+)$", section, flags=re.MULTILINE)
+    primary_language = primary_language_match.group(1).strip() if primary_language_match else None
+    package_manager = package_manager_match.group(1).strip() if package_manager_match else None
+
+    entries: list[DeveloperToolchainEntry] = []
+    lines = section.splitlines()
+    table_lines: list[str] = []
+    collecting = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("|"):
+            table_lines.append(line)
+            collecting = True
+            continue
+        if collecting:
+            break
+
+    for line in table_lines[2:]:
+        parts = [part.strip() for part in line.strip().strip("|").split("|")]
+        if len(parts) != 6:
+            continue
+        entries.append(
+            DeveloperToolchainEntry(
+                surface=_clean_table_cell(parts[0]),
+                surface_kind=_canonical_surface_kind(_clean_table_cell(parts[0])),
+                command_or_source=_clean_table_cell(parts[1]),
+                scope=_clean_table_cell(parts[2]),
+                status=_clean_table_cell(parts[3]),
+                fallback_or_stop=_clean_table_cell(parts[4]),
+                notes=_clean_table_cell(parts[5]),
+            )
+        )
+
+    return primary_language, package_manager, entries
 
 
 def _validate_required_paths(root: Path) -> list[ValidationIssue]:
@@ -460,9 +612,286 @@ def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
     return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
 
 
+def _group_developer_toolchain_entries(
+    entries: list[DeveloperToolchainEntry],
+) -> dict[str, list[DeveloperToolchainEntry]]:
+    grouped: dict[str, list[DeveloperToolchainEntry]] = {}
+    for entry in entries:
+        grouped.setdefault(entry.surface_kind, []).append(entry)
+    return grouped
+
+
+def _build_contract_issues(
+    *,
+    primary_language: str | None,
+    package_manager: str | None,
+    entries: list[DeveloperToolchainEntry],
+    contract: dict[str, object],
+) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    required_top_level_fields = set(contract.get("required_top_level_fields", []))
+    required_surface_kinds = set(contract.get("required_surface_kinds", []))
+    allow_surface_qualifiers = bool(contract.get("allow_surface_qualifiers", False))
+
+    if "Primary language" in required_top_level_fields and not primary_language:
+        issues.append(
+            ValidationIssue(
+                "missing-developer-toolchain-primary-language",
+                ".github/project-context.instructions.md: Developer Toolchain is missing Primary language",
+            )
+        )
+
+    if "Package manager" in required_top_level_fields and not package_manager:
+        issues.append(
+            ValidationIssue(
+                "missing-developer-toolchain-package-manager",
+                ".github/project-context.instructions.md: Developer Toolchain is missing Package manager",
+            )
+        )
+
+    if not entries:
+        issues.append(
+            ValidationIssue(
+                "missing-developer-toolchain-table",
+                ".github/project-context.instructions.md: Developer Toolchain needs a structured table of surfaces",
+            )
+        )
+        return issues
+
+    grouped = _group_developer_toolchain_entries(entries)
+    for surface_kind in sorted(required_surface_kinds):
+        if surface_kind not in grouped:
+            issues.append(
+                ValidationIssue(
+                    "missing-developer-toolchain-surface",
+                    f".github/project-context.instructions.md: Developer Toolchain is missing required surface '{surface_kind}'",
+                )
+            )
+
+    for entry in entries:
+        if _surface_is_qualified(entry.surface) and not allow_surface_qualifiers:
+            issues.append(
+                ValidationIssue(
+                    "developer-toolchain-qualifier-disallowed",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses a qualifier but the manifest contract forbids qualified labels",
+                )
+            )
+
+        if entry.scope not in DEVELOPER_TOOLCHAIN_ALLOWED_SCOPES:
+            issues.append(
+                ValidationIssue(
+                    "invalid-developer-toolchain-scope",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
+                )
+            )
+
+        if entry.status not in DEVELOPER_TOOLCHAIN_ALLOWED_STATUSES:
+            issues.append(
+                ValidationIssue(
+                    "invalid-developer-toolchain-status",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
+                )
+            )
+
+        if entry.status in {"declared-unverified", "known-broken"} and not entry.fallback_or_stop:
+            issues.append(
+                ValidationIssue(
+                    "missing-developer-toolchain-fallback",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
+                )
+            )
+
+        if entry.status == "not-applicable" and entry.command_or_source.lower() != "none":
+            issues.append(
+                ValidationIssue(
+                    "invalid-developer-toolchain-none",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
+                )
+            )
+
+    return issues
+
+
+def _validate_developer_toolchain_contract(
+    project_context_path: Path,
+    *,
+    project_type: str | None,
+    contract: dict[str, object],
+) -> list[ValidationIssue]:
+    if not project_context_path.is_file():
+        return [
+            ValidationIssue(
+                "missing-developer-toolchain-context",
+                ".github/project-context.instructions.md: missing project context file for Developer Toolchain validation",
+            )
+        ]
+
+    text = _read(project_context_path)
+    if _extract_markdown_section(text, "Developer Toolchain") is None:
+        return [
+            ValidationIssue(
+                "missing-developer-toolchain-section",
+                ".github/project-context.instructions.md: add a Developer Toolchain section",
+            )
+        ]
+
+    primary_language, package_manager, entries = _parse_developer_toolchain_entries(text)
+    issues = _build_contract_issues(
+        primary_language=primary_language,
+        package_manager=package_manager,
+        entries=entries,
+        contract=contract,
+    )
+    return issues
+
+
+def collect_advisories(root: Path) -> list[ValidationAdvisory]:
+    advisories: list[ValidationAdvisory] = []
+    project_context = root / ".github/project-context.instructions.md"
+    if not project_context.is_file():
+        return advisories
+
+    text = _read(project_context)
+    project_type = _extract_project_type(text)
+    primary_language, package_manager, entries = _parse_developer_toolchain_entries(text)
+    if _extract_markdown_section(text, "Developer Toolchain") is None:
+        advisories.append(
+            ValidationAdvisory(
+                "developer-toolchain-reminder",
+                ".github/project-context.instructions.md: add a Developer Toolchain section so agents can discover diagnostics, run, health, and repro surfaces",
+            )
+        )
+        return advisories
+
+    if not primary_language:
+        advisories.append(
+            ValidationAdvisory(
+                "developer-toolchain-reminder",
+                ".github/project-context.instructions.md: missing Primary language in the Developer Toolchain section",
+            )
+        )
+
+    if not package_manager:
+        advisories.append(
+            ValidationAdvisory(
+                "developer-toolchain-reminder",
+                ".github/project-context.instructions.md: missing Package manager in the Developer Toolchain section",
+            )
+        )
+
+    if not entries:
+        advisories.append(
+            ValidationAdvisory(
+                "developer-toolchain-reminder",
+                ".github/project-context.instructions.md: add a Developer Toolchain table with structured surfaces rather than keeping the section empty",
+            )
+        )
+        return advisories
+
+    grouped = _group_developer_toolchain_entries(entries)
+
+    for surface in DEVELOPER_TOOLCHAIN_REQUIRED_SURFACES:
+        if surface not in grouped:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: add the required Developer Toolchain surface '{surface}'",
+                )
+            )
+
+    for surface in DEVELOPER_TOOLCHAIN_RECOMMENDED_SURFACES:
+        if surface not in grouped:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: consider adding the recommended Developer Toolchain surface '{surface}' or set it explicitly to none",
+                )
+            )
+
+    for entry in entries:
+        if entry.surface_kind not in DEVELOPER_TOOLCHAIN_ALLOWED_SURFACE_KINDS:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unknown base surface '{entry.surface_kind}'; prefer canonical names such as Diagnostics, Run, or Debug",
+                )
+            )
+
+        if entry.scope not in DEVELOPER_TOOLCHAIN_ALLOWED_SCOPES:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
+                )
+            )
+
+        if entry.status not in DEVELOPER_TOOLCHAIN_ALLOWED_STATUSES:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
+                )
+            )
+
+        if entry.status in {"declared-unverified", "known-broken"} and not entry.fallback_or_stop:
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
+                )
+            )
+
+        if entry.status == "not-applicable" and entry.command_or_source.lower() != "none":
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    f".github/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
+                )
+            )
+
+    if not any(entry.status in DEVELOPER_TOOLCHAIN_ALLOWED_STATUSES for entry in entries):
+        advisories.append(
+            ValidationAdvisory(
+                "developer-toolchain-reminder",
+                ".github/project-context.instructions.md: add verification status values so declared commands become an actionable decision surface",
+            )
+        )
+
+    if project_type in LIVE_RUNTIME_PROJECT_TYPES:
+        repro_entries = grouped.get("Repro path", [])
+        if repro_entries and all(entry.command_or_source.lower() == "none" for entry in repro_entries):
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    ".github/project-context.instructions.md: live-runtime project types should prefer a concrete Repro path when one is stable; keep 'none' only when that is the honest current state",
+                )
+            )
+
+        run_entries = grouped.get("Run", [])
+        if run_entries and all(entry.command_or_source.lower() == "none" for entry in run_entries):
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    ".github/project-context.instructions.md: live-runtime project types should normally declare a concrete Run entrypoint rather than 'none'",
+                )
+            )
+
+    return advisories
+
+
 def validate_repo(root: Path) -> list[ValidationIssue]:
     if (root / ADOPTER_MANIFEST_PATH).is_file():
         issues = _validate_adopted_repo(root)
+        manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+        contract = manifest.get("developer_toolchain_contract")
+        if isinstance(contract, dict):
+            issues.extend(
+                _validate_developer_toolchain_contract(
+                    root / ".github/project-context.instructions.md",
+                    project_type=manifest.get("project_type"),
+                    contract=contract,
+                )
+            )
         issues.extend(_validate_preference_drift(root))
         return issues
 
@@ -485,6 +914,13 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     for check in checks:
         issues.extend(check(root))
+    issues.extend(
+        _validate_developer_toolchain_contract(
+            root / ".github/project-context.instructions.md",
+            project_type=_extract_project_type(_read(root / ".github/project-context.instructions.md")),
+            contract=DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT,
+        )
+    )
     return issues
 
 
@@ -500,10 +936,15 @@ def main() -> int:
     root = args.root.resolve()
 
     issues = validate_repo(root)
+    advisories = collect_advisories(root)
 
     print("=== Agent Framework Template — Structured Validation ===")
     print("")
     if not issues:
+        for advisory in advisories:
+            print(f"⚠️  {advisory.kind}: {advisory.detail}")
+        if advisories:
+            print("")
         print("✅  All structured checks passed.")
         return 0
 

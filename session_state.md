@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Promote the aligned progress/closeout visual contract plus preference-drift auditing into the template's default adoption surface.
+Close out the Developer Toolchain hardening follow-up: manifest-backed required-core enforcement, richer multi-runtime example coverage, and final git closeout.
 
 ---
 
 ## Working Hypothesis
 
-The remaining governance drift is not missing docs but missing automatic enforcement: the template should ship one reusable audit that catches regressions in progress/footer contract wording both at the template root and in manifest-based adopter repos.
+The remaining gap after the first rollout is not more discussion but stronger packaging: bootstrapped adopters need a manifest-declared required-core contract, and multi-runtime repositories need a concrete reference example that the validator and bootstrap path both understand.
 
 **Confidence**: High
 
-**Evidence**: The template already has manifest-driven adopted-repo validation, shipped progress/closeout companion docs, and a standard bootstrap profile. That makes the progress/footer contract a good fit for a snippet-based audit that can run both locally and in copied repos.
+**Evidence**: The design draft is published, reminder-level advisories already parse the section structurally, the bootstrap path already renders starter values, and the remaining work is clearly bounded to manifest enforcement plus richer example coverage.
 
 **Contradictions**: None.
 
@@ -25,46 +25,59 @@ The remaining governance drift is not missing docs but missing automatic enforce
 
 ## Plan
 
-**Approach**: Align the template's Rule 8, companion docs, and execution contract to the preferred visual contract, then ship a standalone preference-drift audit and wire it into both template-root and adopted-repo validation.
+**Approach**: Ship the stronger contract only where the bootstrap manifest explicitly declares it, then prove the richer multi-runtime path with a committed full-stack reference example.
 
 **Steps**:
-1. Align Rule 8 and companion templates to `•` for progress and a single final `📍` footer.
-2. Add a reusable `scripts/preference_drift_audit.py` for known regressions in progress/closeout wording.
-3. Wire the audit into `scripts/validate_template.py` for both root and manifest-based adopted repos.
-4. Distribute the audit through the standard bootstrap profile and keep regression coverage in tests.
+1. completed
+2. completed
+3. completed
+4. completed
+5. completed
 
-**Why this approach**: It keeps the preferred communication contract from drifting back into memory-only guidance and makes future adopters inherit the same executable safeguard by default.
+**Why this approach**: It upgrades new adopters to a real contract without retroactively breaking old repos, and it proves the multi-runtime model with a committed example instead of leaving it theoretical.
 
 ---
 
 ## Active Work
 
-**Current Step**: Align the template's progress/closeout contract and ship the corresponding drift audit as part of the standard governance surface.
+**Current Step**: No active work.
 
-**Next Planned Step**: Validate the upgraded template locally and through bootstrap, then close out if the new audit path is green.
+**Next Planned Step**: Independent review, then git closeout.
 
 ---
 
 ## Recent Receipts
 
-- Preference drift audit landed at the template root, local structured validation passed, standalone drift audit passed, and a real standard bootstrap repo also passed its copied validator.
-
-- Template-level doc-first rule uplift added: repository guideline added, reusable template asset added, adoption guide and template surfaces updated.
-- Structured validation passed via `python3 scripts/validate_template.py`.
-- All tests passed via `python3 -m pytest tests/ -q`.
-- `30 passed in 3.16s`, and both standard and capability-aware bootstrap dry runs succeeded via `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run` and `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke-cap --project-name "Smoke" --profile standard --project-type cli-tool --capability closeout-audit --capability runtime-guards --capability git-hooks --dry-run`.
-- Independent evaluation returned `Verdict: PASS` after reviewing the manifest-driven validator path and hook edge-case coverage.
-- Framework change set was committed and pushed as `c2c83d8 feat: ship execution contracts and governance scaffolding`.
+- The current discussion record and appended feedback were re-read and assessed as sufficient to freeze a conservative v1 design.
+- An independent Architect review recommended publishing now with a progressive schema, actionable verification states, scope-aware stop rules, and a repro-path requirement limited to live runtime repositories.
+- A new TYPE-A design draft was added for the Developer Toolchain concept and wired into the docs index and project adapter.
+- Structured validation passed after the design draft and discovery-surface updates.
+- Independent evaluation returned `Verdict: PASS` after the design draft was tightened around entry shape, scope attachment, and draft-versus-enforcement wording.
+- The project-context template, execution contract, adoption guide, bootstrap presets, root project adapter, tests, and changelog were updated to expose first-pass Developer Toolchain surfaces.
+- `python3 scripts/validate_template.py` passed, `python3 -m pytest tests/ -q` passed with `31 passed`, and a standard bootstrap dry run rendered the new surfaces successfully.
+- Reminder-level Developer Toolchain advisories were added to `scripts/validate_template.py` without turning the new contract into a hard-fail requirement.
+- The demo project's project adapter and walkthrough docs now include the Developer Toolchain surface, and the root README now points adopters at the design and discussion docs.
+- Final validation passed: `python3 scripts/validate_template.py`, `python3 -m pytest tests/ -q` with `33 passed`, and the standard bootstrap dry run all succeeded.
+- Developer Toolchain advisories were upgraded from substring checks to structured parsing of the section and its table entries.
+- Additional tests now cover invalid status values, weak live-runtime repro declarations, and the healthy bootstrapped-adopter path under the structured advisory model.
+- Final validation after the advisory upgrade passed: `python3 scripts/validate_template.py`, `python3 -m pytest tests/ -q` with `35 passed`, and the standard bootstrap dry run all succeeded.
+- Bootstrapped manifests now declare a Developer Toolchain `required-core` contract, and `scripts/validate_template.py` enforces that contract for manifest-based adopters.
+- Developer Toolchain surface labels now allow qualifiers such as `Run (frontend)` and `Run (backend)`, which the validator normalizes back to the base contract surface.
+- A new `examples/full_stack_project/` reference repo now demonstrates multi-runtime Developer Toolchain shape, full-stack repro modeling, and the manifest contract in one place.
+- Final validation for the hardening wave passed: `python3 scripts/validate_template.py`, `python3 -m pytest tests/ -q` with `41 passed`, full bootstrap smoke via `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-full-smoke --project-name "Smoke Full" --profile full --project-type full-stack --dry-run`, and adopted-repo validation via `python3 /tmp/agent-framework-template-adopted-check/scripts/validate_template.py --root /tmp/agent-framework-template-adopted-check`.
+- Independent evaluation returned `Verdict: PASS` after re-checking manifest-gated enforcement, qualified multi-runtime labels, documentation accuracy, and the fresh adopted-repo validation path.
 
 ---
 
 ## Phase Notes
 
-- The template now treats normal `git add` / `git commit` / standard `git push` as main-thread-owned by default; only exception cases still escalate.
-- The template now ships a reusable doc-first execution guideline plus adoption and adapter guidance, so adopters can make roadmap/design-first execution a default repository policy instead of a local afterthought.
-- Bootstrap now writes `.github/agent-framework-manifest.json`, and the copied validator uses it to validate adopted repos against the selected profile/capability surface.
-- Optional git-hook scaffolding is covered end to end: installer, pre-commit closeout audit, pre-push runtime checks, root-commit pushes, and dirty-worktree rejection.
-- Push-check now uses pushed commit ranges or tip SHAs instead of staged diffs and suppresses hook-generated bytecode artifacts with `PYTHONDONTWRITEBYTECODE=1`.
+- The framework now has both a discussion surface and a formal v1 design surface for the Developer Toolchain concept.
+- The design draft freezes a progressive schema, actionable verification status behavior, scope tags, and a scope-aware execution ladder.
+- The first implementation layer is now real in template/bootstrap surfaces, while hard enforcement of missing fields remains deferred.
+- Reminder-level enforcement is now present through validator advisories, which gives adopters feedback without making the first rollout brittle.
+- Reminder-level enforcement is now structural rather than snippet-based for Developer Toolchain entries, which makes the first rollout materially more trustworthy.
+- The follow-up wave now adds manifest-gated hard enforcement for the Developer Toolchain required core without turning optional enrichments into hard requirements.
+- The framework now ships both a single-runtime demo and a multi-runtime full-stack reference path for Developer Toolchain adoption.
 
 ---
 
@@ -89,28 +102,40 @@ The remaining governance drift is not missing docs but missing automatic enforce
 
 ## User Acceptance Criteria
 
-- [x] When an adopter bootstraps a repo, the copied validator checks the selected profile/capabilities instead of template-root requirements.
-- [x] When an adopter enables hook scaffolding, installer, pre-commit, and pre-push behavior can be exercised end to end.
-- [x] When a pre-push runtime check runs, it evaluates pushed commit boundaries, including first-push/root-commit cases, and refuses dirty worktrees that would contaminate the result.
+- [x] When a contributor needs the formal v1 contract rather than open discussion, a dedicated design draft exists with explicit schema tiers and behavior rules.
+- [x] When a contributor bootstraps or fills a project adapter, the template now exposes a first-pass Developer Toolchain section with starter values or placeholders.
+- [x] When the repository validates itself, the new Developer Toolchain surfaces remain structurally consistent across docs, bootstrap, and tests.
+- [x] When a repo omits or weakens the Developer Toolchain surface, the validator can warn without turning the omission into a hard failure.
+- [x] When a contributor inspects the demo adopted repository, the Developer Toolchain shape is visible in the example project adapter and walkthrough.
+- [x] When a repo supplies malformed Developer Toolchain rows, unsupported statuses or scopes, or weak live-runtime repro declarations, the validator can surface targeted reminder-level advisories.
+- [x] When a newly bootstrapped adopter carries the manifest-declared Developer Toolchain contract, missing or malformed required-core fields become hard validation failures.
+- [x] When a contributor needs a multi-runtime example, the repository ships a full-stack reference that uses qualified surface labels without breaking validation.
 
-End-to-end scenario: an adopter bootstraps a repo, runs the copied validator successfully, enables the optional hooks, and sees pre-commit/pre-push enforcement behave against the same commit truth git is about to publish.
+End-to-end scenario: a future contributor can bootstrap a fresh adopter, inherit a manifest-declared required-core Developer Toolchain contract, pass the copied validator only when that core is structurally honest, and inspect either the single-runtime demo or the multi-runtime full-stack example for a concrete reference path.
 
-Agent cannot verify: downstream third-party AI tools honoring every rule consistently.
+Agent cannot verify: how downstream adopters will customize or enforce the new fields after bootstrap.
 
 ---
 
 ## Phase Decisions
 
-- Ship runtime and closeout governance as opt-in executable scaffolding rather than leaving them as documentation-only reference patterns.
-- Keep adopted-repo validation self-contained by freezing the bootstrapped asset surface in a manifest.
-- Treat dirty worktrees as out of bounds for commit-scoped push checks.
+- Publish the formal v1 design draft now instead of reopening broad discussion.
+- Keep `Developer Toolchain` separate from `Validation Toolchain`.
+- Make verification status actionable and scope-aware in the draft rather than leaving those ideas as discussion-only notes.
+- Implement the first adopter-facing surface now, but defer hard validation enforcement for missing fields to a later task.
+- Use reminder-level validator advisories as the first enforcement step instead of immediately turning missing fields into hard failures.
+- Make Developer Toolchain advisories parse the section structurally rather than relying on loose substring presence checks.
+- Make hard enforcement manifest-gated so new adopters opt in automatically while older adopters stay on the previous softer contract until they refresh.
+- Treat qualified surface labels as a first-class multi-runtime mechanism instead of forcing a repository to invent one fake universal run command.
 
 ---
 
 ## Technical Insights
 
-- If a repo repeatedly wants the main thread to handle routine Git closeout, the durable fix is to encode that as the default execution-contract policy and reserve human escalation for exception cases only.
-- When a repository-level process rule proves repeatedly valuable in real use, the durable fix is to push it into the template's reusable surfaces such as templates, adoption guidance, and adapter defaults rather than keep it only as a project-local override.
-- New governance docs only become real product surface when validator, bootstrap, README, and project adapter all point at the same truth.
-- Rule-number drift is cheap to introduce and worth checking automatically.
-- Commit-scoped hook checks need both path scoping and worktree boundary control; either half by itself is not enough.
+- Once discussion converges on contract size, status semantics, and stop rules, the next highest-value move is a design freeze rather than more broad opinion gathering.
+- Verification status only becomes useful when it changes agent behavior; descriptive status alone will decay into documentation noise.
+- For framework productization, a design doc is not enough: the value becomes real only when bootstrap, templates, docs, and self-validation all point at the same contract.
+- Reminder-level enforcement is a useful intermediate step when a new contract has just become adopter-facing: it creates pressure toward quality without forcing immediate ecosystem-wide cleanup.
+- For new structured contracts, advisory quality matters as much as advisory existence; weak substring checks create false confidence and should be replaced by section-aware parsing as early as practical.
+- Once a contract is stable enough to ship, the least disruptive way to harden it is to bind enforcement to a bootstrapped manifest rather than guessing adopter intent from repository shape alone.
+- Multi-runtime examples should prove the normalization rule in code and docs at the same time; otherwise the validator and the design drift in opposite directions.

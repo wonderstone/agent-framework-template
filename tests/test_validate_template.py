@@ -16,6 +16,7 @@ SPEC.loader.exec_module(MODULE)
 
 ValidationIssue = MODULE.ValidationIssue
 validate_repo = MODULE.validate_repo
+collect_advisories = MODULE.collect_advisories
 
 BOOTSTRAP_MODULE_PATH = REPO_ROOT / "scripts" / "bootstrap_adoption.py"
 BOOTSTRAP_SPEC = importlib.util.spec_from_file_location("bootstrap_adoption_for_validation", BOOTSTRAP_MODULE_PATH)
@@ -137,3 +138,184 @@ def test_validate_repo_passes_for_bootstrapped_adopted_repo(tmp_path: Path) -> N
     issues = validate_repo(tmp_path / "adopted")
 
     assert issues == []
+
+
+def test_validate_repo_reports_missing_developer_toolchain_section_for_bootstrapped_adopted_repo(
+    tmp_path: Path,
+) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    text = project_context.read_text(encoding="utf-8")
+    start = text.index("## Developer Toolchain")
+    end = text.index("## Build and Test Commands")
+    project_context.write_text(text[:start] + text[end:], encoding="utf-8")
+
+    issues = validate_repo(tmp_path / "adopted")
+
+    assert ValidationIssue(
+        "missing-developer-toolchain-section",
+        ".github/project-context.instructions.md: add a Developer Toolchain section",
+    ) in issues
+
+
+def test_validate_repo_reports_invalid_developer_toolchain_status_for_bootstrapped_adopted_repo(
+    tmp_path: Path,
+) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace(
+            "| `declared-unverified` |", "| `mystery-status` |", 1
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(tmp_path / "adopted")
+
+    assert ValidationIssue(
+        "invalid-developer-toolchain-status",
+        ".github/project-context.instructions.md: surface 'Diagnostics' uses unsupported status 'mystery-status'",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_primary_language_for_bootstrapped_adopted_repo(
+    tmp_path: Path,
+) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace(
+            "Primary language: Python\n\n", ""
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(tmp_path / "adopted")
+
+    assert ValidationIssue(
+        "missing-developer-toolchain-primary-language",
+        ".github/project-context.instructions.md: Developer Toolchain is missing Primary language",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_required_surface_for_bootstrapped_adopted_repo(
+    tmp_path: Path,
+) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace(
+            "| Build | `python -m build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when packaging matters |\n",
+            "",
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(tmp_path / "adopted")
+
+    assert ValidationIssue(
+        "missing-developer-toolchain-surface",
+        ".github/project-context.instructions.md: Developer Toolchain is missing required surface 'Build'",
+    ) in issues
+
+
+def test_collect_advisories_reports_missing_developer_toolchain_section(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    text = project_context.read_text(encoding="utf-8")
+    start = text.index("## Developer Toolchain")
+    end = text.index("## Build and Test Commands")
+    project_context.write_text(text[:start] + text[end:], encoding="utf-8")
+
+    advisories = collect_advisories(repo_copy)
+
+    assert any(advisory.kind == "developer-toolchain-reminder" for advisory in advisories)
+
+
+def test_collect_advisories_reports_invalid_developer_toolchain_status(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace("| `verified-working` |", "| `mystery-status` |", 1),
+        encoding="utf-8",
+    )
+
+    advisories = collect_advisories(repo_copy)
+
+    assert any("unsupported status 'mystery-status'" in advisory.detail for advisory in advisories)
+
+
+def test_collect_advisories_reports_live_runtime_repro_none(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace(
+            "| Repro path | `run the primary user command with real arguments` | `service` | `declared-unverified` | Use `none` only if no stable user-visible flow exists yet | Shortest user-visible repro |",
+            "| Repro path | `none` | `service` | `not-applicable` | Stop after smoke because no stable repro exists yet | Shortest user-visible repro |",
+        ),
+        encoding="utf-8",
+    )
+
+    advisories = collect_advisories(tmp_path / "adopted")
+
+    assert any("live-runtime project types should prefer a concrete Repro path" in advisory.detail for advisory in advisories)
+
+
+def test_collect_advisories_accepts_qualified_surface_labels(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="full-stack",
+    )
+
+    advisories = collect_advisories(tmp_path / "adopted")
+
+    assert not any("unknown base surface" in advisory.detail for advisory in advisories)
+
+
+def test_collect_advisories_passes_for_bootstrapped_adopted_repo(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    advisories = collect_advisories(tmp_path / "adopted")
+
+    assert advisories == []

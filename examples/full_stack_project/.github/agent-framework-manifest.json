@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "project_name": "Full Stack Reference Project",
+  "profile": "full",
+  "project_type": "full-stack",
+  "capabilities": [],
+  "expected_files": [
+    ".github/agent-framework-manifest.json",
+    ".github/project-context.instructions.md",
+    "README.md",
+    "docs/INDEX.md",
+    "docs/runbooks/full-stack-workflow.md",
+    "frontend/src/.gitkeep",
+    "backend/app/.gitkeep",
+    "tests/e2e/.gitkeep"
+  ],
+  "developer_toolchain_contract": {
+    "version": "v1",
+    "enforcement": "required-core",
+    "required_top_level_fields": [
+      "Primary language",
+      "Package manager"
+    ],
+    "required_surface_kinds": [
+      "Diagnostics",
+      "Run",
+      "Health or smoke",
+      "Repro path",
+      "Build"
+    ],
+    "recommended_surface_kinds": [
+      "Lint"
+    ],
+    "allow_surface_qualifiers": true
+  }
+}

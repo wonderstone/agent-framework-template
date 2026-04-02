@@ -45,7 +45,7 @@ The repository now also includes a **productization surface** around that model:
 - When to evaluate dispatch
 - How to validate after changes
 - How to manage state across sessions
-- The reply footer format
+- The in-progress status line and final closeout format
 
 **Does NOT contain**: project facts, file paths, IP addresses, ports, or domain logic.
 
@@ -325,7 +325,7 @@ When a subtask is confirmed done, the agent executes a 4-step atomic ritual **be
 1. ROADMAP row: `○` → `✅ YYYY-MM-DD`
 2. Acceptance criteria: `[ ]` → `[x]`
 3. `session_state.md`: move item to "Completed This Phase"
-4. Footer: update `Next` to the next subtask
+4. Status line / closeout summary: update `Next` to the next subtask or next phase boundary
 
 ---
 
@@ -346,6 +346,15 @@ When all acceptance criteria in a phase are ✅:
 Multi-step tasks are the primary operational mode. The framework's default execution posture is autonomous forward progress — not wait-and-confirm. This posture is established by Rule 20 in `.github/copilot-instructions.md`.
 
 Before entering that mode, the agent should emit a short execution contract for user confirmation. This is a one-time agreement on execution style, not a request for per-step permission.
+
+Long tasks most often fail operationally not because implementation is impossible, but because internal progress checkpoints get mistaken for true closeout. To keep while-style execution stable, the framework freezes four things before execution begins:
+
+1. the progress unit
+2. the intermediate checkpoint event
+3. the true closeout boundary
+4. the host closeout action reserved for that true boundary only
+
+Those fields live in `templates/execution_contract.template.md`, `templates/session_state.template.md`, `docs/PROGRESS_UPDATE_TEMPLATE.md`, and `docs/CLOSEOUT_SUMMARY_TEMPLATE.md`. The goal is to make "one batch finished" visibly different from "the task is actually complete."
 
 ### Execution Boundary
 
@@ -443,7 +452,7 @@ Can the task be split into 2+ scopes where BOTH of the following are true for ea
 
 Fan-out is the default when both criteria are met. Independent validation is desirable but not a gate.
 
-The dispatch decision is always disclosed in the user-visible reply, not just in the footer.
+The dispatch decision is always disclosed in the user-visible reply, not just in the status line.
 
 ---
 

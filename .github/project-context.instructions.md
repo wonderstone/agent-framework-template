@@ -28,7 +28,13 @@ description: >
 | `README.md` | Project entry point |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
+| `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
+| `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion surface for how repositories should expose diagnostics, lint, build, run, and debug tooling to agents |
+| `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, progressive failure capture, runtime evidence ownership, and root-cause closeout |
+| `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion history and alternative viewpoints for AI-era traceability and recovery surfaces |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and the reusable surfaces adopters should inherit |
+| `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` | Default final closeout-summary shape for hosts with terminal completion actions |
+| `docs/PROGRESS_UPDATE_TEMPLATE.md` | Default in-progress update shape for long-running or while-style tasks |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
 | `templates/execution_contract.template.md` | Pre-execution confirmation contract for long-running tasks |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Guard-registry pattern for protecting active user-facing runtime paths |
@@ -59,6 +65,10 @@ When resuming a multi-step task, recover context in this order:
 |---|---|
 | `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
 | `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
+| `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
+| `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
+| `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |
+| `ai traceability\|traceability discussion\|recovery discussion\|incident discussion` | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` |
 | `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
@@ -89,6 +99,56 @@ python3 scripts/validate_template.py \
   && python3 -m pytest tests/ -q \
   && python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run
 ```
+
+## Developer Toolchain
+
+Primary language: Python
+
+Package manager: pip
+
+| Surface | Command or source | Scope | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Diagnostics | `python3 -m compileall scripts tests examples/demo_project/src` | `module` | `verified-working` | Stop after compile blockers are cleared unless broader proof is required | Fast syntax and import diagnostics for shipped Python surfaces |
+| Run | `none` | `service` | `not-applicable` | Stop at build, validation, or smoke because this repo does not ship a single live app runtime | Framework repository rather than an application runtime |
+| Health or smoke | `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run` | `module` | `verified-working` | Stop and report if bootstrap smoke cannot run honestly | Fastest runtime-adjacent smoke path for shipped adopter tooling |
+| Repro path | `none` | `full-stack` | `not-applicable` | Stop after smoke because the repository does not expose a single end-user runtime path | User-visible proof lives in validation and bootstrap smoke surfaces |
+| Build | `python3 -m compileall scripts tests examples/demo_project/src` | `module` | `verified-working` | Stop after build blockers are cleared when smoke is unnecessary | Required before broader smoke when syntax is in question |
+| Lint | `python3 scripts/validate_template.py` | `file` | `verified-working` | Stop after lint when task scope is local and runnable proof is unnecessary | Structured repository integrity check |
+
+### Runtime Evidence
+
+| Evidence surface | Applies to | Priority | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Logs | `bootstrap smoke / validator workflows` | `first` | `verified-working` | Fall back to command stderr or stop and report missing runtime evidence | Most runtime-adjacent evidence in this repository comes from script output rather than a long-lived log sink |
+| Health check | `bootstrap smoke` | `first` | `verified-working` | Stop and report if smoke cannot run honestly | `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run` |
+| Smoke path | `template bootstrap path` | `first` | `verified-working` | Stop after smoke when the repository does not expose a single app runtime | Fastest trustworthy runtime-adjacent proof for this template repo |
+
+## User Surface Map
+
+| Surface name | Owner path | Sensitive | Fastest repro path | Primary evidence source | Notes |
+|---|---|---|---|---|---|
+| `template bootstrap flow` | `scripts/bootstrap_adoption.py` | `no` | `python3 scripts/bootstrap_adoption.py /tmp/agent-framework-template-smoke --project-name "Smoke" --profile standard --project-type cli-tool --dry-run` | `Health check` | Primary user-visible workflow for adopters validating setup |
+| `template validation flow` | `scripts/validate_template.py` | `no` | `python3 scripts/validate_template.py` | `Logs` | Main integrity surface for template structure and shipped assets |
+| `framework governance surfaces` | `.github/` and `templates/` | `yes` | `python3 scripts/validate_template.py` plus focused doc review | `Logs` | Sensitive because changes affect future adopted repositories and enforcement behavior |
+
+## Security-Sensitive Surfaces And Escalation
+
+Sensitive path declarations:
+
+| Path or surface | Why sensitive |
+|---|---|
+| `.github/copilot-instructions.md` | Framework governance and agent behavior boundary |
+| `.github/project-context.instructions.md` | Repository truth source for future sessions |
+| `templates/` | Shipped adopter-facing contract surface |
+| `scripts/bootstrap_adoption.py` | Controls what adopters inherit |
+
+Escalation rule:
+
+1. automatically escalate failure tracking when an impacted user surface is marked `Sensitive = yes`
+2. automatically escalate when a failure touches a declared sensitive path, config surface, secret surface, or trust-boundary surface
+3. after escalation, require the failure artifact to record:
+   impacted trust boundary, relevant config or secret surface, and at least one negative-path or misuse-path validation claim
+4. human classification may upgrade severity further, but should not be the only trigger
 
 ## Build and Test Commands
 

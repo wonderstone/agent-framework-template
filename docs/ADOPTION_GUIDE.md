@@ -58,6 +58,10 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
   COMPATIBILITY.md                 ← verified surfaces and known limits
+  DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design draft for the Developer Toolchain surface
+  DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and alternative viewpoints for that surface
+  AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history for AI-era traceability, diagnosis, runtime evidence, and recovery mechanisms
+  TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout
   LEFTOVER_UNIT_CONTRACT.md        ← how to record truthful partial-work state
   STRATEGY_MECHANISM_LAYERING.md   ← keep if you want formal reviewer or agent role splits
   ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
@@ -69,7 +73,9 @@ docs/
 templates/
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
   project-context.template.md      ← blank project adapter to fill in
+  root_cause_note.template.md      ← closeout note distinguishing cause-suspected from cause-established recovery
   session_state.template.md        ← blank session state to fill in
   roadmap.template.md              ← blank ROADMAP to fill in
   git_audit_task_packet.template.md ← task packet template
@@ -109,11 +115,58 @@ Open `.github/project-context.instructions.md` and replace every `[placeholder]`
 | Project Map rows | Your actual directory structure |
 | Canonical Docs rows | Your actual key docs |
 | Critical Topic Triggers | Keywords that matter in your domain |
+| Developer Toolchain | Your language, package manager, diagnostics, run, health, repro, and build surfaces |
 | Build and Test Commands | Your actual build/test/lint commands |
 | Protected Paths | Paths that require explicit confirmation before destructive ops |
 | Runtime Config Locations | Where your config files live |
 
 Use `templates/project-context.template.md` as a blank starting point if preferred.
+
+When filling the `Developer Toolchain` section, prefer an honest progressive contract over a fictional complete one.
+
+Required first-pass fields:
+
+1. primary language
+2. package manager
+3. diagnostics source or command
+4. run entrypoint or explicit `none`
+5. health or smoke path or explicit `none`
+6. repro path for live runtime repositories, otherwise explicit `none`
+
+If the relevant runtime path depends on a build step, also declare `Build`.
+
+Strong recommendation:
+
+record verification status and fallback or stop behavior for each declared surface so the agent can react differently to `declared-unverified`, `verified-working`, and `known-broken` commands.
+
+Also fill the traceability surfaces honestly:
+
+1. `Runtime Evidence` should stay inside `Developer Toolchain` by default and name where logs, health checks, and smoke paths actually live
+2. `User Surface Map` should cover the top user-critical flows first; partial truthful coverage is better than a fake complete atlas
+3. `Security-Sensitive Surfaces And Escalation` should identify the paths and flows that must trigger stronger failure tracking automatically
+
+If your repository has live runtime paths, also keep and use:
+
+1. `templates/failure_packet.template.md`
+2. `templates/root_cause_note.template.md`
+
+These surfaces help future agents distinguish:
+
+1. behavior broken right now
+2. cause only suspected
+3. cause actually established
+
+The structured validator now provides reminder-level advisories for obviously weak Developer Toolchain sections.
+
+Those advisories are meant to nudge honest completion of the section, not to hard-fail first adoption.
+
+Bootstrap-generated adopters now also carry a manifest-declared `required-core` contract for Developer Toolchain.
+
+That means:
+
+1. the required core must exist and stay structurally valid in newly bootstrapped repos
+2. optional enrichment such as `Debug` or `Format` still remains advisory
+3. multi-runtime repos may qualify labels with parentheses, for example `Run (frontend)` and `Run (backend)`
 
 If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
 
@@ -131,6 +184,14 @@ If you want a ready-made starter pack rather than starting from scratch, keep `e
 2. second batch: observability/failure-path, performance/benchmark, migration/compatibility, docs/spec drift
 
 In most repositories, the first batch should be adapted first. The second batch becomes first-class when the codebase starts to need stronger observability, performance discipline, compatibility sequencing, or doc/spec governance.
+
+If your repository is multi-runtime, also inspect `examples/full_stack_project/`.
+
+That example shows how to:
+
+1. declare qualified Developer Toolchain labels for frontend and backend paths
+2. keep one manifest-declared required-core contract
+3. document a full-stack repro path without pretending the stack has only one runtime entrypoint
 
 ---
 
@@ -162,9 +223,9 @@ At minimum, confirm:
 - what the true closeout boundary is for while-mode work
 - what E2E or user-visible validation is required before the task can be reported complete
 
-The template default is that the main-thread agent performs normal commit and push, and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
+The template default is that the main-thread agent performs normal commit/push and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
 
-When you confirm the execution contract, also confirm the communication surface:
+Status-line and closeout preference to copy into local policy surfaces when relevant:
 
 - routine in-progress replies use `• 当前在做: ... | 下一步: ...`
 - the longer focus-bearing variant is only for ambiguous cases
@@ -180,6 +241,10 @@ Your `docs/INDEX.md` starts with the core docs that exist. For a new project, th
 | Document | Description |
 |---|---|
 | `README.md` | Project entry point |
+| `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
+| `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion history and alternative viewpoints for that surface |
+| `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion history for AI-era traceability, diagnosis, runtime evidence, and recovery mechanisms |
+| `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and required planning surfaces |
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | How to adopt this framework |
@@ -247,7 +312,7 @@ This makes doc-first execution a repository default rather than a conversational
 
 ## Step 7 — Customize Rule 8 Status Line Language (Optional)
 
-The default in-progress status line in `copilot-instructions.md` uses English. If your team works in another language, update the Rule 8 examples to match.
+The default in-progress status line in `copilot-instructions.md` uses English. If your team works in another language, update the Rule 8 examples accordingly.
 
 ---
 

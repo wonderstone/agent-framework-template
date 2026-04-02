@@ -14,6 +14,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
     "backend-api": {
+        "primary_language": "Python",
+        "package_manager": "pip",
         "project_map_rows": (
             "| `src/` | API implementation and domain services |",
             "| `tests/` | Unit and integration test suites |",
@@ -25,6 +27,14 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "| Unit | pytest | `pytest tests/unit -q` |",
             "| Integration | pytest | `pytest tests/integration -q` |",
             "| End-to-end | curl smoke script | `./scripts/smoke.sh` |",
+        ),
+        "developer_tool_rows": (
+            "| Diagnostics | `pyright .` | `module` | `declared-unverified` | Fall back to `python -m compileall src tests` before deeper runtime work | Type and import diagnostics |",
+            "| Run | `./scripts/start.sh` | `service` | `declared-unverified` | If startup fails, inspect logs and stop unless a fallback run path is declared | Dev server entrypoint |",
+            "| Health or smoke | `./scripts/smoke.sh` | `service` | `declared-unverified` | Stop and report if the service cannot be confirmed honestly | Fastest runtime confirmation path |",
+            "| Repro path | `curl [primary endpoint]` | `service` | `declared-unverified` | Use `none` if no stable user-visible repro exists yet | Shortest API repro path |",
+            "| Build | `python -m compileall src tests` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when runtime depends on build |",
+            "| Lint | `ruff check .` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
         ),
         "full_suite": "pytest tests/ -q && ./scripts/smoke.sh",
         "build_test_commands": (
@@ -60,8 +70,23 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "- Activate your virtualenv before running validation commands.",
             "- Keep a lightweight smoke script in `scripts/smoke.sh` for UAC checks.",
         ),
+        "runtime_evidence_rows": (
+            "| Logs | `primary service` | `first` | `declared-unverified` | Fall back to stderr or stop and report missing runtime evidence | App log path or primary runtime output |",
+            "| Health check | `primary API flow` | `first` | `declared-unverified` | Stop and report if the health path cannot be exercised honestly | `./scripts/smoke.sh` or `GET /health` |",
+            "| Smoke path | `primary user flow` | `first` | `declared-unverified` | Fall back to logs plus repro and stop if neither is honest | Fastest runtime-adjacent confirmation |",
+        ),
+        "user_surface_rows": (
+            "| `primary API flow` | `src/` | `no` | `curl [primary endpoint]` | `Health check` | Top user-visible API path |",
+            "| `auth or admin API flow` | `src/` | `yes` | `curl [sensitive endpoint]` | `Logs` | Sensitive path needing stronger traceability |",
+        ),
+        "sensitive_rows": (
+            "| `src/auth/` | auth and permission boundary |",
+            "| `.env` | secrets and environment trust boundary |",
+        ),
     },
     "web-frontend": {
+        "primary_language": "TypeScript",
+        "package_manager": "npm",
         "project_map_rows": (
             "| `src/` | UI components, routes, and client-side state |",
             "| `tests/` | Unit, integration, and browser tests |",
@@ -73,6 +98,14 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "| Unit | Vitest | `npm run test:unit` |",
             "| Integration | Testing Library | `npm run test:integration` |",
             "| End-to-end | Playwright | `npm run test:e2e` |",
+        ),
+        "developer_tool_rows": (
+            "| Diagnostics | `npm run typecheck` | `module` | `declared-unverified` | Fall back to editor diagnostics only if no CLI typecheck is available | Type diagnostics |",
+            "| Run | `npm run dev` | `service` | `declared-unverified` | If startup fails, inspect logs and stop unless a fallback preview path is declared | Frontend dev server |",
+            "| Health or smoke | `open primary route or run npm run test:e2e` | `service` | `declared-unverified` | Stop and report if the UI cannot be confirmed honestly | Fastest visible runtime confirmation |",
+            "| Repro path | `open primary route and exercise main journey` | `full-stack` | `declared-unverified` | Use `none` only if no stable user journey exists yet | User-visible repro path |",
+            "| Build | `npm run build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when runtime depends on build |",
+            "| Lint | `npm run lint` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
         ),
         "full_suite": "npm run lint && npm run test && npm run test:e2e",
         "build_test_commands": (
@@ -108,8 +141,23 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "- Keep at least one browser-driven E2E path for the primary user journey.",
             "- Call out responsive or accessibility validation in acceptance evidence.",
         ),
+        "runtime_evidence_rows": (
+            "| Logs | `frontend dev server` | `second` | `declared-unverified` | Fall back to browser console or stop and report missing evidence | Terminal output or browser console logs |",
+            "| Health check | `primary route` | `first` | `declared-unverified` | Fall back to smoke path if no dedicated health path exists | Load the primary route successfully |",
+            "| Smoke path | `main user journey` | `first` | `declared-unverified` | Stop and report if the journey cannot be exercised honestly | Browser path or `npm run test:e2e` |",
+        ),
+        "user_surface_rows": (
+            "| `primary user journey` | `src/` | `no` | `open primary route and exercise main journey` | `Smoke path` | Main happy-path UI flow |",
+            "| `login or billing journey` | `src/` | `yes` | `open sensitive route and validate access behavior` | `Logs` | Sensitive user-facing path needing stronger traceability |",
+        ),
+        "sensitive_rows": (
+            "| `src/auth/` | auth and session boundary |",
+            "| `.env.local` | API keys and local secret surface |",
+        ),
     },
     "cli-tool": {
+        "primary_language": "Python",
+        "package_manager": "pip",
         "project_map_rows": (
             "| `src/` | CLI commands, parsing, and application logic |",
             "| `tests/` | Unit and command-level smoke tests |",
@@ -121,6 +169,14 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "| Unit | pytest | `pytest tests/unit -q` |",
             "| Integration | pytest | `pytest tests/integration -q` |",
             "| End-to-end | shell smoke test | `./scripts/smoke.sh` |",
+        ),
+        "developer_tool_rows": (
+            "| Diagnostics | `pyright .` | `module` | `declared-unverified` | Fall back to `python -m compileall src tests` before deeper runtime work | Type and import diagnostics |",
+            "| Run | `python -m src.main --help` | `service` | `declared-unverified` | If the entrypoint fails, inspect stderr and stop unless a fallback command is declared | Primary CLI entrypoint |",
+            "| Health or smoke | `./scripts/smoke.sh` | `service` | `declared-unverified` | Stop and report if the CLI cannot be exercised honestly | Command-level smoke path |",
+            "| Repro path | `run the primary user command with real arguments` | `service` | `declared-unverified` | Use `none` only if no stable user-visible flow exists yet | Shortest user-visible repro |",
+            "| Build | `python -m build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when packaging matters |",
+            "| Lint | `ruff check .` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
         ),
         "full_suite": "pytest tests/ -q && ./scripts/smoke.sh",
         "build_test_commands": (
@@ -156,8 +212,23 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "- Keep one shell smoke test that exercises the main command exactly as a user would run it.",
             "- Prefer human-readable CLI output in UAC items, not just exit-code checks.",
         ),
+        "runtime_evidence_rows": (
+            "| Logs | `cli execution` | `first` | `declared-unverified` | Fall back to stderr capture or stop and report missing runtime evidence | Command stdout or stderr is usually the first evidence surface |",
+            "| Health check | `main command` | `first` | `declared-unverified` | Fall back to smoke path if the direct command is not stable yet | `python -m src.main --help` or a safe command invocation |",
+            "| Smoke path | `primary user command` | `first` | `declared-unverified` | Stop and report if the command cannot be exercised honestly | `./scripts/smoke.sh` |",
+        ),
+        "user_surface_rows": (
+            "| `primary CLI command` | `src/` | `no` | `run the main command with real arguments` | `Smoke path` | Main user-visible CLI path |",
+            "| `credentialed or destructive command` | `src/` | `yes` | `run the sensitive command in a safe fixture environment` | `Logs` | Sensitive because user trust or irreversible actions may be involved |",
+        ),
+        "sensitive_rows": (
+            "| `.env` | secrets and credential surface |",
+            "| `src/commands/` | command behavior that may be destructive or high-trust |",
+        ),
     },
     "library": {
+        "primary_language": "Python",
+        "package_manager": "pip",
         "project_map_rows": (
             "| `src/` | Reusable library modules and public APIs |",
             "| `tests/` | Unit and contract tests |",
@@ -169,6 +240,14 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "| Unit | pytest | `pytest tests/unit -q` |",
             "| Integration | contract tests | `pytest tests/contracts -q` |",
             "| End-to-end | example import smoke test | `python examples/smoke_import.py` |",
+        ),
+        "developer_tool_rows": (
+            "| Diagnostics | `pyright .` | `module` | `declared-unverified` | Fall back to `python -m compileall src tests` before deeper work | Type and import diagnostics |",
+            "| Run | `none` | `service` | `not-applicable` | Stop at build or smoke unless runnable proof is explicitly requested | No live service runtime by default |",
+            "| Health or smoke | `python examples/smoke_import.py` | `module` | `declared-unverified` | Stop and report if public API smoke cannot run honestly | Public API smoke path |",
+            "| Repro path | `none` | `full-stack` | `not-applicable` | Stop after smoke unless a consumer repro path is declared | Libraries may not expose a live runtime path |",
+            "| Build | `python -m build` | `module` | `declared-unverified` | Stop after build blockers are cleared when smoke is unnecessary | Required when packaging matters |",
+            "| Lint | `ruff check .` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
         ),
         "full_suite": "pytest tests/ -q && python examples/smoke_import.py",
         "build_test_commands": (
@@ -204,8 +283,23 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "- Track compatibility guarantees explicitly in docs and changelog entries.",
             "- Keep at least one smoke import path that uses the public API only.",
         ),
+        "runtime_evidence_rows": (
+            "| Logs | `import and packaging workflows` | `second` | `declared-unverified` | Fall back to command stderr or stop and report missing runtime evidence | Build and import output is often the first evidence surface |",
+            "| Health check | `public API smoke` | `first` | `declared-unverified` | Stop and report if the public API cannot be exercised honestly | `python examples/smoke_import.py` |",
+            "| Smoke path | `consumer import path` | `first` | `declared-unverified` | Fall back to build output if the smoke path is missing | Fastest consumer-facing confirmation |",
+        ),
+        "user_surface_rows": (
+            "| `public API import path` | `src/` | `no` | `python examples/smoke_import.py` | `Health check` | Main consumer-visible surface for a library |",
+            "| `compatibility-sensitive API path` | `src/` | `yes` | `run the public API call covered by compatibility docs` | `Logs` | Sensitive when compatibility or upgrade safety matters |",
+        ),
+        "sensitive_rows": (
+            "| `pyproject.toml` | packaging and release trust boundary |",
+            "| `src/` public API files | compatibility-sensitive surface |",
+        ),
     },
     "full-stack": {
+        "primary_language": "TypeScript + Python",
+        "package_manager": "npm + pip",
         "project_map_rows": (
             "| `frontend/` | Browser UI and client-side state |",
             "| `backend/` | API, jobs, and domain services |",
@@ -217,6 +311,19 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "| Unit | project-native test runner | `[frontend unit] + [backend unit]` |",
             "| Integration | API + UI integration tests | `[integration command]` |",
             "| End-to-end | browser or journey test | `[e2e command]` |",
+        ),
+        "developer_tool_rows": (
+            "| Diagnostics (frontend) | `[frontend typecheck]` | `module` | `declared-unverified` | Fall back to narrower frontend diagnostics before starting the full stack | Frontend type diagnostics |",
+            "| Diagnostics (backend) | `[backend typecheck]` | `module` | `declared-unverified` | Fall back to compile diagnostics before broader runtime work | Backend type diagnostics |",
+            "| Run (frontend) | `[frontend dev server]` | `service` | `declared-unverified` | If startup fails, stop unless a preview fallback is declared | Frontend runtime entrypoint |",
+            "| Run (backend) | `[backend api command]` | `service` | `declared-unverified` | If startup fails, stop unless a narrower backend fallback is declared | Backend runtime entrypoint |",
+            "| Health or smoke (backend) | `[backend health check]` | `service` | `declared-unverified` | Stop and report if the API cannot be confirmed honestly | Fastest backend runtime confirmation |",
+            "| Health or smoke (journey) | `[integration command]` | `full-stack` | `declared-unverified` | Stop and report if the user journey cannot be confirmed honestly | Cross-layer smoke path |",
+            "| Repro path (primary journey) | `[primary user journey]` | `full-stack` | `declared-unverified` | Use `none` only if no stable user journey exists yet | Shortest full-stack repro path |",
+            "| Build (frontend) | `[frontend build]` | `module` | `declared-unverified` | Stop after frontend build blockers are cleared when runnable proof is unnecessary | Frontend build surface |",
+            "| Build (backend) | `[backend build]` | `module` | `declared-unverified` | Stop after backend build blockers are cleared when runnable proof is unnecessary | Backend build surface |",
+            "| Lint (frontend) | `[frontend lint]` | `file` | `declared-unverified` | Stop after frontend lint when task scope is local | Recommended |",
+            "| Lint (backend) | `[backend lint]` | `file` | `declared-unverified` | Stop after backend lint when task scope is local | Recommended |",
         ),
         "full_suite": "[unit] && [integration] && [e2e]",
         "build_test_commands": (
@@ -253,6 +360,19 @@ PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
             "- Define one end-to-end user journey that crosses frontend and backend every time.",
             "- Keep contract drift visible in docs when frontend and backend change together.",
         ),
+        "runtime_evidence_rows": (
+            "| Logs | `frontend and backend runtimes` | `second` | `declared-unverified` | Fall back to the narrower service log that owns the failing surface | Record where each service emits first-line evidence |",
+            "| Health check | `backend service` | `first` | `declared-unverified` | Fall back to journey smoke if the service health path is missing | `[backend health check]` |",
+            "| Smoke path | `primary full-stack journey` | `first` | `declared-unverified` | Stop and report if the journey cannot be exercised honestly | `[integration command]` |",
+        ),
+        "user_surface_rows": (
+            "| `primary full-stack journey` | `frontend/` + `backend/` | `no` | `[primary user journey]` | `Smoke path` | Cross-layer happy path |",
+            "| `auth or payment journey` | `frontend/` + `backend/` | `yes` | `[sensitive user journey]` | `Logs` | Sensitive because it crosses trust boundaries |",
+        ),
+        "sensitive_rows": (
+            "| `backend/auth/` | auth and permission boundary |",
+            "| `.env` | shared secret and environment trust boundary |",
+        ),
     },
 }
 
@@ -283,11 +403,15 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "LICENSE",
         "VERSION",
         "docs/ADOPTION_GUIDE.md",
+        "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
         "docs/COMPATIBILITY.md",
+        "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+        "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
         "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
         "docs/FRAMEWORK_ARCHITECTURE.md",
         "docs/LEFTOVER_UNIT_CONTRACT.md",
         "docs/RUNTIME_SURFACE_PROTECTION.md",
+        "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
         "docs/runbooks/resumable-git-audit-pipeline.md",
         "scripts/git_audit_pipeline.py",
         "scripts/preference_drift_audit.py",
@@ -298,7 +422,9 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "templates/git_audit_task_packet.template.md",
         "templates/doc_first_execution_guidelines.template.md",
         "templates/execution_contract.template.md",
+        "templates/failure_packet.template.md",
         "templates/project-context.template.md",
+        "templates/root_cause_note.template.md",
         "templates/roadmap.template.md",
         "templates/session_state.template.md",
     ),
@@ -317,6 +443,14 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "examples/demo_project/tmp/git_audit/add_task_priority/audit_receipt.md",
         "examples/demo_project/tmp/git_audit/add_task_priority/handoff_packet.md",
         "examples/demo_project/tmp/git_audit/add_task_priority/task_packet.md",
+        "examples/full_stack_project/README.md",
+        "examples/full_stack_project/.github/project-context.instructions.md",
+        "examples/full_stack_project/.github/agent-framework-manifest.json",
+        "examples/full_stack_project/docs/INDEX.md",
+        "examples/full_stack_project/docs/runbooks/full-stack-workflow.md",
+        "examples/full_stack_project/frontend/src/.gitkeep",
+        "examples/full_stack_project/backend/app/.gitkeep",
+        "examples/full_stack_project/tests/e2e/.gitkeep",
         "examples/reviewer_roles/01_goal_acceptance_owner.md",
         "examples/reviewer_roles/02_plan_checkpoint_owner.md",
         "examples/reviewer_roles/03_runtime_correctness_reviewer.md",
@@ -407,6 +541,10 @@ def _replace_project_context_sections(contents: str, project_type: str) -> str:
         "Project type: [fill in]": f"Project type: {project_type}",
         "| Unit | [pytest / Jest / Vitest / etc.] | `[command]` |\n| Integration | [httpx / supertest / React Testing Library / etc.] | `[command]` |\n| End-to-end | [Playwright / Cypress / Newman / curl script / etc.] | `[command]` |": "\n".join(preset["validation_tool_rows"]),
         "# Run full suite (all tiers in sequence)\n# [single command or script]": f"# Run full suite (all tiers in sequence)\n{preset['full_suite']}",
+        "Primary language: [fill in]\n\nPackage manager: [fill in]\n\n| Surface | Command or source | Scope | Status | Fallback or stop | Notes |\n|---|---|---|---|---|---|\n| Diagnostics | [command or source] | [file / module] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [syntax or type diagnostics] |\n| Run | [command or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [main local execution path] |\n| Health or smoke | [command or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [fastest reliable runtime confirmation] |\n| Repro path | [command, script, or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [required for repos with a live runtime path] |\n| Build | [command or `none`] | [module / service] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [required when the runtime path depends on build] |\n| Lint | [command or `none`] | [file / module] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [recommended] |": f"Primary language: {preset['primary_language']}\n\nPackage manager: {preset['package_manager']}\n\n| Surface | Command or source | Scope | Status | Fallback or stop | Notes |\n|---|---|---|---|---|---|\n" + "\n".join(preset["developer_tool_rows"]),
+        "| Logs | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [log path, command, or viewer] |\n| Health check | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [endpoint, script, or command] |\n| Smoke path | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [fastest runtime-adjacent confirmation] |\n| [Optional additional evidence] | [surface / service] | [priority] | [status] | [fallback or stop] | [trace / metric / screenshot harness / inspection command] |": "\n".join(preset["runtime_evidence_rows"]),
+        "| [surface] | [path / module / entrypoint / `none`] | [yes / no] | [command / script / route / `none`] | [logs / health / smoke / trace / user report / `none`] | [optional short context] |\n| [surface] | [path / module / entrypoint / `none`] | [yes / no] | [command / script / route / `none`] | [logs / health / smoke / trace / user report / `none`] | [optional short context] |": "\n".join(preset["user_surface_rows"]),
+        "| `[path / config / flow]` | [auth / secrets / billing / export / model routing / external tool / prompt boundary] |": "\n".join(preset["sensitive_rows"]),
         "# Replace with actual project commands\n\n# Type check\n# pyright .\n\n# Run tests\n# pytest tests/\n\n# Lint\n# ruff check .\n\n# Build\n# npm run build\n\n# Start\n# ./scripts/start.sh": "\n".join(preset["build_test_commands"]),
         "| `data/` | Runtime state — irreversible if deleted |\n| `.env` | Secrets — append preferred over overwrite |\n| `[add more]` | [reason] |": "\n".join(preset["protected_rows"]),
         "| `.env` | Environment-level overrides |\n| `[config file path]` | [what it controls] |": "\n".join(preset["runtime_rows"]),
@@ -458,11 +596,26 @@ def _write_manifest(
     dry_run: bool,
 ) -> bool:
     payload = {
+        "schema_version": 2,
         "project_name": project_name,
         "profile": profile,
         "project_type": project_type,
         "capabilities": list(capabilities),
         "expected_files": list(expected_files),
+        "developer_toolchain_contract": {
+            "version": "v1",
+            "enforcement": "required-core",
+            "required_top_level_fields": ["Primary language", "Package manager"],
+            "required_surface_kinds": [
+                "Diagnostics",
+                "Run",
+                "Health or smoke",
+                "Repro path",
+                "Build",
+            ],
+            "recommended_surface_kinds": ["Lint"],
+            "allow_surface_qualifiers": True,
+        },
     }
     return _write_text(
         destination,
@@ -643,12 +796,14 @@ def main() -> int:
     print("1. Fill any remaining placeholder docs or commands for your project.")
     if args.profile == "minimal":
         print("2. Add the standard profile later if you want bundled validation tooling and CI.")
-        print("3. Create your first ROADMAP and session-state entries before starting feature work.")
+        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
+        print("4. Create your first ROADMAP and session-state entries before starting feature work.")
     else:
         print("2. Run python3 scripts/validate_template.py from the target repository.")
-        print("3. Do one bootstrap smoke task before adopting the workflow broadly.")
+        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
+        print("4. Do one bootstrap smoke task before adopting the workflow broadly.")
     if result.capabilities:
-        print("4. Review any opt-in capability scaffolding before enabling it in production.")
+        print("5. Review any opt-in capability scaffolding before enabling it in production.")
     return 0
 
 

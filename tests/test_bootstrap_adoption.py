@@ -49,6 +49,8 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
 
     assert existing.read_text(encoding="utf-8") == "keep me"
     assert existing in result.skipped
+    assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DESIGN.md").exists()
+    assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DISCUSSION.md").exists()
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
@@ -74,10 +76,14 @@ def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:
     manifest = json.loads(
         (tmp_path / ".github" / "agent-framework-manifest.json").read_text(encoding="utf-8")
     )
+    assert manifest["schema_version"] == 2
     assert manifest["project_name"] == "Capability Demo"
     assert manifest["profile"] == "minimal"
     assert manifest["project_type"] == "cli-tool"
     assert manifest["capabilities"] == ["closeout-audit", "runtime-guards", "git-hooks"]
+    assert manifest["developer_toolchain_contract"]["version"] == "v1"
+    assert manifest["developer_toolchain_contract"]["enforcement"] == "required-core"
+    assert manifest["developer_toolchain_contract"]["allow_surface_qualifiers"] is True
     assert ".github/agent-framework-manifest.json" in manifest["expected_files"]
     assert "scripts/closeout_truth_audit.py" in manifest["expected_files"]
     assert ".github/runtime_surface_registry.py" in manifest["expected_files"]
@@ -93,6 +99,7 @@ def test_bootstrap_full_copies_examples_and_ci(tmp_path: Path) -> None:
 
     assert (tmp_path / ".github" / "workflows" / "ci.yml").exists()
     assert (tmp_path / "examples" / "reviewer_roles" / "10_docs_spec_drift_reviewer.md").exists()
+    assert (tmp_path / "examples" / "full_stack_project" / "README.md").exists()
     assert (tmp_path / "scripts" / "bootstrap_adoption.py").exists()
     assert (tmp_path / "templates" / "reviewer_role_profile.template.md").exists()
 
@@ -121,8 +128,30 @@ def test_bootstrap_uses_project_type_preset_for_cli_projects(tmp_path: Path) -> 
         encoding="utf-8"
     )
     assert "Project type: cli-tool" in project_context
+    assert "## Developer Toolchain" in project_context
+    assert "Primary language: Python" in project_context
+    assert "Package manager: pip" in project_context
+    assert "run the primary user command with real arguments" in project_context
     assert "python -m build" in project_context
     assert result.project_type == "cli-tool"
+
+
+def test_bootstrap_uses_qualified_surface_labels_for_full_stack_projects(tmp_path: Path) -> None:
+    result = bootstrap_repo(
+        target_dir=tmp_path,
+        project_name="Full Stack Demo",
+        profile="minimal",
+        project_type="full-stack",
+    )
+
+    project_context = (tmp_path / ".github" / "project-context.instructions.md").read_text(
+        encoding="utf-8"
+    )
+    assert "Project type: full-stack" in project_context
+    assert "| Diagnostics (frontend) |" in project_context
+    assert "| Run (backend) |" in project_context
+    assert "| Repro path (primary journey) |" in project_context
+    assert result.project_type == "full-stack"
 
 
 def test_detect_project_type_prefers_backend_for_pyproject(tmp_path: Path) -> None:

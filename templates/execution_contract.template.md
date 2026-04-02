@@ -11,6 +11,25 @@
 - Scope: [allowed modules / files / systems]
 - Out of Scope: [what should not be touched]
 
+## Optional Fast-Start Block
+
+Use this when the task is well-bounded and the repository wants a one-shot confirmation surface before execution begins.
+
+Execution Boundary:
+- Authorized scope: [file set or module scope]
+- Authorized ops: [read / edit / lint / test / state updates / dispatch]
+- Hard stops: [protected paths / destructive ops / source-of-truth conflicts / scope expansion]
+- Check-in point: [phase boundary / acceptance checkpoint / explicit blocker]
+
+Working Hypothesis:
+- [one-sentence working assumption about cause, solution, or design direction]
+
+Decomposition Decision:
+- [fan-out / serial]
+- [owner files or bounded scopes]
+- [validation path per scope]
+- [reason this split is or is not worth parallelizing]
+
 ---
 
 ## Planning Surfaces
@@ -20,53 +39,6 @@
 - Validation doc: [path]
 - State doc: [path]
 - Rule: if this is a non-trivial task and these surfaces do not exist yet, create or update them before implementation begins
-
-## Optional Fast-Start Block
-
-Paste or adapt this block when a task-start ritual needs one compact surface that freezes execution, validation, and closeout rules up front:
-
-```text
-Planning Surfaces:
-- Roadmap or design doc: [path]
-- Execution checklist: [path]
-- Validation doc: [path]
-- State doc: [path]
-
-Execution Boundary:
-- Authorized scope: [file set or module scope]
-- Authorized ops: read · edit · lint · test · state updates · fan-out to CLI
-- Hard stops: [protected paths / destructive git / scope conflict / low-confidence irreversible decision]
-- Check-in point: [phase boundary / acceptance criteria met / explicit blocker reached]
-- Parallel ceiling: [default 5 when fan-out is used; `1` when no fan-out is intended]
-
-Long-Loop Closeout Contract:
-- Progress unit: [module / batch / slice / review pass]
-- True closeout boundary: [full task complete / explicit blocker / user-requested checkpoint]
-- Intermediate batch rule: finishing one progress unit is a progress update only, not final closeout
-- Host closeout rule: do not trigger `task_complete` or equivalent host closeout action until the true closeout boundary is reached
-
-Working Hypothesis:
-- Hypothesis: [one sentence]
-- Confidence: [High / Medium / Low]
-
-User Acceptance Criteria (UAC):
-- [ ] When [user does X], [user observes Y]
-- [ ] When [user does X], [user observes Y]
-
-End-to-end scenario:
-- [entry point -> full path -> observable result]
-
-Decomposition Decision:
-- Scale: [Simple / Compound / Complex]
-- Proceeding serially because: [reason]
-  or
-- Subtasks: [subtask -> owner files]
-- Generator: [main thread / CLI / subagent]
-- Evaluator: [separate CLI / subagent / context-reset main thread]
-- Fallback: [CLI -> subagent / escalate]
-```
-
-Use this block when teams repeatedly miss execution-boundary declarations, task-specific UAC, dispatch disclosure, fallback ownership, or the progress-versus-closeout distinction for while-style work.
 
 ## Long-Loop Closeout Contract
 
@@ -115,6 +87,12 @@ Use this block when teams repeatedly miss execution-boundary declarations, task-
 ### 4. Validation And Completion Gate
 
 - Minimum technical validation: [lint / typecheck / focused tests / workspace checks]
+- Task scope for developer execution: [file / module / service / full-stack]
+- Highest developer-tool layer needed for this task: [diagnostics / lint / build / run / health / repro]
+- If a command is `declared-unverified`: [attempt once and treat failure as recoverable / skip and log / custom]
+- If a command is `known-broken`: [use fallback / stop and report / custom]
+- Runtime entrypoint required for this task: [yes / no]
+- Repro path required for this task: [yes / no]
 - Required user-observable validation: [E2E path / smoke path / scenario simulation]
 - Bootstrap-mode allowance: [none / toolchain setup / runtime entrypoint setup]
 - User Acceptance Criteria (UAC):
@@ -124,6 +102,14 @@ Use this block when teams repeatedly miss execution-boundary declarations, task-
 - If full E2E is not yet possible: [record the missing surface and how it will be introduced later]
 - Gap check before closeout: [what the user would notice that tests might not catch]
 - Completion rule: do not report complete until both technical and user-visible acceptance evidence exist
+- If runtime behavior breaks during the task: [open or update a failure packet / lightweight note / custom]
+- If cause remains only suspected at closeout: [create a root-cause note / record residual risk inline / custom]
+
+Default developer-tool ladder:
+
+`diagnostics → lint → build → run → health → repro`
+
+Rule: stop at the minimum layer needed by the task scope unless runnable or user-visible proof was explicitly requested.
 
 ### 5. Scope Boundary
 
@@ -141,6 +127,13 @@ Use this block when teams repeatedly miss execution-boundary declarations, task-
   - source-of-truth conflict
   - material scope expansion
   - inability to satisfy the validation gate
+  - impacted surface marked sensitive in the project adapter
+  - touched path or config declared security-sensitive in the project adapter
+
+- After security-sensitive escalation, require:
+  - impacted trust boundary
+  - relevant config or secret surface
+  - at least one negative-path or misuse-path validation claim
 
 ### 7. State And Handoff Rules
 

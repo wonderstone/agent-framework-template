@@ -37,6 +37,8 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design for the Developer Toolchain contract
+  DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and tradeoffs behind that contract
   DOC_FIRST_EXECUTION_GUIDELINES.md ← repository-default doc-first planning rule for non-trivial work
   LEFTOVER_UNIT_CONTRACT.md        ← how to classify and record partial work truthfully
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
@@ -59,6 +61,7 @@ templates/
   runtime_surface_registry.template.py ← registry skeleton for runtime surface guard definitions
 
 examples/
+  full_stack_project/              ← richer reference repo for multi-runtime Developer Toolchain shape
   reviewer_roles/
     01_goal_acceptance_owner.md    ← first-batch strategy role
     02_plan_checkpoint_owner.md    ← first-batch strategy role
@@ -158,7 +161,7 @@ cp templates/session_state.template.md      your-repo/session_state.md
 
 # 3. Fill in the project adapter
 #    Edit your-repo/.github/project-context.instructions.md
-#    Replace all [placeholders] with real values
+#    Replace all [placeholders] with real values, including the Developer Toolchain section
 ```
 
 ### Full setup
@@ -179,6 +182,12 @@ Before any long-running or multi-step task, the agent should produce an executio
 
 The default is: main-thread agent handles normal `git add` / `commit` / standard `push`, and only exception cases are escalated. This confirmation is meant to override that default when needed, not to force per-step micromanagement.
 
+Progress and closeout preference summary:
+
+- routine in-progress replies use `• 当前在做: ... | 下一步: ...`
+- use `• 当前聚焦: ... | 正在做: ... | 下一步: ...` only when the focus needs to be explicit
+- final closeout keeps exactly one `📍` footer and places `---` immediately before it
+
 If a repository wants roadmap/design-first execution to be the default for non-trivial work, it can also ship [`docs/DOC_FIRST_EXECUTION_GUIDELINES.md`](docs/DOC_FIRST_EXECUTION_GUIDELINES.md) from [`templates/doc_first_execution_guidelines.template.md`](templates/doc_first_execution_guidelines.template.md) and route doc-first triggers to it through the project adapter.
 
 ---
@@ -188,9 +197,10 @@ If a repository wants roadmap/design-first execution to be the default for non-t
 If you want one concrete path instead of reading the full framework first:
 
 1. Run `python scripts/bootstrap_adoption.py ../your-repo --project-name "Your Project" --profile standard`
-2. Open the generated `.github/project-context.instructions.md` and replace the default commands
+2. Open the generated `.github/project-context.instructions.md` and replace the default commands plus Developer Toolchain starter values
 3. Run `python3 scripts/validate_template.py`
 4. Review [`examples/demo_project/`](examples/demo_project/) for a tiny adopted repository with a committed packet / receipt / handoff cycle
+5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path
 
 ---
 
@@ -241,6 +251,10 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 
 **Runtime surface protection** — [`docs/RUNTIME_SURFACE_PROTECTION.md`](docs/RUNTIME_SURFACE_PROTECTION.md) now pairs the governance pattern with opt-in executable scaffolding. The template ships a generic guard runner, registry skeleton, and optional hooks, while adopters still provide the real surfaces, banned phrases, focused tests, and live validators.
 
+**Developer Toolchain** — [`docs/DEVELOPER_TOOLCHAIN_DESIGN.md`](docs/DEVELOPER_TOOLCHAIN_DESIGN.md) defines the agent-facing contract for diagnostics, run, health, repro, build, and verification status. [`docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md`](docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md) preserves the discussion history and tradeoffs that led to the current design.
+
+Bootstrap-generated adopters now also receive a manifest-declared Developer Toolchain required-core contract. That lets the copied validator hard-fail missing or malformed core fields while still leaving optional enrichment surfaces advisory.
+
 **Leftover unit contract** — [`docs/LEFTOVER_UNIT_CONTRACT.md`](docs/LEFTOVER_UNIT_CONTRACT.md) defines how to classify partial work, record why it stopped, and preserve a clean re-entry point instead of leaving vague TODO debt behind.
 
 **Strategy layer vs mechanism layer** — the template now makes an explicit distinction between:
@@ -258,13 +272,7 @@ If you want something more concrete than a doc example list, the template now al
 
 **Completion checkpoints** — when a subtask is confirmed done, the agent updates ROADMAP, session state, acceptance criteria, and the current status line or closeout summary before moving on.
 
-**Progress vs closeout formatting** — [`docs/PROGRESS_UPDATE_TEMPLATE.md`](docs/PROGRESS_UPDATE_TEMPLATE.md) defines the stable shape for in-progress while-loop updates, and [`docs/CLOSEOUT_SUMMARY_TEMPLATE.md`](docs/CLOSEOUT_SUMMARY_TEMPLATE.md) defines the stable final closeout shape for hosts that expose a terminal action such as `task_complete`.
-
-The current visual contract is:
-
-- routine in-progress replies use `• 当前在做: ... | 下一步: ...`
-- use `• 当前聚焦: ... | 正在做: ... | 下一步: ...` only when the focus needs to be explicit
-- final closeout keeps exactly one `📍` footer and places `---` immediately before it
+**Progress vs closeout formatting** — [`docs/PROGRESS_UPDATE_TEMPLATE.md`](docs/PROGRESS_UPDATE_TEMPLATE.md) defines the stable shape for in-progress while-loop updates, and [`docs/CLOSEOUT_SUMMARY_TEMPLATE.md`](docs/CLOSEOUT_SUMMARY_TEMPLATE.md) defines the stable final closeout shape for hosts that use a terminal action such as `task_complete`.
 
 ---
 

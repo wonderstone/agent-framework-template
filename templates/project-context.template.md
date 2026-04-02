@@ -22,6 +22,10 @@ description: >
 | Doc | Purpose |
 |---|---|
 | `README.md` | Project entry point |
+| `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | [Formal v1 design draft for the agent-facing Developer Toolchain surface — keep if useful] |
+| `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | [Discussion history and alternative viewpoints for Developer Toolchain — keep if useful] |
+| `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | [Formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout — keep if useful] |
+| `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | [Discussion history and alternative viewpoints for AI-era traceability and recovery — keep if useful] |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | [Repository-default doc-first planning rule and required planning surfaces] |
 | `ARCHITECTURE.md` | [System architecture — create if needed] |
 | `ROADMAP.md` | Phase planning and acceptance targets |
@@ -51,6 +55,10 @@ description: >
 |---|---|
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
+| `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
+| `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
+| `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |
+| `ai traceability\|traceability discussion\|recovery discussion\|incident discussion` | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` |
 | `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
@@ -81,6 +89,70 @@ Project type: [fill in]
 ```
 
 <!-- If any tier is missing, declare a toolchain setup task before feature work. -->
+
+## Developer Toolchain
+
+<!-- Progressive contract. Use explicit `none` when a surface does not exist. -->
+<!-- Qualify the surface label with parentheses when multiple runtimes exist, e.g. `Run (frontend)` and `Run (backend)`. -->
+
+Primary language: [fill in]
+
+Package manager: [fill in]
+
+| Surface | Command or source | Scope | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Diagnostics | [command or source] | [file / module] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [syntax or type diagnostics] |
+| Run | [command or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [main local execution path] |
+| Health or smoke | [command or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [fastest reliable runtime confirmation] |
+| Repro path | [command, script, or `none`] | [service / full-stack] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [required for repos with a live runtime path] |
+| Build | [command or `none`] | [module / service] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [required when the runtime path depends on build] |
+| Lint | [command or `none`] | [file / module] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [recommended] |
+
+Default policy:
+
+1. climb only as far as the task scope and user-visible acceptance target require
+2. treat `declared-unverified` as recoverable, not trustworthy by default
+3. never leave `known-broken` without either a fallback path or an explicit stop rule
+
+### Runtime Evidence
+
+<!-- Keep this as the single source of truth for normal repositories. -->
+<!-- Promote to a dedicated doc only when one section can no longer tell the agent where to look first. -->
+
+| Evidence surface | Applies to | Priority | Status | Fallback or stop | Notes |
+|---|---|---|---|---|---|
+| Logs | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [log path, command, or viewer] |
+| Health check | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [endpoint, script, or command] |
+| Smoke path | [surface / service / `none`] | [first / second / fallback] | [declared-unverified / verified-working / known-broken / not-applicable] | [fallback or explicit stop rule] | [fastest runtime-adjacent confirmation] |
+| [Optional additional evidence] | [surface / service] | [priority] | [status] | [fallback or stop] | [trace / metric / screenshot harness / inspection command] |
+
+## User Surface Map
+
+<!-- This is a decision surface, not a full architecture atlas. -->
+<!-- Cover the top user-critical flows first. Use explicit `none` when the repository has no live runtime path. -->
+
+| Surface name | Owner path | Sensitive | Fastest repro path | Primary evidence source | Notes |
+|---|---|---|---|---|---|
+| [surface] | [path / module / entrypoint / `none`] | [yes / no] | [command / script / route / `none`] | [logs / health / smoke / trace / user report / `none`] | [optional short context] |
+| [surface] | [path / module / entrypoint / `none`] | [yes / no] | [command / script / route / `none`] | [logs / health / smoke / trace / user report / `none`] | [optional short context] |
+
+## Security-Sensitive Surfaces And Escalation
+
+<!-- Keep this near the user-surface map so automatic escalation can evaluate against a durable source. -->
+
+Sensitive path declarations:
+
+| Path or surface | Why sensitive |
+|---|---|
+| `[path / config / flow]` | [auth / secrets / billing / export / model routing / external tool / prompt boundary] |
+
+Escalation rule:
+
+1. automatically escalate failure tracking when an impacted user surface is marked `Sensitive = yes`
+2. automatically escalate when a failure touches a declared sensitive path, config surface, secret surface, or trust-boundary surface
+3. after escalation, require the failure artifact to record:
+   impacted trust boundary, relevant config or secret surface, and at least one negative-path or misuse-path validation claim
+4. human classification may upgrade severity further, but should not be the only trigger
 
 ## Build and Test Commands
 
@@ -130,3 +202,4 @@ Project type: [fill in]
 
 <!-- Add environment-specific notes: venv activation, service pre-checks, etc. -->
 <!-- If your repository adopts doc-first execution as the default, say so explicitly here so future sessions do not treat it as optional. -->
+<!-- If your repository has live runtime paths, point future sessions to `templates/failure_packet.template.md` and `templates/root_cause_note.template.md` or your repo-local copies of them. -->
