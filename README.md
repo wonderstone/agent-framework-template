@@ -46,6 +46,8 @@ docs/
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
   RUNTIME_SURFACE_PROTECTION.md    ← guard-registry pattern for live user-facing paths
+  PROGRESS_UPDATE_TEMPLATE.md      ← stable format for in-progress while-loop status updates
+  CLOSEOUT_SUMMARY_TEMPLATE.md     ← stable format for final closeout summaries
   runbooks/
     multi-model-discussion-loop.md ← append-only discussion workflow for open design questions
     resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
@@ -85,6 +87,7 @@ scripts/
   bootstrap_adoption.py           ← bootstraps minimal / standard / full adoption into another repo
   closeout_truth_audit.py         ← diff-aware receipt-anchor audit for truth-source closeout claims
   discussion_pipeline.py          ← generates and extends discussion packets for multi-model debate
+  preference_drift_audit.py       ← detects agent preference drift against declared project-context rules
   install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
   runtime_surface_guardrails.py   ← registry-driven runner for runtime surface staged/live checks
   validate-template.sh             ← checks template integrity (run after setup)
@@ -336,6 +339,7 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Optional git hooks | `.githooks/` + `scripts/install_git_hooks.sh` |
 | Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
 | Discussion packet defaults | `templates/discussion_packet.template.md` + `scripts/discussion_pipeline.py` |
+| Preference drift detection | `scripts/preference_drift_audit.py` |
 
 ---
 
