@@ -5,7 +5,7 @@ This walkthrough shows one realistic way to use the framework in a small reposit
 ## Bootstrap
 
 ```bash
-python scripts/bootstrap_adoption.py ../demo-task-tracker \
+python3 scripts/bootstrap_adoption.py ../demo-task-tracker \
   --project-name "Demo Task Tracker" \
   --profile standard \
   --project-type cli-tool
@@ -51,7 +51,7 @@ Example committed artifacts:
 
 For a small repository like this demo, a practical layout is:
 
-1. keep long-lived truth in `.github/project-context.instructions.md`
+1. keep long-lived truth in `.github/instructions/project-context.instructions.md`
 2. keep event truth in task-local artifacts such as `failure_packet.md`
 3. keep recovery truth in `root_cause_note.md`
 4. keep audit recovery truth in `tmp/git_audit/`

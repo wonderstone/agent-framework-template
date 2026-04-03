@@ -1,4 +1,6 @@
 ---
+name: "Project Context Adapter"
+applyTo: "**"
 description: >
   [Project Name] project adapter. Provides the project map, critical topic triggers,
   protected paths, build/test commands, and runtime config locations. Always read

@@ -24,16 +24,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install test dependencies
-        run: python -m pip install pytest
+        run: python3 -m pip install pytest
 
       - name: Run structured template validation
-        run: python scripts/validate_template.py
+        run: python3 scripts/validate_template.py
 
       - name: Run test suite
-        run: python -m pytest tests/ -q
+        run: python3 -m pytest tests/ -q
 
       - name: Run bootstrap smoke tests
         run: |
-          python scripts/bootstrap_adoption.py /tmp/template-smoke-minimal --project-name "Smoke Minimal" --profile minimal --project-type cli-tool --dry-run
-          python scripts/bootstrap_adoption.py /tmp/template-smoke-standard --project-name "Smoke Standard" --profile standard --project-type backend-api --dry-run
-          python scripts/bootstrap_adoption.py /tmp/template-smoke-full --project-name "Smoke Full" --profile full --project-type web-frontend --dry-run
+          python3 scripts/bootstrap_adoption.py "${RUNNER_TEMP}/template-smoke-minimal" --project-name "Smoke Minimal" --profile minimal --project-type cli-tool --dry-run
+          python3 scripts/bootstrap_adoption.py "${RUNNER_TEMP}/template-smoke-standard" --project-name "Smoke Standard" --profile standard --project-type backend-api --dry-run
+          python3 scripts/bootstrap_adoption.py "${RUNNER_TEMP}/template-smoke-full" --project-name "Smoke Full" --profile full --project-type web-frontend --dry-run

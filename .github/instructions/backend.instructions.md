@@ -5,7 +5,7 @@
 
 ## Before You Start
 
-1. Read `.github/project-context.instructions.md` — confirm build/test commands
+1. Read `.github/instructions/project-context.instructions.md` — confirm build/test commands
 2. Identify whether the change touches a **public contract** (API, data model, config schema)
 3. If yes → cross-module validation required (not just file-level)
 

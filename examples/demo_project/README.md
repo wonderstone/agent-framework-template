@@ -16,7 +16,7 @@ The feature in the committed audit artifacts is: adding task priority labels wit
 
 ```
 examples/demo_project/
-  .github/project-context.instructions.md
+  .github/instructions/project-context.instructions.md
   docs/
     ARCHITECTURE.md
     INDEX.md
@@ -36,6 +36,6 @@ examples/demo_project/
 ## Walkthrough
 
 1. Read [demo-workflow.md](docs/runbooks/demo-workflow.md) to see the exact bootstrap and audit sequence.
-2. Open [project-context.instructions.md](.github/project-context.instructions.md) to see what adopters customize first, including the Developer Toolchain section.
+2. Open [project-context.instructions.md](.github/instructions/project-context.instructions.md) to see what adopters customize first, including the Developer Toolchain section.
 3. Inspect [task_tracker.py](src/task_tracker.py) and [test_task_tracker.py](tests/test_task_tracker.py) for a minimal code surface.
 4. Review the committed packet, receipt, and handoff files under `tmp/git_audit/` to see how work survives interruption.

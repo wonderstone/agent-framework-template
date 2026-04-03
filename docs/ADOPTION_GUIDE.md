@@ -20,7 +20,7 @@ Step-by-step guide for adopting this agent framework in a new project.
 Run this from the template repository:
 
 ```bash
-python scripts/bootstrap_adoption.py ../your-repo \
+python3 scripts/bootstrap_adoption.py ../your-repo \
   --project-name "Your Project" \
   --profile standard
 ```
@@ -44,12 +44,12 @@ Copy these files into your new repository, preserving their paths:
 ```
 .github/
   copilot-instructions.md          ← operating rules (Rule 0–27)
-  project-context.instructions.md  ← project adapter (fill in Step 2)
   RELEASE_TEMPLATE.md              ← release notes starting point
   agents/
     architect.agent.md             ← analysis/planning agent
     implementer.agent.md           ← execution/validation agent
   instructions/
+    project-context.instructions.md ← project adapter (fill in Step 2)
     backend.instructions.md        ← backend change protocol
     docs.instructions.md           ← documentation change protocol
 
@@ -88,6 +88,7 @@ examples/
     *.md                           ← 10 ready-to-adapt starter role profiles
 
 scripts/
+  active_docs_audit.py            ← executable active-doc portability and stale-assertion audit
   bootstrap_adoption.py            ← bootstrap and profile-aware adoption helper
   closeout_truth_audit.py          ← executable Rule 25 enforcement for truth-source closeout claims
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
@@ -107,7 +108,7 @@ templates/
 
 ## Step 2 — Fill In the Project Adapter
 
-Open `.github/project-context.instructions.md` and replace every `[placeholder]`:
+Open `.github/instructions/project-context.instructions.md` and replace every `[placeholder]`:
 
 | Placeholder | Replace with |
 |---|---|
@@ -303,7 +304,7 @@ Customize these local references:
 Then make the rule visible in three places:
 
 1. the repository's main instruction or policy surface
-2. `.github/project-context.instructions.md`
+2. `.github/instructions/project-context.instructions.md`
 3. the main entry README or module README that future sessions will read first
 
 This makes doc-first execution a repository default rather than a conversational preference.
@@ -360,14 +361,14 @@ Everything else is additive.
 After setup, run the structured validator from the repo root to confirm no required files are missing:
 
 ```bash
-python scripts/validate_template.py
+python3 scripts/validate_template.py
 # or equivalently: bash scripts/validate-template.sh  (thin wrapper for the above)
 ```
 
 If you want to inspect the bootstrap plan before writing files, use:
 
 ```bash
-python scripts/bootstrap_adoption.py ../your-repo \
+python3 scripts/bootstrap_adoption.py ../your-repo \
   --project-name "Your Project" \
   --profile standard \
   --capability closeout-audit \
@@ -384,7 +385,7 @@ bash scripts/install_git_hooks.sh
 If you keep the resumable audit workflow, do a smoke run once:
 
 ```bash
-python scripts/git_audit_pipeline.py init-task \
+python3 scripts/git_audit_pipeline.py init-task \
   --task-id "template-smoke" \
   --goal "Verify packet generation" \
   --truth-sources "- docs/runbooks/resumable-git-audit-pipeline.md" \
@@ -430,4 +431,4 @@ If you are unsure, begin with `standard`. It gives the best balance of real guar
 
 **session_state.md is out of sync**: treat the actual code as truth; update session_state.md to match, not the other way around.
 
-**Validation fails with missing checks**: re-run `python scripts/validate_template.py` after copying the latest `copilot-instructions.md` and `scripts/` from this template repository. `validate-template.sh` is a bash wrapper for the same command.
+**Validation fails with missing checks**: re-run `python3 scripts/validate_template.py` after copying the latest `copilot-instructions.md` and `scripts/` from this template repository. `validate-template.sh` is a bash wrapper for the same command.

@@ -10,7 +10,7 @@ It is intentionally lightweight:
 
 ## What To Inspect
 
-1. Open [.github/project-context.instructions.md](.github/project-context.instructions.md) to see qualified Developer Toolchain labels such as `Run (frontend)` and `Run (backend)`.
+1. Open [.github/instructions/project-context.instructions.md](.github/instructions/project-context.instructions.md) to see qualified Developer Toolchain labels such as `Run (frontend)` and `Run (backend)`.
 2. Open [.github/agent-framework-manifest.json](.github/agent-framework-manifest.json) to see the manifest-declared `required-core` Developer Toolchain contract.
 3. Read [docs/runbooks/full-stack-workflow.md](docs/runbooks/full-stack-workflow.md) for the intended adoption flow.
 

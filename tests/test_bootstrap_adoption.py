@@ -30,7 +30,7 @@ def test_bootstrap_minimal_creates_core_files(tmp_path: Path) -> None:
     assert (tmp_path / "docs" / "archive" / ".gitkeep").exists()
     assert (tmp_path / "session_state.md").exists()
     assert (tmp_path / "ROADMAP.md").exists()
-    project_context = tmp_path / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / ".github" / "instructions" / "project-context.instructions.md"
     assert project_context.exists()
     assert "Demo Project" in project_context.read_text(encoding="utf-8")
     assert result.skipped == ()
@@ -124,7 +124,7 @@ def test_bootstrap_uses_project_type_preset_for_cli_projects(tmp_path: Path) -> 
         project_type="cli-tool",
     )
 
-    project_context = (tmp_path / ".github" / "project-context.instructions.md").read_text(
+    project_context = (tmp_path / ".github" / "instructions" / "project-context.instructions.md").read_text(
         encoding="utf-8"
     )
     assert "Project type: cli-tool" in project_context
@@ -144,7 +144,7 @@ def test_bootstrap_uses_qualified_surface_labels_for_full_stack_projects(tmp_pat
         project_type="full-stack",
     )
 
-    project_context = (tmp_path / ".github" / "project-context.instructions.md").read_text(
+    project_context = (tmp_path / ".github" / "instructions" / "project-context.instructions.md").read_text(
         encoding="utf-8"
     )
     assert "Project type: full-stack" in project_context

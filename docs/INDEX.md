@@ -24,15 +24,13 @@
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Surface guard registry pattern: protecting user-facing runtime paths from placeholder regression |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | Leftover unit contract: how to record, classify, and recover partial work truthfully |
 
-## Project (create these for your project)
+## Repository Root
 
-> These entries are placeholders. Replace them with the actual docs for your project.
-> Remove any entry that does not apply; add new rows as your project's docs grow.
+> These root-level files exist in this repository and act as live companion surfaces beside the TYPE-A docs.
 
 | Document | Description |
 |---|---|
 | `README.md` | Project entry point and quick-start guide |
-| `ARCHITECTURE.md` | System architecture, module map, and service boundaries |
 | `ROADMAP.md` | Phase planning, milestones, and acceptance criteria |
 
 ## Guides and Runbooks

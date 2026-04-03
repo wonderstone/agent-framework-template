@@ -12,6 +12,7 @@ The following are exercised directly in this template repository:
 |---|---|
 | Bootstrap CLI | Unit tests plus `--dry-run` smoke commands in CI |
 | Template validator | Unit tests plus CI execution |
+| Active docs portability and stale-assertion audit | Standalone audit script plus validator integration for live docs and instruction surfaces |
 | Preference drift audit | Standalone audit script plus validator integration for progress/closeout contract drift |
 | Git audit generator | Unit tests |
 | Core docs and file references | Structured validator |
@@ -28,6 +29,7 @@ The CI workflow currently validates on Python 3.11 and 3.12.
 | Cursor / Windsurf / Augment | Intended when they respect the same instruction surface |
 | Codex CLI or external CLI reviewer workflows | Supported conceptually by the packet / receipt / handoff mechanism; verify local prompting behavior in your environment |
 | Browser, backend, CLI, or library projects | Supported through bootstrap presets, but still require project-specific command customization |
+| Active doc portability enforcement | Included in the standard profile through `scripts/active_docs_audit.py` and executed by `scripts/validate_template.py` |
 | Preference-alignment drift enforcement | Included in the standard profile through `scripts/preference_drift_audit.py` and executed by `scripts/validate_template.py` |
 
 Adopters should treat the bootstrap output as a starting point, not finished project configuration.

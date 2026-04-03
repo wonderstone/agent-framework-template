@@ -39,7 +39,7 @@ State in one sentence: what am I about to change and why?
 |---|---|
 | Have I read the target file in its current state? | Read it now — do not proceed |
 | Is the target path listed under Protected Paths? | STOP — request explicit confirmation |
-| Have I loaded `.github/project-context.instructions.md`? | Load it now |
+| Have I loaded `.github/instructions/project-context.instructions.md`? | Load it now |
 | Is this change within the stated scope? | STOP — flag scope creep; request direction |
 | Do all sources (docs, code, config) agree on this change? | STOP — report the conflict; do not guess |
 
@@ -68,7 +68,7 @@ Only after all self-check questions pass:
 - I do not enter autonomous long-task execution until the execution contract has been surfaced to the user
 - I treat normal `git add` / `git commit` / standard `git push` as main-thread-owned by default; I escalate only when exception conditions from Rule 9 are active
 - If validation fails due to a pre-existing issue unrelated to my change, I flag it and wait for direction — I do not silently fix it
-- If I encounter a protected path (see `.github/project-context.instructions.md`), I stop and request confirmation
+- If I encounter a protected path (see `.github/instructions/project-context.instructions.md`), I stop and request confirmation
 - A wrong assumption discovered mid-step requires an explicit correction entry in `session_state.md` — I do not silently course-correct
 - If work is handed off, retried in another CLI, or paused before Git closeout, I write an audit receipt or handoff packet instead of relying on chat history alone
 

@@ -318,7 +318,7 @@ When the design moves from draft to implementation, these framework surfaces are
 | `scripts/bootstrap_adoption.py` | Render first-pass `Developer Toolchain` placeholders and preset defaults |
 | `docs/ADOPTION_GUIDE.md` | Add an adoption step covering language plus developer-toolchain confirmation |
 | `templates/execution_contract.template.md` | Add a short execution-ladder and stop-rule policy section |
-| `.github/project-context.instructions.md` | Add formal trigger language for developer-toolchain design and usage |
+| `.github/instructions/project-context.instructions.md` | Add formal trigger language for developer-toolchain design and usage |
 
 Reminder-level validator advisories are already part of this design draft.
 

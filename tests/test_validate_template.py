@@ -56,6 +56,28 @@ def test_validate_repo_reports_preference_drift(tmp_path: Path) -> None:
     ) in issues
 
 
+def test_validate_repo_reports_active_doc_portability_drift(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    project_context = repo_copy / ".github" / "instructions" / "project-context.instructions.md"
+    project_context.write_text(
+        project_context.read_text(encoding="utf-8").replace(
+            '${TMPDIR:-/tmp}/agent-framework-template-smoke',
+            '/tmp/agent-framework-template-smoke',
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "nonportable-active-doc-path",
+        ".github/instructions/project-context.instructions.md: /tmp/agent-framework-template-smoke",
+    ) in issues
+
+
 def test_validate_repo_reports_missing_required_file(tmp_path: Path) -> None:
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
@@ -70,7 +92,7 @@ def test_validate_repo_reports_root_project_context_placeholder(tmp_path: Path) 
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
 
-    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    project_context = repo_copy / ".github" / "instructions" / "project-context.instructions.md"
     original = project_context.read_text(encoding="utf-8")
     project_context.write_text(
         original.replace("# agent-framework-template — Project Context", "# [Project Name] — Project Context", 1),
@@ -150,7 +172,7 @@ def test_validate_repo_reports_missing_developer_toolchain_section_for_bootstrap
         project_type="cli-tool",
     )
 
-    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / "adopted" / ".github" / "instructions" / "project-context.instructions.md"
     text = project_context.read_text(encoding="utf-8")
     start = text.index("## Developer Toolchain")
     end = text.index("## Build and Test Commands")
@@ -160,7 +182,7 @@ def test_validate_repo_reports_missing_developer_toolchain_section_for_bootstrap
 
     assert ValidationIssue(
         "missing-developer-toolchain-section",
-        ".github/project-context.instructions.md: add a Developer Toolchain section",
+        ".github/instructions/project-context.instructions.md: add a Developer Toolchain section",
     ) in issues
 
 
@@ -174,7 +196,7 @@ def test_validate_repo_reports_invalid_developer_toolchain_status_for_bootstrapp
         project_type="cli-tool",
     )
 
-    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / "adopted" / ".github" / "instructions" / "project-context.instructions.md"
     project_context.write_text(
         project_context.read_text(encoding="utf-8").replace(
             "| `declared-unverified` |", "| `mystery-status` |", 1
@@ -186,7 +208,7 @@ def test_validate_repo_reports_invalid_developer_toolchain_status_for_bootstrapp
 
     assert ValidationIssue(
         "invalid-developer-toolchain-status",
-        ".github/project-context.instructions.md: surface 'Diagnostics' uses unsupported status 'mystery-status'",
+        ".github/instructions/project-context.instructions.md: surface 'Diagnostics' uses unsupported status 'mystery-status'",
     ) in issues
 
 
@@ -200,7 +222,7 @@ def test_validate_repo_reports_missing_primary_language_for_bootstrapped_adopted
         project_type="cli-tool",
     )
 
-    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / "adopted" / ".github" / "instructions" / "project-context.instructions.md"
     project_context.write_text(
         project_context.read_text(encoding="utf-8").replace(
             "Primary language: Python\n\n", ""
@@ -212,7 +234,7 @@ def test_validate_repo_reports_missing_primary_language_for_bootstrapped_adopted
 
     assert ValidationIssue(
         "missing-developer-toolchain-primary-language",
-        ".github/project-context.instructions.md: Developer Toolchain is missing Primary language",
+        ".github/instructions/project-context.instructions.md: Developer Toolchain is missing Primary language",
     ) in issues
 
 
@@ -226,7 +248,7 @@ def test_validate_repo_reports_missing_required_surface_for_bootstrapped_adopted
         project_type="cli-tool",
     )
 
-    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / "adopted" / ".github" / "instructions" / "project-context.instructions.md"
     project_context.write_text(
         project_context.read_text(encoding="utf-8").replace(
             "| Build | `python -m build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when packaging matters |\n",
@@ -239,7 +261,7 @@ def test_validate_repo_reports_missing_required_surface_for_bootstrapped_adopted
 
     assert ValidationIssue(
         "missing-developer-toolchain-surface",
-        ".github/project-context.instructions.md: Developer Toolchain is missing required surface 'Build'",
+        ".github/instructions/project-context.instructions.md: Developer Toolchain is missing required surface 'Build'",
     ) in issues
 
 
@@ -247,7 +269,7 @@ def test_collect_advisories_reports_missing_developer_toolchain_section(tmp_path
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
 
-    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    project_context = repo_copy / ".github" / "instructions" / "project-context.instructions.md"
     text = project_context.read_text(encoding="utf-8")
     start = text.index("## Developer Toolchain")
     end = text.index("## Build and Test Commands")
@@ -262,7 +284,7 @@ def test_collect_advisories_reports_invalid_developer_toolchain_status(tmp_path:
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
 
-    project_context = repo_copy / ".github" / "project-context.instructions.md"
+    project_context = repo_copy / ".github" / "instructions" / "project-context.instructions.md"
     project_context.write_text(
         project_context.read_text(encoding="utf-8").replace("| `verified-working` |", "| `mystery-status` |", 1),
         encoding="utf-8",
@@ -281,7 +303,7 @@ def test_collect_advisories_reports_live_runtime_repro_none(tmp_path: Path) -> N
         project_type="cli-tool",
     )
 
-    project_context = tmp_path / "adopted" / ".github" / "project-context.instructions.md"
+    project_context = tmp_path / "adopted" / ".github" / "instructions" / "project-context.instructions.md"
     project_context.write_text(
         project_context.read_text(encoding="utf-8").replace(
             "| Repro path | `run the primary user command with real arguments` | `service` | `declared-unverified` | Use `none` only if no stable user-visible flow exists yet | Shortest user-visible repro |",

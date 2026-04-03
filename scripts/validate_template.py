@@ -15,6 +15,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from active_docs_audit import audit_repo as audit_active_docs
 from preference_drift_audit import audit_repo as audit_preference_drift
 
 
@@ -25,7 +26,7 @@ REQUIRED_FILES = (
     ".githooks/pre-push",
     ".gitignore",
     ".github/copilot-instructions.md",
-    ".github/project-context.instructions.md",
+    ".github/instructions/project-context.instructions.md",
     ".github/agents/architect.agent.md",
     ".github/agents/implementer.agent.md",
     ".github/instructions/backend.instructions.md",
@@ -54,12 +55,13 @@ REQUIRED_FILES = (
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
     "examples/demo_project/README.md",
-    "examples/demo_project/.github/project-context.instructions.md",
+    "examples/demo_project/.github/instructions/project-context.instructions.md",
     "examples/demo_project/docs/ARCHITECTURE.md",
     "examples/demo_project/docs/INDEX.md",
     "examples/demo_project/docs/runbooks/demo-workflow.md",
     "examples/demo_project/src/task_tracker.py",
     "examples/demo_project/tests/test_task_tracker.py",
+    "scripts/active_docs_audit.py",
     "scripts/bootstrap_adoption.py",
     "scripts/closeout_truth_audit.py",
     "scripts/git_audit_pipeline.py",
@@ -77,6 +79,7 @@ REQUIRED_FILES = (
     "templates/roadmap.template.md",
     "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
+    "tests/test_active_docs_audit.py",
     "tests/test_closeout_truth_audit.py",
     "tests/test_bootstrap_adoption.py",
     "tests/test_git_audit_pipeline.py",
@@ -194,6 +197,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/execution_contract.template.md",
     "python3 -m pytest tests/ -q",
+    '${TMPDIR:-/tmp}/agent-framework-template-smoke',
     "examples/demo_project/tmp/git_audit/",
 )
 
@@ -445,9 +449,10 @@ def _validate_ci(root: Path) -> list[ValidationIssue]:
     text = _read(root / ".github/workflows/ci.yml")
     required_snippets = (
         "python-version:",
-        "scripts/validate_template.py",
-        "python -m pytest tests/ -q",
+        "python3 scripts/validate_template.py",
+        "python3 -m pytest tests/ -q",
         "scripts/bootstrap_adoption.py",
+        '${RUNNER_TEMP}/template-smoke-minimal',
     )
     issues: list[ValidationIssue] = []
     for snippet in required_snippets:
@@ -493,7 +498,7 @@ def _validate_adopted_repo(root: Path) -> list[ValidationIssue]:
 
 
 def _validate_root_project_context(root: Path) -> list[ValidationIssue]:
-    text = _read(root / ".github/project-context.instructions.md")
+    text = _read(root / ".github/instructions/project-context.instructions.md")
     issues: list[ValidationIssue] = []
 
     for snippet in ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS:
@@ -612,6 +617,10 @@ def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
     return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
 
 
+def _validate_active_docs(root: Path) -> list[ValidationIssue]:
+    return [ValidationIssue(issue.kind, issue.detail) for issue in audit_active_docs(root)]
+
+
 def _group_developer_toolchain_entries(
     entries: list[DeveloperToolchainEntry],
 ) -> dict[str, list[DeveloperToolchainEntry]]:
@@ -637,7 +646,7 @@ def _build_contract_issues(
         issues.append(
             ValidationIssue(
                 "missing-developer-toolchain-primary-language",
-                ".github/project-context.instructions.md: Developer Toolchain is missing Primary language",
+                ".github/instructions/project-context.instructions.md: Developer Toolchain is missing Primary language",
             )
         )
 
@@ -645,7 +654,7 @@ def _build_contract_issues(
         issues.append(
             ValidationIssue(
                 "missing-developer-toolchain-package-manager",
-                ".github/project-context.instructions.md: Developer Toolchain is missing Package manager",
+                ".github/instructions/project-context.instructions.md: Developer Toolchain is missing Package manager",
             )
         )
 
@@ -653,7 +662,7 @@ def _build_contract_issues(
         issues.append(
             ValidationIssue(
                 "missing-developer-toolchain-table",
-                ".github/project-context.instructions.md: Developer Toolchain needs a structured table of surfaces",
+                ".github/instructions/project-context.instructions.md: Developer Toolchain needs a structured table of surfaces",
             )
         )
         return issues
@@ -664,7 +673,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "missing-developer-toolchain-surface",
-                    f".github/project-context.instructions.md: Developer Toolchain is missing required surface '{surface_kind}'",
+                    f".github/instructions/project-context.instructions.md: Developer Toolchain is missing required surface '{surface_kind}'",
                 )
             )
 
@@ -673,7 +682,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "developer-toolchain-qualifier-disallowed",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses a qualifier but the manifest contract forbids qualified labels",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses a qualifier but the manifest contract forbids qualified labels",
                 )
             )
 
@@ -681,7 +690,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "invalid-developer-toolchain-scope",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
                 )
             )
 
@@ -689,7 +698,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "invalid-developer-toolchain-status",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
                 )
             )
 
@@ -697,7 +706,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "missing-developer-toolchain-fallback",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
                 )
             )
 
@@ -705,7 +714,7 @@ def _build_contract_issues(
             issues.append(
                 ValidationIssue(
                     "invalid-developer-toolchain-none",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
                 )
             )
 
@@ -722,7 +731,7 @@ def _validate_developer_toolchain_contract(
         return [
             ValidationIssue(
                 "missing-developer-toolchain-context",
-                ".github/project-context.instructions.md: missing project context file for Developer Toolchain validation",
+                ".github/instructions/project-context.instructions.md: missing project context file for Developer Toolchain validation",
             )
         ]
 
@@ -731,7 +740,7 @@ def _validate_developer_toolchain_contract(
         return [
             ValidationIssue(
                 "missing-developer-toolchain-section",
-                ".github/project-context.instructions.md: add a Developer Toolchain section",
+                ".github/instructions/project-context.instructions.md: add a Developer Toolchain section",
             )
         ]
 
@@ -747,7 +756,7 @@ def _validate_developer_toolchain_contract(
 
 def collect_advisories(root: Path) -> list[ValidationAdvisory]:
     advisories: list[ValidationAdvisory] = []
-    project_context = root / ".github/project-context.instructions.md"
+    project_context = root / ".github/instructions/project-context.instructions.md"
     if not project_context.is_file():
         return advisories
 
@@ -758,7 +767,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
         advisories.append(
             ValidationAdvisory(
                 "developer-toolchain-reminder",
-                ".github/project-context.instructions.md: add a Developer Toolchain section so agents can discover diagnostics, run, health, and repro surfaces",
+                ".github/instructions/project-context.instructions.md: add a Developer Toolchain section so agents can discover diagnostics, run, health, and repro surfaces",
             )
         )
         return advisories
@@ -767,7 +776,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
         advisories.append(
             ValidationAdvisory(
                 "developer-toolchain-reminder",
-                ".github/project-context.instructions.md: missing Primary language in the Developer Toolchain section",
+                ".github/instructions/project-context.instructions.md: missing Primary language in the Developer Toolchain section",
             )
         )
 
@@ -775,7 +784,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
         advisories.append(
             ValidationAdvisory(
                 "developer-toolchain-reminder",
-                ".github/project-context.instructions.md: missing Package manager in the Developer Toolchain section",
+                ".github/instructions/project-context.instructions.md: missing Package manager in the Developer Toolchain section",
             )
         )
 
@@ -783,7 +792,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
         advisories.append(
             ValidationAdvisory(
                 "developer-toolchain-reminder",
-                ".github/project-context.instructions.md: add a Developer Toolchain table with structured surfaces rather than keeping the section empty",
+                ".github/instructions/project-context.instructions.md: add a Developer Toolchain table with structured surfaces rather than keeping the section empty",
             )
         )
         return advisories
@@ -795,7 +804,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: add the required Developer Toolchain surface '{surface}'",
+                    f".github/instructions/project-context.instructions.md: add the required Developer Toolchain surface '{surface}'",
                 )
             )
 
@@ -804,7 +813,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: consider adding the recommended Developer Toolchain surface '{surface}' or set it explicitly to none",
+                    f".github/instructions/project-context.instructions.md: consider adding the recommended Developer Toolchain surface '{surface}' or set it explicitly to none",
                 )
             )
 
@@ -813,7 +822,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unknown base surface '{entry.surface_kind}'; prefer canonical names such as Diagnostics, Run, or Debug",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses unknown base surface '{entry.surface_kind}'; prefer canonical names such as Diagnostics, Run, or Debug",
                 )
             )
 
@@ -821,7 +830,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses unsupported scope '{entry.scope}'",
                 )
             )
 
@@ -829,7 +838,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' uses unsupported status '{entry.status}'",
                 )
             )
 
@@ -837,7 +846,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' needs a fallback or explicit stop rule for status '{entry.status}'",
                 )
             )
 
@@ -845,7 +854,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    f".github/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
                 )
             )
 
@@ -853,7 +862,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
         advisories.append(
             ValidationAdvisory(
                 "developer-toolchain-reminder",
-                ".github/project-context.instructions.md: add verification status values so declared commands become an actionable decision surface",
+                ".github/instructions/project-context.instructions.md: add verification status values so declared commands become an actionable decision surface",
             )
         )
 
@@ -863,7 +872,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    ".github/project-context.instructions.md: live-runtime project types should prefer a concrete Repro path when one is stable; keep 'none' only when that is the honest current state",
+                    ".github/instructions/project-context.instructions.md: live-runtime project types should prefer a concrete Repro path when one is stable; keep 'none' only when that is the honest current state",
                 )
             )
 
@@ -872,7 +881,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
             advisories.append(
                 ValidationAdvisory(
                     "developer-toolchain-reminder",
-                    ".github/project-context.instructions.md: live-runtime project types should normally declare a concrete Run entrypoint rather than 'none'",
+                    ".github/instructions/project-context.instructions.md: live-runtime project types should normally declare a concrete Run entrypoint rather than 'none'",
                 )
             )
 
@@ -887,12 +896,13 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         if isinstance(contract, dict):
             issues.extend(
                 _validate_developer_toolchain_contract(
-                    root / ".github/project-context.instructions.md",
+                    root / ".github/instructions/project-context.instructions.md",
                     project_type=manifest.get("project_type"),
                     contract=contract,
                 )
             )
         issues.extend(_validate_preference_drift(root))
+        issues.extend(_validate_active_docs(root))
         return issues
 
     checks = (
@@ -909,6 +919,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_execution_contract,
         _validate_closeout_rule_guards,
         _validate_preference_drift,
+        _validate_active_docs,
         _validate_receipt_closeout_references,
     )
     issues: list[ValidationIssue] = []
@@ -916,8 +927,8 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         issues.extend(check(root))
     issues.extend(
         _validate_developer_toolchain_contract(
-            root / ".github/project-context.instructions.md",
-            project_type=_extract_project_type(_read(root / ".github/project-context.instructions.md")),
+            root / ".github/instructions/project-context.instructions.md",
+            project_type=_extract_project_type(_read(root / ".github/instructions/project-context.instructions.md")),
             contract=DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT,
         )
     )

@@ -65,9 +65,9 @@ Do not let an auditor's narrative override a failing hard gate.
 Use the bundled generator script:
 
 ```bash
-python scripts/git_audit_pipeline.py init-task ...
-python scripts/git_audit_pipeline.py record-receipt ...
-python scripts/git_audit_pipeline.py create-handoff ...
+python3 scripts/git_audit_pipeline.py init-task ...
+python3 scripts/git_audit_pipeline.py record-receipt ...
+python3 scripts/git_audit_pipeline.py create-handoff ...
 ```
 
 ## Relationship To The Rest Of The Framework
@@ -77,6 +77,6 @@ This runbook does not add a fifth instruction layer.
 It complements the framework like this:
 
 1. `.github/copilot-instructions.md` decides when the workflow is mandatory.
-2. `.github/project-context.instructions.md` routes `audit|handoff|receipt|packet` topics here.
+2. `.github/instructions/project-context.instructions.md` routes `audit|handoff|receipt|packet` topics here.
 3. `docs/FRAMEWORK_ARCHITECTURE.md` explains why these artifacts sit alongside the four-layer load model.
 4. `scripts/git_audit_pipeline.py` and the templates make the workflow operational.

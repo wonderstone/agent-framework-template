@@ -6,7 +6,7 @@
   "capabilities": [],
   "expected_files": [
     ".github/agent-framework-manifest.json",
-    ".github/project-context.instructions.md",
+    ".github/instructions/project-context.instructions.md",
     "README.md",
     "docs/INDEX.md",
     "docs/runbooks/full-stack-workflow.md",

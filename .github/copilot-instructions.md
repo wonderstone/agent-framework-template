@@ -1,6 +1,6 @@
 # Agent Operating Rules
 
-> Behavior rules only. Project-specific facts live in `.github/project-context.instructions.md`.
+> Behavior rules only. Project-specific facts live in `.github/instructions/project-context.instructions.md`.
 >
 > **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
 
@@ -24,7 +24,7 @@ Pre-action verification (read → verify → execute → report) is formalized i
 
 Before deleting, clearing, overwriting, or replacing any file:
 
-1. Read `.github/project-context.instructions.md`
+1. Read `.github/instructions/project-context.instructions.md`
 2. Confirm the target is not listed under **Protected Paths**
 3. If protected: require explicit user confirmation before proceeding
 
@@ -40,7 +40,7 @@ Before deleting, clearing, overwriting, or replacing any file:
 
 ## Rule 3: Critical Topic Triggers (🔴 Mandatory)
 
-Topic triggers are defined in `.github/project-context.instructions.md`.
+Topic triggers are defined in `.github/instructions/project-context.instructions.md`.
 
 When a keyword appears in the user's message:
 
@@ -123,7 +123,7 @@ Trigger a context reset when any of the following is true:
 **Reset entry sequence** — the new session reads these in order, nothing else:
 
 1. `.github/copilot-instructions.md` — operating rules (always loaded)
-2. `.github/project-context.instructions.md` — project adapter
+2. `.github/instructions/project-context.instructions.md` — project adapter
 3. `session_state.md` — current goal, hypothesis, plan, and active work
 4. `tmp/git_audit/<task_slug>/handoff_packet.md` — resume point and blocker (if task is in progress)
 5. Only the files listed in the task packet's allowed-files — no speculative reading
@@ -288,7 +288,7 @@ Answer each question. If any answer is NO or UNKNOWN, resolve it before proceedi
 |---|---|
 | Have I read every file I plan to change? | **STOP** — read missing files first |
 | Are any target paths listed under Protected Paths? | **STOP** — request explicit user confirmation |
-| Have I loaded `.github/project-context.instructions.md`? | **STOP** — load it now |
+| Have I loaded `.github/instructions/project-context.instructions.md`? | **STOP** — load it now |
 | Do all sources (docs, code, config) agree on this change? | **STOP** — escalate the conflict; do not guess |
 | Is the scope of this change fully understood? | **STOP** — ask for clarification |
 
@@ -566,7 +566,7 @@ Every `## Next Actions` block must include:
 
 ---
 
-*Project facts: `.github/project-context.instructions.md`*
+*Project facts: `.github/instructions/project-context.instructions.md`*
 *Canonical doc index: `docs/INDEX.md`*
 *Cross-session state: `session_state.md`*
 
@@ -693,7 +693,7 @@ Within the declared boundary, proceed without per-step confirmation.
 ### Pre-Authorized Operations (no confirmation needed within boundary)
 
 - Reading any file in the authorized scope
-- Loading `.github/project-context.instructions.md` and canonical docs
+- Loading `.github/instructions/project-context.instructions.md` and canonical docs
 - Running lint, type checks, and test commands defined in the project adapter
 - Writing to `session_state.md`, `docs/archive/`, and task artifact locations
 - Fan-out to CLI executors (Rule 19) within the declared scope
@@ -921,7 +921,7 @@ If any answer is NO, the toolchain setup subtask must complete before implementa
 
 ### Documentation Requirement
 
-Record the validated toolchain in `.github/project-context.instructions.md` under **Validation Toolchain**. This makes it part of the project adapter (Layer 2) — available to all agents on every task without re-eliciting.
+Record the validated toolchain in `.github/instructions/project-context.instructions.md` under **Validation Toolchain**. This makes it part of the project adapter (Layer 2) — available to all agents on every task without re-eliciting.
 
 Add `e2e|toolchain|acceptance` to the Critical Topic Triggers table in the project adapter, pointing to the Validation Toolchain section.
 

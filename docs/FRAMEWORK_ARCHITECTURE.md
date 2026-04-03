@@ -54,7 +54,7 @@ The repository now also includes a **productization surface** around that model:
 
 ## Layer 2 — Project Adapter
 
-**File**: `.github/project-context.instructions.md`
+**File**: `.github/instructions/project-context.instructions.md`
 
 **Load condition**: triggered at the start of any multi-step task, OR when a critical topic keyword appears in the user's message.
 
@@ -338,7 +338,7 @@ Full tier breakdown (Unit + Integration + E2E) is in Rule 23.
 
 ### Where the Toolchain Lives
 
-The validated toolchain is recorded in `.github/project-context.instructions.md` under **Validation Toolchain**. This places it in Layer 2 (Project Adapter) — loaded at task start, available to all agents without re-eliciting.
+The validated toolchain is recorded in `.github/instructions/project-context.instructions.md` under **Validation Toolchain**. This places it in Layer 2 (Project Adapter) — loaded at task start, available to all agents without re-eliciting.
 
 Bootstrap presets now help teams get to that state faster: `scripts/bootstrap_adoption.py` can render a first-pass project adapter for `backend-api`, `web-frontend`, `cli-tool`, `library`, or `full-stack` repositories. The generated values are starting points and still require project-specific confirmation.
 
@@ -350,8 +350,8 @@ When a required toolchain tier is missing, the agent declares a setup subtask an
 
 This template repository now validates itself in three layers:
 
-1. `scripts/validate_template.py` checks required assets, key sections, cross-doc references, CI expectations, and bootstrap coverage
-2. `python -m pytest tests/ -q` exercises the bootstrap helper, audit generator, and validator itself
+1. `scripts/validate_template.py` checks required assets, key sections, cross-doc references, active-doc portability, stale assertions, CI expectations, and bootstrap coverage
+2. `python3 -m pytest tests/ -q` exercises the bootstrap helper, audit generator, and validator itself
 3. `.github/workflows/ci.yml` runs the structured validator, the tests, and bootstrap smoke commands on supported Python versions
 
 This does not eliminate project-specific verification, but it does reduce drift between the repository's claims and the assets it ships.
@@ -648,7 +648,7 @@ ACT     → Only if all checks pass; otherwise STOP and resolve
 |---|---|---|
 | 1 | Have I read every file I plan to change? | STOP — read missing files first |
 | 2 | Are any target paths listed under Protected Paths? | STOP — request explicit user confirmation |
-| 3 | Is `.github/project-context.instructions.md` loaded? | STOP — load it now |
+| 3 | Is `.github/instructions/project-context.instructions.md` loaded? | STOP — load it now |
 | 4 | Do all sources (docs, code, config) agree on this change? | STOP — escalate the conflict; do not guess |
 | 5 | Is the full scope of this change understood? | STOP — ask for clarification |
 

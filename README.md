@@ -21,7 +21,6 @@ This template exists to make those failure modes harder by default. It gives tea
 ```
 .github/
   copilot-instructions.md          ← operating rules (Rule 0–27, always loaded)
-  project-context.instructions.md  ← project adapter (fill in for your project)
   RELEASE_TEMPLATE.md              ← lightweight release notes template
   workflows/
     ci.yml                         ← validates integrity and tests on push / PR
@@ -29,6 +28,7 @@ This template exists to make those failure modes harder by default. It gives tea
     architect.agent.md             ← analysis / planning / critique agent
     implementer.agent.md           ← execution / validation / change agent
   instructions/
+    project-context.instructions.md ← project adapter (fill in for your project)
     backend.instructions.md        ← protocol for backend code changes
     docs.instructions.md           ← protocol for documentation changes
 
@@ -79,6 +79,7 @@ examples/
     10_docs_spec_drift_reviewer.md ← second-batch strategy role
 
 scripts/
+  active_docs_audit.py           ← checks live docs for nonportable paths and stale framework assertions
   bootstrap_adoption.py           ← bootstraps minimal / standard / full adoption into another repo
   closeout_truth_audit.py         ← diff-aware receipt-anchor audit for truth-source closeout claims
   install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
@@ -115,7 +116,7 @@ Goal:
 Required steps:
 1. Run the template bootstrap script from <TEMPLATE_REPO_PATH> targeting <TARGET_REPO_PATH>.
 2. Keep the generated framework files in their template paths.
-3. Fill in the generated `.github/project-context.instructions.md` placeholders using this repo's real structure, commands, and protected paths.
+3. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders using this repo's real structure, commands, and protected paths.
 4. Leave unrelated application code untouched.
 5. Run validation from the target repo:
   - `python3 scripts/validate_template.py`
@@ -136,7 +137,7 @@ Constraints:
 Use the bootstrap script when you want a working starting point without manually copying files one by one:
 
 ```bash
-python scripts/bootstrap_adoption.py ../your-repo \
+python3 scripts/bootstrap_adoption.py ../your-repo \
   --project-name "Your Project" \
   --profile standard
 ```
@@ -158,13 +159,14 @@ Profiles:
 ```bash
 # 1. Copy the core rules
 cp .github/copilot-instructions.md          your-repo/.github/
-cp .github/project-context.instructions.md  your-repo/.github/
+mkdir -p your-repo/.github/instructions
+cp .github/instructions/project-context.instructions.md  your-repo/.github/instructions/
 
 # 2. Initialize session state
 cp templates/session_state.template.md      your-repo/session_state.md
 
 # 3. Fill in the project adapter
-#    Edit your-repo/.github/project-context.instructions.md
+#    Edit your-repo/.github/instructions/project-context.instructions.md
 #    Replace all [placeholders] with real values, including the Developer Toolchain section
 ```
 
@@ -200,8 +202,8 @@ If a repository wants roadmap/design-first execution to be the default for non-t
 
 If you want one concrete path instead of reading the full framework first:
 
-1. Run `python scripts/bootstrap_adoption.py ../your-repo --project-name "Your Project" --profile standard`
-2. Open the generated `.github/project-context.instructions.md` and replace the default commands plus Developer Toolchain starter values
+1. Run `python3 scripts/bootstrap_adoption.py ../your-repo --project-name "Your Project" --profile standard`
+2. Open the generated `.github/instructions/project-context.instructions.md` and replace the default commands plus Developer Toolchain starter values
 3. Run `python3 scripts/validate_template.py`
 4. Review [`examples/demo_project/`](examples/demo_project/) for a tiny adopted repository with a committed packet / receipt / handoff cycle
 5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path
@@ -300,10 +302,10 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 
 | What to customize | Where |
 |---|---|
-| Project directory map | `project-context.instructions.md` → Project Map |
-| Topic → doc routing | `project-context.instructions.md` → Critical Topic Triggers |
-| Build/test commands | `project-context.instructions.md` → Build and Test Commands |
-| Protected paths | `project-context.instructions.md` → Protected Paths |
+| Project directory map | `.github/instructions/project-context.instructions.md` → Project Map |
+| Topic → doc routing | `.github/instructions/project-context.instructions.md` → Critical Topic Triggers |
+| Build/test commands | `.github/instructions/project-context.instructions.md` → Build and Test Commands |
+| Protected paths | `.github/instructions/project-context.instructions.md` → Protected Paths |
 | Status-line language | `copilot-instructions.md` → Rule 8 |
 | Agent roles/format | `.github/agents/*.agent.md` |
 | Strategy-vs-mechanism guidance | `docs/STRATEGY_MECHANISM_LAYERING.md` |

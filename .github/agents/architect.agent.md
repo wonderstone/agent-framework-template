@@ -46,7 +46,7 @@ Before producing any analysis or recommendation, verify:
 | Pre-condition | If not satisfied |
 |---|---|
 | All relevant files listed in the task have been read | **STOP** — read missing files; do not speculate about their content |
-| `.github/project-context.instructions.md` has been loaded | **STOP** — load it before referencing any project-specific facts |
+| `.github/instructions/project-context.instructions.md` has been loaded | **STOP** — load it before referencing any project-specific facts |
 | Sources (docs, code, config) are consistent with each other | **STOP** — surface the conflict; do not pick a side silently |
 | Scope is clearly defined (what is in scope, what is not) | **STOP** — request clarification before proceeding |
 

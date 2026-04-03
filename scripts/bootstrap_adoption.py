@@ -413,6 +413,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/RUNTIME_SURFACE_PROTECTION.md",
         "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
         "docs/runbooks/resumable-git-audit-pipeline.md",
+        "scripts/active_docs_audit.py",
         "scripts/git_audit_pipeline.py",
         "scripts/preference_drift_audit.py",
         "scripts/validate-template.sh",
@@ -432,7 +433,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/ROLE_STRATEGY_EXAMPLES.md",
         "docs/STRATEGY_MECHANISM_LAYERING.md",
         "examples/demo_project/README.md",
-        "examples/demo_project/.github/project-context.instructions.md",
+        "examples/demo_project/.github/instructions/project-context.instructions.md",
         "examples/demo_project/ROADMAP.md",
         "examples/demo_project/session_state.md",
         "examples/demo_project/docs/ARCHITECTURE.md",
@@ -444,7 +445,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "examples/demo_project/tmp/git_audit/add_task_priority/handoff_packet.md",
         "examples/demo_project/tmp/git_audit/add_task_priority/task_packet.md",
         "examples/full_stack_project/README.md",
-        "examples/full_stack_project/.github/project-context.instructions.md",
+        "examples/full_stack_project/.github/instructions/project-context.instructions.md",
         "examples/full_stack_project/.github/agent-framework-manifest.json",
         "examples/full_stack_project/docs/INDEX.md",
         "examples/full_stack_project/docs/runbooks/full-stack-workflow.md",
@@ -483,7 +484,7 @@ CAPABILITY_COPY_PATHS: dict[str, tuple[str, ...]] = {
 }
 
 RENDERED_FILES: dict[str, str] = {
-    ".github/project-context.instructions.md": "templates/project-context.template.md",
+    ".github/instructions/project-context.instructions.md": "templates/project-context.template.md",
     "session_state.md": "templates/session_state.template.md",
     "ROADMAP.md": "templates/roadmap.template.md",
 }
