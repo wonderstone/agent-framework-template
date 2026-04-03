@@ -39,9 +39,10 @@
 
 | Document | Description |
 |---|---|
+| `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit, replaceable reviewers, and Git closeout recovery |
 
 ---
 
-*Last updated: 2026-04-03 — added traceability and recovery v1 draft and aligned the template index*
+*Last updated: 2026-04-04 — added the multi-model discussion loop runbook*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

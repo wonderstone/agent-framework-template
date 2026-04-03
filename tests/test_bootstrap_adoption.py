@@ -54,8 +54,11 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
+    assert (tmp_path / "docs" / "runbooks" / "multi-model-discussion-loop.md").exists()
     assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
+    assert (tmp_path / "templates" / "discussion_packet.template.md").exists()
     assert (tmp_path / "templates" / "execution_contract.template.md").exists()
+    assert (tmp_path / "scripts" / "discussion_pipeline.py").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
 
 

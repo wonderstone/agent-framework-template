@@ -51,13 +51,15 @@ If those elements are absent, the plan is not implementation-ready.
 The expected planning stack for non-trivial work is:
 
 1. repository-level roadmap or design doc
-2. file-level execution checklist or implementation checklist
-3. validation commands recorded in a durable validation doc or equivalent
-4. current state reflected in `session_state.md` or the repository's state-tracking equivalent
+2. for open design space, a durable discussion doc or packet before execution starts
+3. file-level execution checklist or implementation checklist
+4. validation commands recorded in a durable validation doc or equivalent
+5. current state reflected in `session_state.md` or the repository's state-tracking equivalent
 
 This means:
 
 - the roadmap says what the phase or workstream is
+- the discussion packet says what is still being decided, by which criteria, and what each discussion round concluded
 - the checklist says what to build next, in which files, in which order
 - the validation doc says how truth is checked
 - the state doc says what the current step is right now
@@ -68,11 +70,12 @@ This means:
 When the user asks for a new phase, subsystem, or meaningful behavior change, the default behavior is:
 
 1. update or create the roadmap or design truth first
-2. create or update the execution checklist next
-3. sync validation commands and entry docs
-4. freeze the progress unit, check-in point, and true closeout boundary for while-style work
-5. update current state tracking
-6. begin implementation only after those planning surfaces exist
+2. if there are multiple viable approaches, create a durable discussion surface and resolve the choice there next
+3. create or update the execution checklist after the direction is chosen
+4. sync validation commands and entry docs
+5. freeze the progress unit, check-in point, and true closeout boundary for while-style work
+6. update current state tracking
+7. begin implementation only after those planning surfaces exist
 
 Do not ask the user to choose between doc-first and code-first for non-trivial work unless they explicitly request a lighter-weight path.
 
@@ -103,6 +106,7 @@ Forbidden behavior:
 3. leaving file-level scope or validation commands unspecified for a multi-step task
 4. entering while-style execution without a written distinction between progress checkpoints and the true closeout boundary
 5. treating internal batch completion as permission to emit final closeout
+6. starting implementation while framework selection, architecture direction, or plan-review disagreement still lives only in chat memory
 
 ## Template Implications
 

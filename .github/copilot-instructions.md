@@ -463,7 +463,7 @@ Before executing any multi-step task that is non-trivial, the agent MUST produce
 |---|---|
 | Single-step edit, no design decision | Skip — proceed directly to execution |
 | Multi-step task with one obvious path | Plan in one sentence; record it; proceed |
-| Multi-step task with 2+ viable approaches | Enumerate options, evaluate, select explicitly |
+| Multi-step task with 2+ viable approaches | Enumerate options, evaluate, and if the choice has real discussion space, externalize it into a durable discussion packet before selecting |
 | Task with significant risk or cross-module impact | Always plan; involve Architect role |
 
 ### Planning Steps
@@ -473,6 +473,28 @@ Before executing any multi-step task that is non-trivial, the agent MUST produce
 3. **Evaluate tradeoffs** — for each option: speed · risk · scope · dependencies (one line each)
 4. **Select** — choose one path explicitly; state why
 5. **Record** — write the chosen approach and steps in `session_state.md` under `## Plan`
+
+### Open-Question Discussion Requirement
+
+If the active problem is primarily a choice among meaningful alternatives, do not let the real debate live only in chat memory.
+
+Typical triggers:
+
+1. framework selection
+2. architecture direction
+3. migration strategy
+4. plan review with credible disagreement
+5. "should we do A or B?" tasks where the answer affects later implementation
+
+When that condition is true:
+
+1. freeze the question, context, options, and criteria in a durable discussion artifact
+2. ask available executors to respond against that same artifact
+3. synthesize the appended feedback
+4. either freeze the plan or launch one narrower second round
+5. start implementation only after the discussion has converged enough to write an honest plan
+
+If the repository ships `docs/runbooks/multi-model-discussion-loop.md`, follow that mechanism.
 
 ### Plan Format
 

@@ -17,6 +17,8 @@ Layer 4 — Code / Config Files     (loaded immediately before any edit)
 
 The framework also ships a **resumable audit artifact system**. It is **not** a fifth instruction layer. It is an operational recovery mechanism that runs alongside the four-layer loading model.
 
+The framework also ships a **discussion-loop artifact system** for open design questions. It is also **not** a fifth instruction layer. It is a mechanism for freezing the question, collecting append-only feedback, and converging before implementation starts.
+
 The framework also distinguishes **strategy** from **mechanism**:
 
 1. strategy answers: which agent / CLI / reviewer is responsible for what kind of judgment
@@ -199,6 +201,27 @@ They do not change the layer order:
 4. If execution stops or ownership changes, create a handoff packet
 5. Run hard gates outside the semantic auditor
 6. Return to the main thread for owner review and Git closeout
+
+## Discussion Loop Artifacts
+
+The framework also includes a portable discussion artifact contract for open design questions.
+
+These artifacts are operational state, not instruction layers:
+
+| Artifact | Purpose | Default location |
+|---|---|---|
+| `discussion packet` | Freeze the decision question, context, options, evaluation criteria, and append-only discussion log | `tmp/discussion/<topic_slug>/discussion_packet.md` |
+
+These artifacts matter because design debate is easy to lose in chat history. A later round or replacement executor should be able to see the original question, prior opinions, and main-thread synthesis without reconstructing them from memory.
+
+### Default Discussion Flow
+
+1. Freeze a discussion packet before broad design debate starts
+2. Dispatch the same packet to available CLIs or subagents
+3. Append feedback blocks to the end of the same file
+4. Let the main thread append a synthesis block
+5. Either freeze a plan, run a narrower second round, or stop on missing truth
+6. Promote the winning direction into execution surfaces before code changes begin
 
 ## Strategy vs Mechanism Layering
 

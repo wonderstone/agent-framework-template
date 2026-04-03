@@ -51,6 +51,8 @@ Examples:
 2. `templates/git_audit_task_packet.template.md`
 3. `templates/git_audit_receipt.template.md`
 4. `templates/git_audit_handoff_packet.template.md`
+5. `docs/runbooks/multi-model-discussion-loop.md`
+6. `templates/discussion_packet.template.md`
 
 This layer exists so a repository can replace an unavailable reviewer without losing workflow continuity.
 

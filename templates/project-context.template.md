@@ -35,9 +35,11 @@ description: >
 | `docs/INDEX.md` | TYPE-A doc navigation index |
 | `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
 | `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
+| `templates/discussion_packet.template.md` | [Append-only packet template for multi-model discussion loops — keep if useful] |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | [Guard-registry pattern for active user-facing runtime paths — create if useful] |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | [How your team records and recovers partial work — create if useful] |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
+| `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
 
 ## Task Recovery Sequence
@@ -64,6 +66,7 @@ description: >
 | `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
+| `discussion\|debate\|framework choice\|plan review\|architecture option\|second round` | `docs/runbooks/multi-model-discussion-loop.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |
@@ -204,4 +207,5 @@ Escalation rule:
 
 <!-- Add environment-specific notes: venv activation, service pre-checks, etc. -->
 <!-- If your repository adopts doc-first execution as the default, say so explicitly here so future sessions do not treat it as optional. -->
+<!-- If your repository standardizes machine-local discussion executors such as Claude Code, Codex, Gemini, Copilot, or custom agents, record those commands in this file or in a nearby runbook instead of relying on chat memory. -->
 <!-- If your repository has live runtime paths, point future sessions to `templates/failure_packet.template.md` and `templates/root_cause_note.template.md` or your repo-local copies of them. -->

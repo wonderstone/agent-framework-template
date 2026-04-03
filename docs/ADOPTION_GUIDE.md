@@ -67,10 +67,12 @@ docs/
   ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
   RUNTIME_SURFACE_PROTECTION.md    ← keep if your project has active runtime paths to protect
   runbooks/
+    multi-model-discussion-loop.md ← recommended for framework choice, plan review, and other open design questions
     resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
+  discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
@@ -91,6 +93,7 @@ scripts/
   active_docs_audit.py            ← executable active-doc portability and stale-assertion audit
   bootstrap_adoption.py            ← bootstrap and profile-aware adoption helper
   closeout_truth_audit.py          ← executable Rule 25 enforcement for truth-source closeout claims
+  discussion_pipeline.py           ← generator for discussion packet creation and append-only feedback/synthesis
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
   install_git_hooks.sh             ← activates optional `.githooks/` in the adopter repo
   runtime_surface_guardrails.py    ← registry-driven runtime guard runner
@@ -170,6 +173,8 @@ That means:
 3. multi-runtime repos may qualify labels with parentheses, for example `Run (frontend)` and `Run (backend)`
 
 If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+If your project wants framework choice, architecture debates, or plan review to happen in a durable multi-model loop before coding, also keep the `discussion|debate|framework choice|plan review|architecture option` trigger mapped to `docs/runbooks/multi-model-discussion-loop.md`.
 
 If you want doc-first execution to be the repository default for non-trivial work, also add `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` to the canonical docs table and keep the `guideline|guidelines|doc-first|execution checklist|planning mode` trigger mapped to it.
 
@@ -251,6 +256,7 @@ Your `docs/INDEX.md` starts with the core docs that exist. For a new project, th
 | `docs/ADOPTION_GUIDE.md` | How to adopt this framework |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to split role strategy from reusable workflow mechanism |
 | `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples to adapt |
+| `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable Git audit |
 ```
 
@@ -333,6 +339,8 @@ The following files are optional and can be removed for simpler projects:
 | `examples/reviewer_roles/` | You want the role examples as guidance only and do not need concrete starter files |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | No external reviewer, multi-CLI, or resumable handoff workflow is needed |
 | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` | Same as above |
+| `docs/runbooks/multi-model-discussion-loop.md` | Open design questions do not need a durable multi-round discussion workflow |
+| `templates/discussion_packet.template.md` + `scripts/discussion_pipeline.py` | Same as above |
 | `templates/reviewer_role_profile.template.md` | Same as above |
 | `templates/` | All templates have been applied |
 
@@ -393,6 +401,20 @@ python3 scripts/git_audit_pipeline.py init-task \
   --do-not-touch "- .env" \
   --validation "- bash scripts/validate-template.sh" \
   --acceptance-boundary "- task packet exists"
+```
+
+If you keep the multi-model discussion workflow, do a smoke run once:
+
+```bash
+python3 scripts/discussion_pipeline.py init-topic \
+  --topic-id "discussion-smoke" \
+  --decision-question "Should this repo require discussion packets before framework changes?" \
+  --why-now "- We want to verify that the packet generator works." \
+  --current-truth "- The repo already supports doc-first execution." \
+  --constraints "- Keep the workflow lightweight." \
+  --candidate-directions "- Always require it for open design questions\n- Keep it optional" \
+  --evaluation-criteria "- Clarity\n- overhead\n- recoverability" \
+  --suggested-executors "- codex\n- claude-code\n- internal-subagent"
 ```
 
 ---

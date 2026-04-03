@@ -39,6 +39,7 @@ description: >
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Default in-progress update shape for long-running or while-style tasks |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
 | `templates/execution_contract.template.md` | Pre-execution confirmation contract for long-running tasks |
+| `templates/discussion_packet.template.md` | Append-only packet template for multi-model discussion loops |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Guard-registry pattern for protecting active user-facing runtime paths |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | How to classify, defer, and recover partial work truthfully |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanisms |
@@ -46,6 +47,7 @@ description: >
 | `examples/reviewer_roles/` | Ready-to-adapt starter set of first-batch and second-batch role profiles |
 | `CHANGELOG.md` | Release boundary and notable changes by version |
 | `VERSION` | Current framework version |
+| `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
 | `docs/INDEX.md` | Navigation index for all TYPE-A docs |
 | `session_state.md` | Cross-session state (current goal, decisions, insights) |
@@ -74,6 +76,7 @@ When resuming a multi-step task, recover context in this order:
 | `guideline\|guidelines\|doc-first\|execution checklist\|planning mode` | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` |
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
+| `discussion\|debate\|framework choice\|plan review\|architecture option\|second round` | `docs/runbooks/multi-model-discussion-loop.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `release\|version\|changelog\|upgrade notes` | `CHANGELOG.md` |
@@ -201,3 +204,4 @@ python3 scripts/bootstrap_adoption.py "${TMPDIR:-/tmp}/agent-framework-template-
 - Keep bootstrap smoke commands in `--dry-run` mode unless intentionally testing write behavior into a disposable target.
 - This template now treats executable doc-first planning as a first-class reusable surface: the source repo documents it locally, and the shipped templates let adopters turn it into their repository default for non-trivial work.
 - The reusable adopter asset for that policy is `templates/doc_first_execution_guidelines.template.md`; repositories that want doc-first mode by default should copy it into `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` and route future sessions to it through their project adapter.
+- The discussion-loop mechanism is intentionally executor-agnostic: local repositories may standardize machine-local commands for Claude Code, Codex, Gemini, Copilot, or custom agents, but this template only standardizes the packet and synthesis workflow.

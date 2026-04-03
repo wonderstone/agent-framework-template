@@ -47,10 +47,12 @@ docs/
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
   RUNTIME_SURFACE_PROTECTION.md    ← guard-registry pattern for live user-facing paths
   runbooks/
+    multi-model-discussion-loop.md ← append-only discussion workflow for open design questions
     resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
   archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
+  discussion_packet.template.md   ← append-only discussion packet for design debates
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   failure_packet.template.md       ← progressive runtime failure packet
@@ -82,6 +84,7 @@ scripts/
   active_docs_audit.py           ← checks live docs for nonportable paths and stale framework assertions
   bootstrap_adoption.py           ← bootstraps minimal / standard / full adoption into another repo
   closeout_truth_audit.py         ← diff-aware receipt-anchor audit for truth-source closeout claims
+  discussion_pipeline.py          ← generates and extends discussion packets for multi-model debate
   install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
   runtime_surface_guardrails.py   ← registry-driven runner for runtime surface staged/live checks
   validate-template.sh             ← checks template integrity (run after setup)
@@ -104,7 +107,10 @@ If you want another agent to copy this framework into a local application reposi
 ```text
 You are working in my application repository at <TARGET_REPO_PATH>.
 
-Use the local agent framework template at <TEMPLATE_REPO_PATH>.
+The agent framework template is at https://github.com/wonderstone/agent-framework-template.
+If it is not already cloned locally, clone it first:
+  git clone https://github.com/wonderstone/agent-framework-template.git <TEMPLATE_REPO_PATH>
+Then use the local copy at <TEMPLATE_REPO_PATH>.
 
 Goal:
 - bootstrap the agent framework from the template repo into this application repo
@@ -116,10 +122,14 @@ Goal:
 Required steps:
 1. Run the template bootstrap script from <TEMPLATE_REPO_PATH> targeting <TARGET_REPO_PATH>.
 2. Keep the generated framework files in their template paths.
-3. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders using this repo's real structure, commands, and protected paths.
+3. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders:
+   - project directory map, critical topic triggers, build/test commands, and protected paths
+   - Developer Toolchain section (diagnostics, run, health, repro, build, verify) — the validator
+     hard-fails if required-core fields are missing or malformed
 4. Leave unrelated application code untouched.
 5. Run validation from the target repo:
   - `python3 scripts/validate_template.py`
+  - `python3 scripts/active_docs_audit.py` — checks for nonportable paths and stale framework assertions in shipped docs
   - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
 6. Report:
   - what files were added or changed
@@ -196,6 +206,8 @@ Progress and closeout preference summary:
 
 If a repository wants roadmap/design-first execution to be the default for non-trivial work, it can also ship [`docs/DOC_FIRST_EXECUTION_GUIDELINES.md`](docs/DOC_FIRST_EXECUTION_GUIDELINES.md) from [`templates/doc_first_execution_guidelines.template.md`](templates/doc_first_execution_guidelines.template.md) and route doc-first triggers to it through the project adapter.
 
+If a repository wants open design questions to go through a durable multi-model discussion before coding, it can also ship [`docs/runbooks/multi-model-discussion-loop.md`](docs/runbooks/multi-model-discussion-loop.md), keep [`templates/discussion_packet.template.md`](templates/discussion_packet.template.md), and use [`scripts/discussion_pipeline.py`](scripts/discussion_pipeline.py) to collect executor feedback into one append-only Markdown packet.
+
 ---
 
 ## Example Workflow
@@ -228,6 +240,8 @@ If you want one concrete path instead of reading the full framework first:
 - `handoff packet` — captures resume point, blocker, and next executor when a CLI or agent session is interrupted
 
 The template ships a canonical runbook, three templates, and `scripts/git_audit_pipeline.py` to generate these assets under `tmp/git_audit/<task_slug>/`.
+
+**Multi-model discussion loop** — when the problem is "which direction should we choose?" rather than "implement the obvious next step", the agent can freeze the decision question in a discussion packet, ask available executors such as Claude Code, Codex, Gemini, Copilot, repo-local agents, or subagents to append feedback, and then let the main thread synthesize whether to freeze a plan or run a narrower second round. This behavior is governed by the runbook at `docs/runbooks/multi-model-discussion-loop.md` and the generator at `scripts/discussion_pipeline.py`.
 
 **Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
 
@@ -321,6 +335,7 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Runtime guard registry | `templates/runtime_surface_registry.template.py` + `scripts/runtime_surface_guardrails.py` |
 | Optional git hooks | `.githooks/` + `scripts/install_git_hooks.sh` |
 | Reviewer / CLI role profiles | `templates/reviewer_role_profile.template.md` |
+| Discussion packet defaults | `templates/discussion_packet.template.md` + `scripts/discussion_pipeline.py` |
 
 ---
 
