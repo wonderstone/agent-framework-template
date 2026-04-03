@@ -1,0 +1,54 @@
+You are participating in round 2 of a framework design discussion.
+
+Task boundary:
+- Read-only analysis only.
+- Do not edit files.
+- Do not run write operations.
+- Focus on design judgment, governance, and validator-shape tradeoffs.
+
+Primary artifact:
+- Read /Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_mechanism_v1/discussion_packet.md before responding.
+
+Decision context:
+- The framework already leans toward a hybrid direction: a framework-native SKILL contract as the canonical core, with vendor-specific skill formats and distribution mechanisms treated as adapter layers.
+- The open questions are now narrower: evidence ranking, review gates for self-updating skills, trigger semantics, validator contract, and honest degradation across agents.
+
+What I need from you:
+- Produce a concise but substantive review in markdown.
+- Do not repeat the whole packet.
+- Prefer concrete contract proposals over generic advice.
+
+Please use exactly these sections:
+
+## Verdict
+- One sentence: support / revise / reject the current hybrid direction.
+
+## Canonical V1 Contract
+- What fields or sections must exist in the framework-native SKILL contract?
+- Keep this to the minimum viable truthful contract, not an aspirational wishlist.
+
+## Evidence And Update Gates
+- Rank the allowed evidence sources for proposing a skill update.
+- Distinguish what may be auto-collected versus what requires explicit human review.
+- State what should be forbidden because it would create silent prompt drift.
+
+## Trigger And Validation Contract
+- What is the minimum triggerability contract?
+- What should validators actually check for, and what should stay advisory only?
+- Include how progressive disclosure should be kept truthful.
+
+## Portability And Honest Degradation
+- Which features are core and portable?
+- Which features should be modeled as optional adapters with explicit degradation behavior?
+
+## Biggest Risk
+- Name the single highest-risk failure mode if this mechanism is implemented badly.
+
+## Narrowest Next Question
+- If a third round is needed, propose one sharply scoped next question.
+
+Output constraints:
+- 400-700 words.
+- Be opinionated.
+- No code changes.
+- No file edits.

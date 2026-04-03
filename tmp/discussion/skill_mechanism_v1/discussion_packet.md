@@ -134,3 +134,84 @@ Current evidence supports a hybrid path: define a framework-native SKILL mechani
 - Which skill types may auto-accumulate gotchas, and which require stricter manual review?
 - What validator contract is minimal but non-fake for triggerability and progressive disclosure?
 - Should bootstrap generate repo-local skills only, or also adapter stubs for vendor-specific skill formats?
+
+---
+
+## Execution Receipt — Round 2 — Multi-CLI Participation
+
+- Timestamp: 2026-04-04T04:56:00+00:00
+- Goal: obtain parallel CLI judgment on the narrowed governance questions for SKILL v1
+- Shared prompt: `tmp/discussion/skill_mechanism_v1/round2/prompt.txt`
+- Raw outputs:
+	- `tmp/discussion/skill_mechanism_v1/round2/codex.md`
+	- `tmp/discussion/skill_mechanism_v1/round2/copilot.md`
+	- `tmp/discussion/skill_mechanism_v1/round2/gemini.md`
+	- `tmp/discussion/skill_mechanism_v1/round2/claude.md`
+- Runtime notes:
+	- Claude CLI was callable but not authenticated in this environment: `Not logged in · Please run /login`.
+	- Gemini CLI initially failed due temporary model-capacity exhaustion, then succeeded on a clean retry.
+	- Codex CLI and GitHub Copilot CLI both completed successfully in headless mode.
+
+## Feedback — Round 2 — Codex CLI
+
+- Stance: support hybrid, but keep the canonical contract smaller and stricter than any adapter surface.
+- Strongest claims:
+	- The framework-native core should stay close to `id`, `type`, `purpose`, `triggers`, `entry_instructions`, labeled `references`, and explicit `governance` metadata.
+	- Evidence may propose changes, but humans must approve any change to `purpose`, `triggers`, `entry_instructions`, or guardrail behavior.
+	- Validators should enforce trigger specificity, reference integrity, governance freshness, and declared degradation for non-portable capabilities.
+	- Hooks, tool gating, packaging, and context-fork execution belong in adapters, not the canonical core.
+- Highest-risk failure mode: governance theater, where unreviewed evidence slowly mutates triggers and instructions into untraceable prompt residue.
+- Narrowest next question proposed: define a field-by-field review matrix, especially what guardrail-skill fields are never eligible for auto-proposed updates.
+
+## Feedback — Round 2 — GitHub Copilot CLI
+
+- Stance: support hybrid, but make the canonical contract the only normative truth and prevent adapters from becoming a backdoor for silent drift.
+- Strongest claims:
+	- V1 should include explicit sections for identity, type, purpose, triggers, entry instructions, resources, constraints, evidence policy, and degradation policy.
+	- Evidence ranking should start with human-reviewed postmortems and reproducible failures, then invocation receipts and operator-authored gotchas, with raw transcripts at the bottom.
+	- Validators should require positive triggers, negative triggers, expected effect, dependency resolution, capability alignment, and degradation coverage.
+	- Progressive disclosure is only honest when omitted detail is named explicitly and hidden files do not introduce new obligations.
+- Highest-risk failure mode: silent prompt drift disguised as continuous improvement.
+- Narrowest next question proposed: define the smallest receipt schema that can justify a skill-update proposal without exposing raw transcript content.
+
+## Feedback — Round 2 — Gemini CLI
+
+- Stance: strongly support hybrid because it keeps skills anchored in repo truth rather than vendor syntax.
+- Strongest claims:
+	- The core contract should stay minimal and deterministic: skill identity and type, trigger condition, execution boundary, progressive-disclosure references, and empirically proven gotchas.
+	- Evidence should be ranked with root-cause notes and failure packets first, then closeout audits, telemetry, and finally agent-proposed observations.
+	- Auto-collection may draft gotchas or reference-file additions, but any structural change to trigger conditions, execution boundaries, or workflow directives must remain human-reviewed.
+	- Validators should check trigger collision risk, referenced file existence, and that the top-level skill does not collapse progressive disclosure by inlining heavy scripts or context dumps.
+- Highest-risk failure mode: trigger bloat, where overlapping skills defeat the whole progressive-disclosure model.
+- Narrowest next question proposed: how to enforce mutually exclusive or hierarchical triggers across skills without a central human router.
+
+## Feedback — Round 2 — Claude CLI Runtime Blocker
+
+- Status: callable binary confirmed, but this environment could not complete review because the CLI is not logged in.
+- Evidence: `tmp/discussion/skill_mechanism_v1/round2/claude.md` contains `Not logged in · Please run /login`.
+- Implication: the claim that all four CLIs can currently participate directly conflicts with the observed runtime state. Three CLIs produced usable feedback in this round; Claude remains a recoverable environment blocker rather than a design blocker.
+
+## Main-Thread Synthesis — Round 2
+
+- Timestamp: 2026-04-04T04:58:00+00:00
+- Decision: freeze-plan
+- Confidence: high
+- Next action: promote the converged contract into a TYPE-A SKILL design doc when implementation work is requested.
+
+### Convergence
+
+- The hybrid direction is now strongly converged across the available CLIs: the canonical truth should be framework-native, while vendor formats, packaging, hooks, tool gating, and subagent/fork behavior remain adapter layers.
+- All three successful CLIs independently converged on the same governance boundary: evidence may propose, but human review must gate any change to normative instructions, trigger conditions, execution boundaries, or guardrail behavior.
+- There is broad agreement that the canonical v1 contract must stay small. The stable center is: identity, type, purpose, triggers, entry instructions, references/resources, governance or evidence/update policy, and explicit degradation semantics for non-portable features.
+- There is also broad agreement that validators should enforce only the truthful mechanical layer: required fields, trigger specificity, reference integrity, capability/degradation declarations, and the separation between entry instructions and deeper supporting artifacts. Usefulness, elegance, and broad prose quality should remain advisory.
+
+### Decisions To Carry Forward
+
+- Freeze a framework-native SKILL contract that is smaller than any vendor adapter and explicitly prohibits adapter-to-core backflow without review.
+- Make `guardrail` skills stricter than the other skill types for update policy; no CLI argued for relaxed automatic mutation here.
+- Treat raw transcripts, model summaries, and frequency-based heuristics as low-trust evidence. They can propose candidate gotchas or receipts, but they must not directly rewrite canonical instructions.
+- Make honest degradation a first-class field rather than an undocumented side effect. If hooks, tool gating, or forked execution are unavailable, the skill must declare the fallback behavior rather than implying parity.
+
+### Remaining Narrow Question
+
+- If another discussion round is needed, it no longer needs to be broad. The narrowest unresolved design question is now the receipt and review matrix: which fields may be updated from which evidence sources, under what reviewer threshold, and with what stricter rules for guardrail skills.
