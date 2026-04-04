@@ -115,6 +115,24 @@ python3 scripts/discussion_pipeline.py append-synthesis ...
 
 The framework intentionally does not hardcode vendor-specific command names or flags for Claude Code, Codex, Gemini, or Copilot because local installations differ. Record machine-local executor commands in the repository adapter, local runbooks, or the task packet when your team standardizes them.
 
+For this repository's current local convention, Claude Code headless discussion runs that rely on the existing interactive account login should avoid `--bare`. A working read-only pattern is:
+
+```bash
+claude -p \
+   --permission-mode plan \
+   --output-format text \
+   --add-dir "$PWD" \
+   < tmp/discussion/<topic_slug>/roundN/prompt.txt
+```
+
+Why this matters:
+
+1. `--bare` disables the normal keychain or OAuth-backed login lookup.
+2. In `--bare` mode, Claude Code expects `ANTHROPIC_API_KEY` or an explicit `apiKeyHelper` configuration instead of the existing account login.
+3. If the workflow depends on the locally signed-in Claude account, validate it first with `claude auth status --text` and do not add `--bare`.
+
+Use `--bare` only when you are intentionally standardizing an API-key-based environment and have already provisioned `ANTHROPIC_API_KEY` or equivalent settings for that machine.
+
 ## Relationship To The Rest Of The Framework
 
 This runbook complements the rest of the framework like this:
