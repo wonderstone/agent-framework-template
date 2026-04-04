@@ -215,3 +215,37 @@ Current evidence supports a hybrid path: define a framework-native SKILL mechani
 ### Remaining Narrow Question
 
 - If another discussion round is needed, it no longer needs to be broad. The narrowest unresolved design question is now the receipt and review matrix: which fields may be updated from which evidence sources, under what reviewer threshold, and with what stricter rules for guardrail skills.
+
+---
+
+## Execution Receipt — Round 2 Addendum — Claude Retry
+
+- Timestamp: 2026-04-04T05:06:00+00:00
+- Goal: re-run the Claude CLI review after correcting the local invocation pattern to use the machine's existing account login instead of `--bare`
+- Command class: `claude -p --permission-mode plan --output-format text --add-dir "$PWD" < prompt.txt`
+- Output: `tmp/discussion/skill_mechanism_v1/round2/claude_retry.md`
+- Runtime result: success
+
+## Feedback — Round 2 Addendum — Claude CLI
+
+- Stance: support the hybrid direction without revision; remaining disagreement is about update gates, not architecture shape.
+- Strongest claims:
+	- The canonical v1 contract should stay at `id`, `type`, `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, and `degradation`.
+	- `entry_instructions`, `governance`, and `degradation` are load-bearing normative fields, not optional commentary.
+	- Human review must gate any change to `purpose`, `triggers`, `entry_instructions`, `governance`, or `degradation`, regardless of skill type.
+	- Raw transcripts, model summaries, and frequency-only heuristics must never become direct update evidence; they may inform a reviewer but not rewrite canonical instructions.
+	- Validators should fail missing fields, weak trigger specificity, unresolved references, missing degradation coverage, and progressive-disclosure collapse.
+- Highest-risk failure mode: governance theater, where formal review exists in the schema but becomes a low-scrutiny rubber stamp and drift accumulates invisibly.
+- Narrowest next question proposed: define the receipt and review matrix by canonical field, evidence tier, and stricter guardrail-skill threshold.
+
+## Main-Thread Synthesis — Round 2 Addendum
+
+- Timestamp: 2026-04-04T05:07:00+00:00
+- Decision: freeze-plan
+- Confidence: high
+- Next action: publish a TYPE-A SKILL mechanism design draft and treat the field-level receipt and review matrix as the next narrow follow-up rather than a blocker to v1 publication.
+
+### Additional Convergence From Claude
+
+- Claude's successful retry does not reopen the architecture decision. It reinforces the same stable center already present across Codex, Copilot, and Gemini: a small framework-native core, explicit triggerability, evidence-ranked updates, and honest degradation for non-portable features.
+- The only meaningful tightening from Claude is that `governance` and `degradation` should be treated as fully normative fields alongside `entry_instructions`, not as optional metadata. That is consistent with the other round-2 feedback and should be folded into the TYPE-A draft.

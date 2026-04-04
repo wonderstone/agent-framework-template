@@ -31,6 +31,7 @@ description: >
 | `docs/FRAMEWORK_ARCHITECTURE.md` | Agent framework layer design |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step adoption guide |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
+| `docs/SKILL_MECHANISM_V1_DRAFT.md` | Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion surface for how repositories should expose diagnostics, lint, build, run, and debug tooling to agents |
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, progressive failure capture, runtime evidence ownership, and root-cause closeout |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion history and alternative viewpoints for AI-era traceability and recovery surfaces |
@@ -70,6 +71,7 @@ When resuming a multi-step task, recover context in this order:
 | `architecture\|design\|layers\|service boundary` | `docs/FRAMEWORK_ARCHITECTURE.md` |
 | `adoption\|setup\|onboard\|quick.start` | `docs/ADOPTION_GUIDE.md` |
 | `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
+| `skill\|skills\|skill design\|skill mechanism\|triggerability\|progressive disclosure\|guardrail skill` | `docs/SKILL_MECHANISM_V1_DRAFT.md` |
 | `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
 | `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |
 | `ai traceability\|traceability discussion\|recovery discussion\|incident discussion` | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` |

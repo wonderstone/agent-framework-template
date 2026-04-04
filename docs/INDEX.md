@@ -16,6 +16,7 @@
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanism |
 | `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples spanning multiple development-stage responsibilities |
 | `docs/COMPATIBILITY.md` | What is validated in this repository and what adopters still need to verify locally |
+| `docs/SKILL_MECHANISM_V1_DRAFT.md` | Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion surface for making language diagnostics, lint, build, run, and debug tooling first-class agent inputs |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion surface for making AI-era failure diagnosis, root-cause reconstruction, runtime evidence, and recovery state first-class framework inputs |
@@ -44,5 +45,5 @@
 
 ---
 
-*Last updated: 2026-04-04 — added the multi-model discussion loop runbook*
+*Last updated: 2026-04-04 — added the SKILL mechanism v1 design draft*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*
