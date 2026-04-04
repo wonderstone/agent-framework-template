@@ -149,6 +149,24 @@ def test_validate_repo_reports_missing_capability_asset(tmp_path: Path) -> None:
     assert ValidationIssue("missing-file", "scripts/closeout_truth_audit.py") in issues
 
 
+def test_validate_repo_reports_missing_skill_heading(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace("### Negative Triggers\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-heading",
+        "examples/skills/01_discussion_packet_workflow.md: ### Negative Triggers",
+    ) in issues
+
+
 def test_validate_repo_passes_for_bootstrapped_adopted_repo(tmp_path: Path) -> None:
     bootstrap_repo(
         target_dir=tmp_path / "adopted",
@@ -341,3 +359,26 @@ def test_collect_advisories_passes_for_bootstrapped_adopted_repo(tmp_path: Path)
     advisories = collect_advisories(tmp_path / "adopted")
 
     assert advisories == []
+
+
+def test_validate_repo_reports_invalid_adopted_skill_type(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    skill_path = tmp_path / "adopted" / "docs" / "skills" / "SKILL.md"
+    skill_path.parent.mkdir(parents=True, exist_ok=True)
+    skill_path.write_text(
+        """# Sample Skill\n\n- ID: sample-skill\n- Type: mystery\n- Owner: adopted-team\n- Review Threshold: single-reviewer\n\n## Purpose\n\nA sample skill.\n\n## Triggers\n\n### Positive Triggers\n\n- Use when the sample condition is present.\n\n### Negative Triggers\n\n- Do not use when the sample non-trigger is present.\n\n### Expected Effect\n\n- The agent changes behavior in a known way.\n\n## Entry Instructions\n\n- Follow the sample steps.\n\n## References\n\n| Name | Path | Required at invocation | Purpose |\n|---|---|---|---|\n| sample | docs/sample.md | no | Example only |\n\n## Governance\n\n### Allowed Evidence\n\n- Human-reviewed receipts.\n\n### Reviewer Gate\n\n- Maintainer review required.\n\n### Forbidden Direct Update Inputs\n\n- Raw transcripts.\n\n## Degradation\n\n- Fall back to manual execution.\n""",
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(tmp_path / "adopted")
+
+    assert ValidationIssue(
+        "invalid-skill-type",
+        "docs/skills/SKILL.md: unsupported skill type 'mystery'",
+    ) in issues

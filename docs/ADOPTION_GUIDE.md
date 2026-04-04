@@ -58,6 +58,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
   COMPATIBILITY.md                 ← verified surfaces and known limits
+  SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design draft for the framework-native SKILL contract
   DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design draft for the Developer Toolchain surface
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and alternative viewpoints for that surface
   AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history for AI-era traceability, diagnosis, runtime evidence, and recovery mechanisms
@@ -75,6 +76,7 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill.template.md                ← framework-native SKILL contract template
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
   project-context.template.md      ← blank project adapter to fill in
   root_cause_note.template.md      ← closeout note distinguishing cause-suspected from cause-established recovery
@@ -86,6 +88,8 @@ templates/
   reviewer_role_profile.template.md ← role profile template for external or internal reviewers
 
 examples/
+  skills/
+    *.md                           ← starter SKILL examples to adapt when your repository formalizes skills
   reviewer_roles/
     *.md                           ← 10 ready-to-adapt starter role profiles
 
@@ -183,6 +187,10 @@ If your project will define multiple reviewer or agent roles with different judg
 When doing so, define the role by judgment boundary first, not by tool name. For example, prefer `runtime correctness reviewer` over `Codex reviewer`, and `maintainability reviewer` over `Claude reviewer`. A CLI, subagent, or custom agent can then be listed as one possible executor of that role.
 
 If you want concrete starting points instead of a blank role profile, keep `docs/ROLE_STRATEGY_EXAMPLES.md` and adapt the examples that fit your repository.
+
+If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md` and `templates/skill.template.md` together. The draft defines the canonical framework-native contract, while the template gives you one concrete file shape to fill in.
+
+If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers one `workflow` skill and one `guardrail` skill.
 
 If you want a ready-made starter pack rather than starting from scratch, keep `examples/reviewer_roles/`. The template ships 10 formal role profiles split into:
 

@@ -14,6 +14,7 @@ The following are exercised directly in this template repository:
 | Template validator | Unit tests plus CI execution |
 | Active docs portability and stale-assertion audit | Standalone audit script plus validator integration for live docs and instruction surfaces |
 | Preference drift audit | Standalone audit script plus validator integration for progress/closeout contract drift |
+| SKILL contract template and starter examples | Structured validator checks canonical sections and starter asset presence |
 | Git audit generator | Unit tests |
 | Core docs and file references | Structured validator |
 

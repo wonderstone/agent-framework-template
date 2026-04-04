@@ -37,6 +37,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design for the framework-native SKILL contract
   TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design for traceability and recovery layout
   AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history behind that design
   DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design for the Developer Toolchain contract
@@ -57,6 +58,7 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for design debates
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill.template.md                ← framework-native SKILL contract template
   failure_packet.template.md       ← progressive runtime failure packet
   project-context.template.md      ← blank project adapter
   root_cause_note.template.md      ← closeout note for cause-suspected vs cause-established recovery
@@ -69,6 +71,9 @@ templates/
   runtime_surface_registry.template.py ← registry skeleton for runtime surface guard definitions
 
 examples/
+  skills/
+    01_discussion_packet_workflow.md ← workflow-style starter skill example
+    02_no_placeholder_runtime_guardrail.md ← guardrail-style starter skill example
   full_stack_project/              ← richer reference repo for multi-runtime Developer Toolchain shape
   reviewer_roles/
     01_goal_acceptance_owner.md    ← first-batch strategy role
@@ -210,6 +215,8 @@ Progress and closeout preference summary:
 If a repository wants roadmap/design-first execution to be the default for non-trivial work, it can also ship [`docs/DOC_FIRST_EXECUTION_GUIDELINES.md`](docs/DOC_FIRST_EXECUTION_GUIDELINES.md) from [`templates/doc_first_execution_guidelines.template.md`](templates/doc_first_execution_guidelines.template.md) and route doc-first triggers to it through the project adapter.
 
 If a repository wants open design questions to go through a durable multi-model discussion before coding, it can also ship [`docs/runbooks/multi-model-discussion-loop.md`](docs/runbooks/multi-model-discussion-loop.md), keep [`templates/discussion_packet.template.md`](templates/discussion_packet.template.md), and use [`scripts/discussion_pipeline.py`](scripts/discussion_pipeline.py) to collect executor feedback into one append-only Markdown packet.
+
+If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
 
 ---
 

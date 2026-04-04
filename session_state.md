@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Close out the Developer Toolchain hardening follow-up: manifest-backed required-core enforcement, richer multi-runtime example coverage, and final git closeout.
+Deliver the first SKILL implementation wave: canonical template, first-pass validator contract, starter examples, and the minimal discovery surfaces that make the mechanism usable instead of discussion-only.
 
 ---
 
 ## Working Hypothesis
 
-The remaining gap after the first rollout is not more discussion but stronger packaging: bootstrapped adopters need a manifest-declared required-core contract, and multi-runtime repositories need a concrete reference example that the validator and bootstrap path both understand.
+The SKILL mechanism has enough design convergence to stop discussing broad direction and start shipping the smallest truthful implementation layer: one canonical template, mechanical validator checks, and a tiny starter example set.
 
 **Confidence**: High
 
-**Evidence**: The design draft is published, reminder-level advisories already parse the section structurally, the bootstrap path already renders starter values, and the remaining work is clearly bounded to manifest enforcement plus richer example coverage.
+**Evidence**: The TYPE-A SKILL draft is published, four CLI rounds converged on a small canonical contract, and the missing value is now operational scaffolding rather than more architecture debate.
 
 **Contradictions**: None.
 
@@ -25,7 +25,7 @@ The remaining gap after the first rollout is not more discussion but stronger pa
 
 ## Plan
 
-**Approach**: Ship the stronger contract only where the bootstrap manifest explicitly declares it, then prove the richer multi-runtime path with a committed full-stack reference example.
+**Approach**: Ship the smallest useful SKILL implementation slice now: canonical template, validator enforcement of the mechanical contract, and two starter examples that prove the contract is not empty.
 
 **Steps**:
 1. completed
@@ -34,7 +34,7 @@ The remaining gap after the first rollout is not more discussion but stronger pa
 4. completed
 5. completed
 
-**Why this approach**: It upgrades new adopters to a real contract without retroactively breaking old repos, and it proves the multi-runtime model with a committed example instead of leaving it theoretical.
+**Why this approach**: It turns the SKILL design draft into a usable framework surface quickly, without blocking on a narrower follow-up such as the field-level receipt matrix.
 
 ---
 
@@ -48,6 +48,10 @@ The remaining gap after the first rollout is not more discussion but stronger pa
 
 ## Recent Receipts
 
+- A corrected non-`--bare` Claude CLI run succeeded and its round-2 feedback was appended to the SKILL discussion packet.
+- A new TYPE-A design draft now freezes the framework-native SKILL contract, evidence ranking, validator boundary, and honest degradation model.
+- First implementation wave completed: `templates/skill.template.md`, two starter skill examples, validator support for structured skill files, bootstrap exposure for the draft and template, and updated adoption/discovery docs.
+- Validation for the SKILL implementation wave passed: `python3 scripts/validate_template.py`, `python3 -m pytest tests/ -q` with `52 passed`, and the standard bootstrap dry run all succeeded.
 - The current discussion record and appended feedback were re-read and assessed as sufficient to freeze a conservative v1 design.
 - An independent Architect review recommended publishing now with a progressive schema, actionable verification states, scope-aware stop rules, and a repro-path requirement limited to live runtime repositories.
 - A new TYPE-A design draft was added for the Developer Toolchain concept and wired into the docs index and project adapter.

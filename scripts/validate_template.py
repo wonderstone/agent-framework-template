@@ -51,10 +51,13 @@ REQUIRED_FILES = (
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
+    "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/multi-model-discussion-loop.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
+    "examples/skills/01_discussion_packet_workflow.md",
+    "examples/skills/02_no_placeholder_runtime_guardrail.md",
     "examples/demo_project/README.md",
     "examples/demo_project/.github/instructions/project-context.instructions.md",
     "examples/demo_project/docs/ARCHITECTURE.md",
@@ -82,6 +85,7 @@ REQUIRED_FILES = (
     "templates/roadmap.template.md",
     "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
+    "templates/skill.template.md",
     "tests/test_active_docs_audit.py",
     "tests/test_closeout_truth_audit.py",
     "tests/test_bootstrap_adoption.py",
@@ -128,6 +132,12 @@ REQUIRED_SECTIONS = {
         "## Integration Notes",
         "## Known Limits",
     ),
+    "docs/SKILL_MECHANISM_V1_DRAFT.md": (
+        "## Core Design Decision",
+        "## Canonical V1 Contract",
+        "## Validator Contract",
+        "## Portability And Honest Degradation",
+    ),
     "docs/PROGRESS_UPDATE_TEMPLATE.md": (
         "## Recommended Template",
         "## Rules For Good Use",
@@ -147,6 +157,7 @@ README_REQUIRED_REFERENCES = (
     "docs/COMPATIBILITY.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+    "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
@@ -155,6 +166,8 @@ README_REQUIRED_REFERENCES = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/skill.template.md",
+    "examples/skills/",
     "scripts/closeout_truth_audit.py",
     "scripts/discussion_pipeline.py",
     "scripts/runtime_surface_guardrails.py",
@@ -177,6 +190,7 @@ INDEX_REQUIRED_ROWS = (
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/COMPATIBILITY.md",
+    "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
@@ -195,6 +209,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+    "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
@@ -289,6 +304,29 @@ DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT = {
     "allow_surface_qualifiers": True,
 }
 
+SKILL_ALLOWED_TYPES = {"knowledge", "workflow", "verification", "guardrail"}
+SKILL_REQUIRED_HEADINGS = (
+    "## Purpose",
+    "## Triggers",
+    "### Positive Triggers",
+    "### Negative Triggers",
+    "### Expected Effect",
+    "## Entry Instructions",
+    "## References",
+    "## Governance",
+    "### Allowed Evidence",
+    "### Reviewer Gate",
+    "### Forbidden Direct Update Inputs",
+    "## Degradation",
+)
+SKILL_REQUIRED_METADATA_LABELS = (
+    "ID",
+    "Type",
+    "Owner",
+    "Review Threshold",
+)
+SKILL_RUNTIME_IGNORE_PARTS = {".git", ".venv", "node_modules", "tmp", "__pycache__"}
+
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -340,6 +378,18 @@ def _extract_project_type(text: str) -> str | None:
     if match is None:
         return None
     return match.group(1).strip()
+
+
+def _extract_markdown_subsection(text: str, heading: str) -> str | None:
+    heading_match = re.search(rf"^### {re.escape(heading)}\s*$", text, flags=re.MULTILINE)
+    if heading_match is None:
+        return None
+
+    start = heading_match.end()
+    next_heading = re.search(r"^(## |### )", text[start:], flags=re.MULTILINE)
+    if next_heading is None:
+        return text[start:]
+    return text[start : start + next_heading.start()]
 
 
 def _clean_table_cell(value: str) -> str:
@@ -619,6 +669,87 @@ def _validate_receipt_closeout_references(root: Path) -> list[ValidationIssue]:
             issues.append(
                 ValidationIssue("receipt-closeout-rule-mismatch", relative_path)
             )
+
+    return issues
+
+
+def _iter_skill_contract_paths(root: Path) -> tuple[Path, ...]:
+    paths: list[Path] = []
+    explicit_paths = (
+        root / "templates" / "skill.template.md",
+        root / "examples" / "skills" / "01_discussion_packet_workflow.md",
+        root / "examples" / "skills" / "02_no_placeholder_runtime_guardrail.md",
+    )
+    for path in explicit_paths:
+        if path.is_file():
+            paths.append(path)
+
+    for path in root.rglob("SKILL.md"):
+        if any(part in SKILL_RUNTIME_IGNORE_PARTS for part in path.parts):
+            continue
+        if path not in paths:
+            paths.append(path)
+
+    return tuple(paths)
+
+
+def _skill_path_label(root: Path, path: Path) -> str:
+    return path.relative_to(root).as_posix()
+
+
+def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+
+    for path in _iter_skill_contract_paths(root):
+        relative = _skill_path_label(root, path)
+        text = _read(path)
+        is_template = relative == "templates/skill.template.md"
+
+        for heading in SKILL_REQUIRED_HEADINGS:
+            if heading not in text:
+                issues.append(ValidationIssue("missing-skill-heading", f"{relative}: {heading}"))
+
+        for label in SKILL_REQUIRED_METADATA_LABELS:
+            if re.search(rf"^- {re.escape(label)}:\s*(.+)$", text, flags=re.MULTILINE) is None:
+                issues.append(ValidationIssue("missing-skill-metadata", f"{relative}: {label}"))
+
+        if "| Name | Path | Required at invocation | Purpose |" not in text:
+            issues.append(
+                ValidationIssue(
+                    "missing-skill-reference-table",
+                    f"{relative}: references table must use the canonical columns Name / Path / Required at invocation / Purpose",
+                )
+            )
+
+        for subsection in ("Positive Triggers", "Negative Triggers", "Expected Effect"):
+            section = _extract_markdown_subsection(text, subsection)
+            if section is not None and "- " not in section:
+                issues.append(
+                    ValidationIssue(
+                        "empty-skill-trigger-section",
+                        f"{relative}: subsection '{subsection}' needs at least one bullet",
+                    )
+                )
+
+        if not is_template:
+            type_match = re.search(r"^- Type:\s*(.+)$", text, flags=re.MULTILINE)
+            if type_match is not None:
+                skill_type = type_match.group(1).strip().strip("`")
+                if skill_type not in SKILL_ALLOWED_TYPES:
+                    issues.append(
+                        ValidationIssue(
+                            "invalid-skill-type",
+                            f"{relative}: unsupported skill type '{skill_type}'",
+                        )
+                    )
+
+            if "[" in text or "{{" in text:
+                issues.append(
+                    ValidationIssue(
+                        "skill-placeholder-leftover",
+                        f"{relative}: replace placeholder text before treating this as a real skill surface",
+                    )
+                )
 
     return issues
 
@@ -913,6 +1044,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
             )
         issues.extend(_validate_preference_drift(root))
         issues.extend(_validate_active_docs(root))
+        issues.extend(_validate_skill_contract_files(root))
         return issues
 
     checks = (
@@ -931,6 +1063,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_preference_drift,
         _validate_active_docs,
         _validate_receipt_closeout_references,
+        _validate_skill_contract_files,
     )
     issues: list[ValidationIssue] = []
     for check in checks:

@@ -24,6 +24,7 @@ description: >
 | Doc | Purpose |
 |---|---|
 | `README.md` | Project entry point |
+| `docs/SKILL_MECHANISM_V1_DRAFT.md` | [Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation — keep if useful] |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | [Formal v1 design draft for the agent-facing Developer Toolchain surface — keep if useful] |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | [Discussion history and alternative viewpoints for Developer Toolchain — keep if useful] |
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | [Formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout — keep if useful] |
@@ -36,6 +37,7 @@ description: >
 | `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
 | `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
 | `templates/discussion_packet.template.md` | [Append-only packet template for multi-model discussion loops — keep if useful] |
+| `templates/skill.template.md` | [Framework-native SKILL contract template — keep if your repository wants formal skill surfaces] |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | [Guard-registry pattern for active user-facing runtime paths — create if useful] |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | [How your team records and recovers partial work — create if useful] |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
@@ -59,6 +61,7 @@ description: >
 |---|---|
 | `network\|port\|proxy\|connectivity` | `docs/NETWORK_GUIDE.md` |
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
+| `skill\|skills\|skill design\|skill mechanism\|triggerability\|progressive disclosure\|guardrail skill` | `docs/SKILL_MECHANISM_V1_DRAFT.md` |
 | `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
 | `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
 | `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |

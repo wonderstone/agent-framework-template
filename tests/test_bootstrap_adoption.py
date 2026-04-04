@@ -54,10 +54,12 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
+    assert (tmp_path / "docs" / "SKILL_MECHANISM_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "runbooks" / "multi-model-discussion-loop.md").exists()
     assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
     assert (tmp_path / "templates" / "discussion_packet.template.md").exists()
     assert (tmp_path / "templates" / "execution_contract.template.md").exists()
+    assert (tmp_path / "templates" / "skill.template.md").exists()
     assert (tmp_path / "scripts" / "discussion_pipeline.py").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
 
@@ -102,6 +104,8 @@ def test_bootstrap_full_copies_examples_and_ci(tmp_path: Path) -> None:
 
     assert (tmp_path / ".github" / "workflows" / "ci.yml").exists()
     assert (tmp_path / "examples" / "reviewer_roles" / "10_docs_spec_drift_reviewer.md").exists()
+    assert (tmp_path / "examples" / "skills" / "01_discussion_packet_workflow.md").exists()
+    assert (tmp_path / "examples" / "skills" / "02_no_placeholder_runtime_guardrail.md").exists()
     assert (tmp_path / "examples" / "full_stack_project" / "README.md").exists()
     assert (tmp_path / "scripts" / "bootstrap_adoption.py").exists()
     assert (tmp_path / "templates" / "reviewer_role_profile.template.md").exists()
