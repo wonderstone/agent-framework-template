@@ -55,6 +55,17 @@ Prevent agents from shipping placeholder runtime paths, fake smoke claims, or mi
 - Frequency-only heuristics that weaken the guardrail because a phrase appears often.
 - Adapter-specific behavior redefining what counts as live proof.
 
+## Receipt And Review Matrix
+
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
+|---|---|---|---|
+| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |
+| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required |
+| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |
+
 ## Degradation
 
 - If a runtime cannot be exercised in the current environment, the skill falls back to blocking the claim, recording the blocker, and preserving explicit uncertainty in the user-facing truth source.

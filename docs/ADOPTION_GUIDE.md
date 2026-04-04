@@ -192,6 +192,8 @@ If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DR
 
 If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers one `workflow` skill and one `guardrail` skill.
 
+When you do so, keep the field-level receipt and review matrix intact. It is the mechanism that turns broad "humans approve" guidance into an actual per-field update policy.
+
 If you want a ready-made starter pack rather than starting from scratch, keep `examples/reviewer_roles/`. The template ships 10 formal role profiles split into:
 
 1. first batch: goal/acceptance, plan/checkpoint, runtime correctness, boundary/contract, git closeout, maintainability

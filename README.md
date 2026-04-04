@@ -218,6 +218,8 @@ If a repository wants open design questions to go through a durable multi-model 
 
 If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
 
+The current SKILL contract now also includes a field-level receipt and review matrix, so repositories can say which evidence tiers may propose changes to `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, and `degradation`, and how `guardrail` skills become stricter.
+
 ---
 
 ## Example Workflow

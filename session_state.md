@@ -7,17 +7,17 @@
 
 ## Current Goal
 
-Deliver the first SKILL implementation wave: canonical template, first-pass validator contract, starter examples, and the minimal discovery surfaces that make the mechanism usable instead of discussion-only.
+Close out the SKILL mechanism implementation follow-up: field-level receipt and review matrix, stronger validator enforcement, and final git closeout.
 
 ---
 
 ## Working Hypothesis
 
-The SKILL mechanism has enough design convergence to stop discussing broad direction and start shipping the smallest truthful implementation layer: one canonical template, mechanical validator checks, and a tiny starter example set.
+The remaining high-value gap is no longer broad architecture or starter assets; it is making the field-level receipt and review matrix real in the design, template, examples, and validator so the SKILL mechanism can be treated as operationally complete.
 
 **Confidence**: High
 
-**Evidence**: The TYPE-A SKILL draft is published, four CLI rounds converged on a small canonical contract, and the missing value is now operational scaffolding rather than more architecture debate.
+**Evidence**: The TYPE-A SKILL draft, canonical template, starter examples, and first-pass validator already exist; the only explicit unresolved design boundary was the field-level receipt and review matrix plus a stronger truthfulness check for references.
 
 **Contradictions**: None.
 
@@ -25,7 +25,7 @@ The SKILL mechanism has enough design convergence to stop discussing broad direc
 
 ## Plan
 
-**Approach**: Ship the smallest useful SKILL implementation slice now: canonical template, validator enforcement of the mechanical contract, and two starter examples that prove the contract is not empty.
+**Approach**: Freeze the field-level receipt and review matrix into the TYPE-A draft and the template surface, then strengthen validator enforcement so referenced paths and matrix completeness become mechanically checked.
 
 **Steps**:
 1. completed
@@ -34,7 +34,7 @@ The SKILL mechanism has enough design convergence to stop discussing broad direc
 4. completed
 5. completed
 
-**Why this approach**: It turns the SKILL design draft into a usable framework surface quickly, without blocking on a narrower follow-up such as the field-level receipt matrix.
+**Why this approach**: It resolves the only explicitly deferred SKILL design boundary while keeping the second implementation wave bounded to truthfulness and governance enforcement rather than opening a broader packaging effort.
 
 ---
 
@@ -48,6 +48,9 @@ The SKILL mechanism has enough design convergence to stop discussing broad direc
 
 ## Recent Receipts
 
+- Second SKILL implementation wave completed: the field-level receipt and review matrix is now frozen in the TYPE-A draft, canonical template, and starter examples.
+- The validator now hard-fails missing review-matrix rows, invalid matrix thresholds in real skills, and nonexistent reference paths in concrete skill files.
+- Second-wave validation passed: `python3 scripts/validate_template.py`, `python3 -m pytest tests/ -q` with `54 passed`, and a full-profile bootstrap dry run all succeeded.
 - A corrected non-`--bare` Claude CLI run succeeded and its round-2 feedback was appended to the SKILL discussion packet.
 - A new TYPE-A design draft now freezes the framework-native SKILL contract, evidence ranking, validator boundary, and honest degradation model.
 - First implementation wave completed: `templates/skill.template.md`, two starter skill examples, validator support for structured skill files, bootstrap exposure for the draft and template, and updated adoption/discovery docs.

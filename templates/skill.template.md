@@ -50,6 +50,17 @@
 
 - [Raw transcripts, model summaries, frequency-only heuristics, or other blocked sources.]
 
+## Receipt And Review Matrix
+
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
+|---|---|---|---|
+| `purpose` | [for example: 1-2 only] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] |
+| `triggers` | [for example: 1-3] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] |
+| `entry_instructions` | [for example: 1-3] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] |
+| `references` | [for example: 1-4] | [single-reviewer / dual-reviewer / owner-only] | [guardrail-specific reference rule] |
+| `governance` | [for example: 1-2 only] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] |
+| `degradation` | [for example: 1-3] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] |
+
 ## Degradation
 
 - If [hook / tool gating / subagent / context isolation] is unavailable, [fallback or explicit refusal].

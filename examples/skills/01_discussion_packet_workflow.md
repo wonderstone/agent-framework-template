@@ -54,6 +54,17 @@ Route open design questions into one durable packet before execution begins so l
 - Raw chat transcripts copied into canonical instructions.
 - Tool-specific prompting quirks promoted into the core workflow without review.
 
+## Receipt And Review Matrix
+
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
+|---|---|---|---|
+| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |
+| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required |
+| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |
+
 ## Degradation
 
 - If external CLIs are unavailable, fall back to repo-local agents, internal subagents, or a main-thread synthesis pass using the same packet.

@@ -186,6 +186,20 @@ The default v1 evidence order is:
 | 4 | Auto-collected telemetry and agent-proposed observations | Low |
 | 5 | Raw transcripts, transcript summaries, and frequency-only heuristics | Lowest |
 
+### Receipt Anchor Rule
+
+Any proposal to change a canonical skill field must point to at least one receipt-bearing artifact.
+
+Valid first-pass receipt anchors include:
+
+1. root-cause notes tied to a reproducible failure
+2. closeout audits tied to a concrete batch of work
+3. structured invocation receipts with explicit provenance
+
+The receipt does not need to approve the change by itself.
+
+It does need to prove that the proposal came from a real observed condition rather than free-form preference drift.
+
 ### Default Review Rule
 
 Evidence may propose.
@@ -220,6 +234,28 @@ These must not directly update the canonical skill:
 4. adapter-layer drift flowing back into the core contract without explicit review
 
 These inputs may inform a reviewer, but they must not become self-executing rewrite sources.
+
+## Field-Level Receipt And Review Matrix
+
+The canonical v1 follow-up question is now frozen into the design itself.
+
+Each canonical field uses the following default matrix:
+
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
+|---|---|---|---|
+| `purpose` | 1-2 only | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `triggers` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `entry_instructions` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
+| `references` | 1-4 | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |
+| `governance` | 1-2 only | `dual-reviewer` | `dual-reviewer`; owner review required |
+| `degradation` | 1-3 | `single-reviewer` | `dual-reviewer`; owner review required |
+
+Matrix rule:
+
+1. a lower-trust evidence tier may add a candidate note, but it may not directly justify a canonical field change beyond the row's allowed tier range
+2. `references` is the most flexible field because it often grows through examples or support files, but even there the reference must remain truthful and reviewable
+3. `governance` and `degradation` are not metadata-only fields; they use stricter review because they change how the skill can evolve and how it behaves under capability gaps
+4. every `guardrail` skill applies its override column even when a repository uses a looser default elsewhere
 
 ---
 
@@ -303,9 +339,11 @@ The next likely implementation steps are:
 3. one or more repository-local starter examples covering at least two skill types
 4. a later follow-up on the field-level receipt and review matrix
 
+That receipt and review matrix is now defined at the design level, but downstream templates and validators still need to consume it consistently.
+
 Open follow-up boundary:
 
-the field-level receipt matrix is intentionally left as a narrower next question, not a blocker to publishing this draft.
+the remaining implementation work is no longer deciding the matrix. It is making sure future templates, validators, and adapter surfaces enforce it consistently.
 
 ---
 

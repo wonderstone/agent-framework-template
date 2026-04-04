@@ -167,6 +167,50 @@ def test_validate_repo_reports_missing_skill_heading(tmp_path: Path) -> None:
     ) in issues
 
 
+def test_validate_repo_reports_missing_skill_review_matrix_row(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace(
+            "| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |\n",
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-review-matrix-row",
+        "examples/skills/01_discussion_packet_workflow.md: receipt and review matrix is missing row 'degradation'",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_skill_reference_path(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "02_no_placeholder_runtime_guardrail.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace(
+            "docs/RUNTIME_SURFACE_PROTECTION.md",
+            "docs/MISSING_RUNTIME_SURFACE_PROTECTION.md",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-reference-path",
+        "examples/skills/02_no_placeholder_runtime_guardrail.md: reference path 'docs/MISSING_RUNTIME_SURFACE_PROTECTION.md' does not exist",
+    ) in issues
+
+
 def test_validate_repo_passes_for_bootstrapped_adopted_repo(tmp_path: Path) -> None:
     bootstrap_repo(
         target_dir=tmp_path / "adopted",
@@ -372,7 +416,7 @@ def test_validate_repo_reports_invalid_adopted_skill_type(tmp_path: Path) -> Non
     skill_path = tmp_path / "adopted" / "docs" / "skills" / "SKILL.md"
     skill_path.parent.mkdir(parents=True, exist_ok=True)
     skill_path.write_text(
-        """# Sample Skill\n\n- ID: sample-skill\n- Type: mystery\n- Owner: adopted-team\n- Review Threshold: single-reviewer\n\n## Purpose\n\nA sample skill.\n\n## Triggers\n\n### Positive Triggers\n\n- Use when the sample condition is present.\n\n### Negative Triggers\n\n- Do not use when the sample non-trigger is present.\n\n### Expected Effect\n\n- The agent changes behavior in a known way.\n\n## Entry Instructions\n\n- Follow the sample steps.\n\n## References\n\n| Name | Path | Required at invocation | Purpose |\n|---|---|---|---|\n| sample | docs/sample.md | no | Example only |\n\n## Governance\n\n### Allowed Evidence\n\n- Human-reviewed receipts.\n\n### Reviewer Gate\n\n- Maintainer review required.\n\n### Forbidden Direct Update Inputs\n\n- Raw transcripts.\n\n## Degradation\n\n- Fall back to manual execution.\n""",
+        """# Sample Skill\n\n- ID: sample-skill\n- Type: mystery\n- Owner: adopted-team\n- Review Threshold: single-reviewer\n\n## Purpose\n\nA sample skill.\n\n## Triggers\n\n### Positive Triggers\n\n- Use when the sample condition is present.\n\n### Negative Triggers\n\n- Do not use when the sample non-trigger is present.\n\n### Expected Effect\n\n- The agent changes behavior in a known way.\n\n## Entry Instructions\n\n- Follow the sample steps.\n\n## References\n\n| Name | Path | Required at invocation | Purpose |\n|---|---|---|---|\n| sample | README.md | no | Example only |\n\n## Governance\n\n### Allowed Evidence\n\n- Human-reviewed receipts.\n\n### Reviewer Gate\n\n- Maintainer review required.\n\n### Forbidden Direct Update Inputs\n\n- Raw transcripts.\n\n## Receipt And Review Matrix\n\n| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |\n|---|---|---|---|\n| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |\n| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required |\n| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |\n\n## Degradation\n\n- Fall back to manual execution.\n""",
         encoding="utf-8",
     )
 

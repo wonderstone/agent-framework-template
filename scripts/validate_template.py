@@ -135,6 +135,7 @@ REQUIRED_SECTIONS = {
     "docs/SKILL_MECHANISM_V1_DRAFT.md": (
         "## Core Design Decision",
         "## Canonical V1 Contract",
+        "## Field-Level Receipt And Review Matrix",
         "## Validator Contract",
         "## Portability And Honest Degradation",
     ),
@@ -317,6 +318,7 @@ SKILL_REQUIRED_HEADINGS = (
     "### Allowed Evidence",
     "### Reviewer Gate",
     "### Forbidden Direct Update Inputs",
+    "## Receipt And Review Matrix",
     "## Degradation",
 )
 SKILL_REQUIRED_METADATA_LABELS = (
@@ -326,6 +328,15 @@ SKILL_REQUIRED_METADATA_LABELS = (
     "Review Threshold",
 )
 SKILL_RUNTIME_IGNORE_PARTS = {".git", ".venv", "node_modules", "tmp", "__pycache__"}
+SKILL_ALLOWED_REVIEW_THRESHOLDS = {"single-reviewer", "dual-reviewer", "owner-only"}
+SKILL_REQUIRED_MATRIX_FIELDS = (
+    "purpose",
+    "triggers",
+    "entry_instructions",
+    "references",
+    "governance",
+    "degradation",
+)
 
 
 def _read(path: Path) -> str:
@@ -390,6 +401,25 @@ def _extract_markdown_subsection(text: str, heading: str) -> str | None:
     if next_heading is None:
         return text[start:]
     return text[start : start + next_heading.start()]
+
+
+def _extract_first_table_after_heading(text: str, heading: str) -> list[list[str]]:
+    section = _extract_markdown_section(text, heading)
+    if section is None:
+        return []
+
+    rows: list[list[str]] = []
+    collecting = False
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("|"):
+            collecting = True
+            parts = [part.strip() for part in stripped.strip("|").split("|")]
+            rows.append(parts)
+            continue
+        if collecting:
+            break
+    return rows
 
 
 def _clean_table_cell(value: str) -> str:
@@ -721,6 +751,56 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
                 )
             )
 
+        matrix_rows = _extract_first_table_after_heading(text, "Receipt And Review Matrix")
+        if len(matrix_rows) < 3:
+            issues.append(
+                ValidationIssue(
+                    "missing-skill-review-matrix",
+                    f"{relative}: receipt and review matrix must use a structured table",
+                )
+            )
+        else:
+            header = [cell.strip() for cell in matrix_rows[0]]
+            expected_header = [
+                "Field",
+                "Proposal evidence tiers",
+                "Minimum reviewer threshold",
+                "Guardrail override",
+            ]
+            if header != expected_header:
+                issues.append(
+                    ValidationIssue(
+                        "invalid-skill-review-matrix-header",
+                        f"{relative}: receipt and review matrix must use the canonical columns Field / Proposal evidence tiers / Minimum reviewer threshold / Guardrail override",
+                    )
+                )
+
+            matrix_by_field: dict[str, list[str]] = {}
+            for row in matrix_rows[2:]:
+                if len(row) != 4:
+                    continue
+                field = row[0].strip().strip("`")
+                matrix_by_field[field] = row
+
+            for field in SKILL_REQUIRED_MATRIX_FIELDS:
+                if field not in matrix_by_field:
+                    issues.append(
+                        ValidationIssue(
+                            "missing-skill-review-matrix-row",
+                            f"{relative}: receipt and review matrix is missing row '{field}'",
+                        )
+                    )
+
+            for field, row in matrix_by_field.items():
+                threshold = row[2].strip().strip("`")
+                if threshold and threshold not in SKILL_ALLOWED_REVIEW_THRESHOLDS and not is_template:
+                    issues.append(
+                        ValidationIssue(
+                            "invalid-skill-review-threshold",
+                            f"{relative}: row '{field}' uses unsupported reviewer threshold '{threshold}'",
+                        )
+                    )
+
         for subsection in ("Positive Triggers", "Negative Triggers", "Expected Effect"):
             section = _extract_markdown_subsection(text, subsection)
             if section is not None and "- " not in section:
@@ -750,6 +830,23 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
                         f"{relative}: replace placeholder text before treating this as a real skill surface",
                     )
                 )
+
+            reference_rows = _extract_first_table_after_heading(text, "References")
+            if len(reference_rows) >= 3:
+                for row in reference_rows[2:]:
+                    if len(row) != 4:
+                        continue
+                    reference_path = row[1].strip().strip("`")
+                    if not reference_path:
+                        continue
+                    target = (root / reference_path).resolve()
+                    if not target.exists():
+                        issues.append(
+                            ValidationIssue(
+                                "missing-skill-reference-path",
+                                f"{relative}: reference path '{reference_path}' does not exist",
+                            )
+                        )
 
     return issues
 
