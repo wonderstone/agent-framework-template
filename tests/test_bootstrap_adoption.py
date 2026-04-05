@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +18,7 @@ SPEC.loader.exec_module(MODULE)
 
 bootstrap_repo = MODULE.bootstrap_repo
 detect_project_type = MODULE.detect_project_type
+main = MODULE.main
 
 
 def test_bootstrap_minimal_creates_core_files(tmp_path: Path) -> None:
@@ -168,3 +171,54 @@ def test_detect_project_type_prefers_backend_for_pyproject(tmp_path: Path) -> No
     (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\n", encoding="utf-8")
 
     assert detect_project_type(tmp_path) == "backend-api"
+
+
+def test_main_prints_skill_accumulation_guidance_for_standard_profile(tmp_path: Path, monkeypatch) -> None:
+    output = StringIO()
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "bootstrap_adoption.py",
+            str(tmp_path),
+            "--project-name",
+            "Std Demo",
+            "--profile",
+            "standard",
+            "--dry-run",
+        ],
+    )
+
+    with redirect_stdout(output):
+        exit_code = main()
+
+    rendered = output.getvalue()
+    assert exit_code == 0
+    assert "initialize at least one repository-specific skill before broad rollout" in rendered
+    assert "Do not promote raw transcript excerpts straight into canonical skills" in rendered
+
+
+def test_main_tells_minimal_profile_users_to_add_standard_for_skill_governance(
+    tmp_path: Path, monkeypatch
+) -> None:
+    output = StringIO()
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "bootstrap_adoption.py",
+            str(tmp_path),
+            "--project-name",
+            "Min Demo",
+            "--profile",
+            "minimal",
+            "--dry-run",
+        ],
+    )
+
+    with redirect_stdout(output):
+        exit_code = main()
+
+    rendered = output.getvalue()
+    assert exit_code == 0
+    assert "add the standard profile before rollout so the SKILL and harvest-governance surfaces ship together" in rendered

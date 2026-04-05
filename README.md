@@ -129,6 +129,7 @@ Goal:
 - use profile <minimal|standard|full>
 - use project type <backend-api|web-frontend|cli-tool|library|full-stack>
 - add optional capabilities only if requested: <closeout-audit runtime-guards git-hooks>
+- if long-term skill accumulation matters in this repo, keep the SKILL and harvest-governance surfaces rather than dropping them during setup
 
 Required steps:
 1. Run the template bootstrap script from <TEMPLATE_REPO_PATH> targeting <TARGET_REPO_PATH>.
@@ -137,20 +138,36 @@ Required steps:
    - project directory map, critical topic triggers, build/test commands, and protected paths
    - Developer Toolchain section (diagnostics, run, health, repro, build, verify) — the validator
      hard-fails if required-core fields are missing or malformed
-4. Leave unrelated application code untouched.
-5. Run validation from the target repo:
+4. If this repository should improve with repeated use, keep these surfaces together:
+   - `docs/SKILL_MECHANISM_V1_DRAFT.md`
+   - `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`
+   - `templates/skill.template.md`
+   - `templates/skill_candidate_packet.template.md`
+   - `templates/skill_promotion_receipt.template.md`
+   - starter examples under `examples/skills/`
+5. If you keep the SKILL path, adapt at least one initial repository-specific skill for a repeated pain point.
+   Prefer one workflow skill or one guardrail skill first rather than a large skill catalog.
+6. Preserve the governance boundary:
+   - do not convert raw transcripts directly into canonical SKILL edits
+   - harvest reusable observations into candidate packets first
+   - use promotion receipts for canonical approved mutations
+7. Leave unrelated application code untouched.
+8. Run validation from the target repo:
   - `python3 scripts/validate_template.py`
   - `python3 scripts/active_docs_audit.py` — checks for nonportable paths and stale framework assertions in shipped docs
   - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
-6. Report:
+9. Report:
   - what files were added or changed
   - what placeholders still need manual project-specific values
   - what validation was run and whether it passed
+  - whether the repo kept the SKILL and harvest surfaces, and if so which first skill was initialized
+  - which surfaces remain design-only or workflow-driven rather than mechanically enforced
 
 Constraints:
 - do not delete existing application files unless required by the framework setup and explicitly justified
 - prefer the standard profile unless I ask for a lighter or fuller setup
 - if doc-first execution should be the default for this repo, also wire `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`
+- do not claim the repo will automatically self-improve unless you also wire the SKILL and harvest-governance surfaces honestly
 ```
 
 ### Fastest setup

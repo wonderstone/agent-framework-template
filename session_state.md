@@ -7,13 +7,13 @@
 
 ## Current Goal
 
-Repository idle after closing the template drift-audit hardening wave.
+Repository idle after closing the adopter-guidance and bootstrap-output hardening wave.
 
 ---
 
 ## Working Hypothesis
 
-The framework architecture is mostly sound, and the highest-value remaining hardening is a narrow validator check for obviously contradictory root-state combinations rather than a broader workflow redesign.
+The highest-value follow-up after the drift audit was to make adoption guidance and bootstrap output say the same honest thing: a repository only improves with repeated use if it keeps the SKILL and harvest-governance surfaces and initializes them deliberately.
 
 **Confidence**: High
 
@@ -28,13 +28,13 @@ The framework architecture is mostly sound, and the highest-value remaining hard
 
 ## Plan
 
-**Approach**: Add a root-only stale-state audit to the validator, cover it with regression tests, then validate and close out the patchset.
+**Approach**: Close the guidance gap from both sides: update the README and adoption guide, then make the bootstrap next-step output repeat the same accumulation boundary for adopters at generation time.
 
 **Steps**:
-1. Add a root-only validator check for obvious stale-state contradictions.
-2. Add regression coverage for the contradictory combinations the audit identified.
-3. Re-run structured validation and the full test suite.
-4. Commit and push the complete drift-audit hardening wave.
+1. Upgrade the README copy-paste adoption prompt to mention SKILL and harvest surfaces explicitly.
+2. Add concrete adopter guidance for safe experience accumulation in the adoption guide.
+3. Update bootstrap next-step output so generated repositories surface the same accumulation guidance at the command line.
+4. Run structured validation and close out the patchset.
 
 **Why this approach**: It fixes the issues the audit actually proved without reopening the larger framework design.
 
@@ -55,6 +55,7 @@ The framework architecture is mostly sound, and the highest-value remaining hard
 - Previous SKILL and harvest-governance rollout already closed in commit `8e700b3` with validator, tests, and bootstrap smoke passing.
 - Root self-hosting now includes a validator-backed stale-state audit for obvious contradictory `session_state.md` combinations.
 - Post-hardening validation passed: `python3 scripts/validate_template.py` and `python3 -m pytest tests/ -q` with `58 passed`.
+- Adopter-guidance closeout passed with `python3 scripts/validate_template.py`, `python3 -m pytest tests/test_bootstrap_adoption.py -q` (`10 passed`), and the documented bootstrap smoke command showing the new SKILL or harvest next-step guidance.
 
 ---
 
@@ -65,6 +66,7 @@ The framework architecture is mostly sound, and the highest-value remaining hard
 - Added a filled execution-contract example to the demo project and wired adopter-facing docs to it.
 - Clarified in root docs which surfaces are mechanically enforced versus instruction-bound.
 - Completed the four-CLI drift-audit packet and validated the repository with `python3 scripts/validate_template.py` and `python3 -m pytest tests/ -q` (`56 passed`).
+- Upgraded the README adoption prompt, the adoption guide, and the bootstrap next-step output so adopters are told exactly how to keep SKILL and harvest-governance surfaces aligned with real experience accumulation.
 
 ---
 
@@ -86,10 +88,12 @@ The framework architecture is mostly sound, and the highest-value remaining hard
 - [x] Four CLI participants provide critique on whether the current framework contract is honest and operationally sound.
 - [x] The shared discussion packet contains the raw round output plus a main-thread synthesis.
 - [x] At least one confirmed expectation-versus-reality drift issue is fixed in the repository.
-- [x] Adopter-facing docs distinguish mechanical enforcement from instruction-bound conventions where that boundary matters.
-- [x] Validation for touched surfaces passes after the stale-state audit is added.
+- [x] Adopter-facing docs explain how a repository should actually use SKILL and harvest-governance surfaces to accumulate experience.
+- [x] Adopter-facing docs explain how a repository should actually use SKILL and harvest-governance surfaces to accumulate experience.
+- [x] The README copy-paste adoption prompt matches the current SKILL and harvest-governance contract.
+- [x] Validation for touched surfaces passes after this documentation update.
 
-End-to-end scenario: a maintainer can inspect the discussion packet, see four-CLI critique plus synthesis, and inspect the repository surfaces to confirm the framework now describes and demonstrates its current behavior more honestly.
+End-to-end scenario: a maintainer bootstraps a repository, reads the README or adoption guide, and sees the same practical boundary for long-term improvement: keep the SKILL and harvest-governance surfaces together, initialize at least one repository-specific skill, and promote changes through candidate packets plus promotion receipts rather than raw transcript mutation.
 
 Agent cannot verify: how downstream adopters will operationalize the execution contract unless they add their own local workflow checks.
 

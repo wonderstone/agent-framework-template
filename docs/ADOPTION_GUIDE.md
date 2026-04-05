@@ -199,6 +199,18 @@ When you do so, keep the field-level receipt and review matrix intact. It is the
 
 If your repository also wants receipt-bearing harvest artifacts rather than inventing them later, keep `templates/skill_candidate_packet.template.md` and `templates/skill_promotion_receipt.template.md` too.
 
+Recommended starting posture if you want the repository to actually improve with repeated use rather than merely carry the files:
+
+1. start with one or two high-frequency skills, not a large initial catalog
+2. prefer a `workflow` skill for a repeated execution pattern or a `guardrail` skill for a repeated failure mode
+3. keep the `promotion_tier` matrix intact so field authority stays explicit
+4. treat closeout receipts, root-cause notes, and repeated failure patterns as candidate evidence
+5. do not let raw transcripts mutate canonical skills directly
+6. require candidate packets before proposed change and promotion receipts before canonical mutation
+7. review trigger overlap aggressively so skill accumulation does not collapse progressive disclosure
+
+This is the key difference between “the repo has SKILL files” and “the repo actually gets better with use”. The framework supports the latter, but only if repositories keep the evidence and promotion boundary explicit.
+
 If you want a ready-made starter pack rather than starting from scratch, keep `examples/reviewer_roles/`. The template ships 10 formal role profiles split into:
 
 1. first batch: goal/acceptance, plan/checkpoint, runtime correctness, boundary/contract, git closeout, maintainability
@@ -227,6 +239,14 @@ Fill in:
 - **Acceptance Criteria**: the observable conditions that mark your first phase complete
 
 Leave everything else blank or with placeholder text until the first subtask is confirmed done.
+
+If the repository wants long-term skill accumulation, this is also the right point to decide whether post-task harvest is in scope from day one.
+
+Practical rule:
+
+1. if the team is still stabilizing basic execution, do not start with automatic harvest expectations
+2. once the repo has trustworthy closeout receipts or root-cause notes, begin creating candidate packets for repeated patterns
+3. only promote a harvested lesson into canonical SKILL content after it survives the repository's declared promotion path
 
 ---
 

@@ -636,6 +636,35 @@ def _write_manifest(
     )
 
 
+def _skill_accumulation_assets_included(profile: str) -> bool:
+    return profile in {"standard", "full"}
+
+
+def _print_next_steps(*, profile: str, capabilities: tuple[str, ...]) -> None:
+    print("Next steps:")
+    print("1. Fill any remaining placeholder docs or commands for your project.")
+    if profile == "minimal":
+        print("2. Add the standard profile later if you want bundled validation tooling and CI.")
+        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
+        print("4. Create your first ROADMAP and session-state entries before starting feature work.")
+        print(
+            "5. If long-term agent improvement matters, add the standard profile before rollout so the SKILL and harvest-governance surfaces ship together."
+        )
+    else:
+        print("2. Run python3 scripts/validate_template.py from the target repository.")
+        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
+        print("4. Do one bootstrap smoke task before adopting the workflow broadly.")
+        if _skill_accumulation_assets_included(profile):
+            print(
+                "5. If you want long-term agent improvement, keep the shipped SKILL and harvest-governance docs or templates, then initialize at least one repository-specific skill before broad rollout."
+            )
+            print(
+                "6. Do not promote raw transcript excerpts straight into canonical skills; use candidate packets and promotion receipts as the mutation boundary."
+            )
+    if capabilities:
+        print("7. Review any opt-in capability scaffolding before enabling it in production.")
+
+
 def bootstrap_repo(
     *,
     target_dir: Path,
@@ -803,18 +832,7 @@ def main() -> int:
         for path in result.conflicts:
             print(f"! {path}")
 
-    print("Next steps:")
-    print("1. Fill any remaining placeholder docs or commands for your project.")
-    if args.profile == "minimal":
-        print("2. Add the standard profile later if you want bundled validation tooling and CI.")
-        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
-        print("4. Create your first ROADMAP and session-state entries before starting feature work.")
-    else:
-        print("2. Run python3 scripts/validate_template.py from the target repository.")
-        print("3. Fill the Developer Toolchain section honestly, using explicit 'none' where needed.")
-        print("4. Do one bootstrap smoke task before adopting the workflow broadly.")
-    if result.capabilities:
-        print("5. Review any opt-in capability scaffolding before enabling it in production.")
+    _print_next_steps(profile=args.profile, capabilities=result.capabilities)
     return 0
 
 
