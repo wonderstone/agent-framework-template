@@ -113,54 +113,67 @@ scripts/
 
 ### Copy-Paste Adoption Prompt
 
-If you want another agent to copy this framework into a local application repository in one pass, paste the prompt below and replace the placeholders first.
+If you want another agent to absorb this framework into its own project in one pass, paste the prompt below and replace the placeholders first.
 
 ```text
 You are working in my application repository at <TARGET_REPO_PATH>.
 
-The agent framework template is at https://github.com/wonderstone/agent-framework-template.
-If it is not already cloned locally, clone it first:
-  git clone https://github.com/wonderstone/agent-framework-template.git <TEMPLATE_REPO_PATH>
-Then use the local copy at <TEMPLATE_REPO_PATH>.
+Template source of truth:
+https://github.com/wonderstone/agent-framework-template
+
+Do not assume the template already exists on the same machine.
+If needed, first clone or otherwise fetch the template repository so you can read its real files before making changes.
 
 Goal:
-- bootstrap the agent framework from the template repo into this application repo
+- absorb the high-value mechanisms from the template repo into this application repo
 - use project name <PROJECT_NAME>
 - use profile <minimal|standard|full>
 - use project type <backend-api|web-frontend|cli-tool|library|full-stack>
 - add optional capabilities only if requested: <closeout-audit runtime-guards git-hooks>
 - if long-term skill accumulation matters in this repo, keep the SKILL and harvest-governance surfaces rather than dropping them during setup
+- do not mechanically copy every template surface; adapt them to the current repository's real runtime, validation, and risk boundaries
 
 Required steps:
-1. Run the template bootstrap script from <TEMPLATE_REPO_PATH> targeting <TARGET_REPO_PATH>.
-2. Keep the generated framework files in their template paths.
-3. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders:
+1. Fetch or clone the template repository from the public source-of-truth URL if you do not already have a readable copy.
+2. Inspect the current application repository first and determine which template mechanisms are actually appropriate for this project.
+3. If bootstrap is the right path, run the template bootstrap script from your fetched template copy targeting <TARGET_REPO_PATH>.
+4. Keep the generated framework files in their template paths unless you have a project-specific reason to change them.
+5. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders:
    - project directory map, critical topic triggers, build/test commands, and protected paths
    - Developer Toolchain section (diagnostics, run, health, repro, build, verify) — the validator
      hard-fails if required-core fields are missing or malformed
-4. If this repository should improve with repeated use, keep these surfaces together:
+6. Keep these high-value template mechanisms whenever they match the repository's real operating model:
+   - truthful project-context adapter
+   - execution contract for long-running work
+   - progressive Developer Toolchain contract
+   - runtime or failure traceability surfaces
+   - resumable receipt or handoff surfaces for longer reviews or audits
+   - closeout truthfulness surfaces
+7. If this repository should improve with repeated use, keep these SKILL and harvest-governance surfaces together:
    - `docs/SKILL_MECHANISM_V1_DRAFT.md`
    - `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`
    - `templates/skill.template.md`
    - `templates/skill_candidate_packet.template.md`
    - `templates/skill_promotion_receipt.template.md`
    - starter examples under `examples/skills/`
-5. If you keep the SKILL path, adapt at least one initial repository-specific skill for a repeated pain point.
+8. If you keep the SKILL path, adapt at least one initial repository-specific skill for a repeated pain point.
    Prefer one workflow skill or one guardrail skill first rather than a large skill catalog.
-6. Preserve the governance boundary:
+9. Preserve the governance boundary:
    - do not convert raw transcripts directly into canonical SKILL edits
    - harvest reusable observations into candidate packets first
    - use promotion receipts for canonical approved mutations
-7. Leave unrelated application code untouched.
-8. Run validation from the target repo:
+10. If this repository is not ready for SKILL-based accumulation yet, say so explicitly and keep only the future upgrade path that still makes sense.
+11. Leave unrelated application code untouched.
+12. Run validation from the target repo:
   - `python3 scripts/validate_template.py`
   - `python3 scripts/active_docs_audit.py` — checks for nonportable paths and stale framework assertions in shipped docs
   - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
-9. Report:
+13. Report:
   - what files were added or changed
   - what placeholders still need manual project-specific values
   - what validation was run and whether it passed
   - whether the repo kept the SKILL and harvest surfaces, and if so which first skill was initialized
+  - which template features were intentionally kept, downgraded, or skipped based on project fit
   - which surfaces remain design-only or workflow-driven rather than mechanically enforced
 
 Constraints:
@@ -168,6 +181,7 @@ Constraints:
 - prefer the standard profile unless I ask for a lighter or fuller setup
 - if doc-first execution should be the default for this repo, also wire `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`
 - do not claim the repo will automatically self-improve unless you also wire the SKILL and harvest-governance surfaces honestly
+- do not invent fake runtime paths, fake E2E, or fake enforcement just to match the template more closely
 ```
 
 ### Fastest setup
