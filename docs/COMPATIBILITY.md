@@ -33,7 +33,9 @@ The CI workflow currently validates on Python 3.11 and 3.12.
 | Browser, backend, CLI, or library projects | Supported through bootstrap presets, but still require project-specific command customization |
 | Active doc portability enforcement | Included in the standard profile through `scripts/active_docs_audit.py` and executed by `scripts/validate_template.py` |
 | Preference-alignment drift enforcement | Included in the standard profile through `scripts/preference_drift_audit.py` and executed by `scripts/validate_template.py` |
+| Root `session_state.md` freshness | Structured validator now catches obvious contradictory root-state combinations in this repository's self-hosting surface |
 | SKILL harvest artifact flow | Design-first support only in this repository; adopters still need local packet/receipt generation and any promotion automation |
+| Execution contract surface | Template plus a filled demo example are shipped, but live instantiation remains workflow-driven unless adopters add local checks |
 
 Adopters should treat the bootstrap output as a starting point, not finished project configuration.
 
@@ -47,3 +49,5 @@ Adopters should treat the bootstrap output as a starting point, not finished pro
 - The repository now ships candidate and promotion receipt templates for SKILL harvest, but it does not yet ship a full end-to-end promotion pipeline or promotion-state registry.
 - Preference drift detection is snippet-based; it is strong against known contract regressions but not every misleading paraphrase.
 - Example reviewer roles are meant to be adapted, not copied blindly into production governance.
+- Adopter `session_state.md` freshness and execution-contract instantiation are not automatically enforced by a universal hook; they still depend on agent or operator discipline unless a repository adds local checks.
+- The closeout truth audit is a focused anti-placeholder guard, not a full semantic proof system for all Rule 0–27 behavior.

@@ -234,6 +234,8 @@ Leave everything else blank or with placeholder text until the first subtask is 
 
 Before the first long-running task, copy `templates/execution_contract.template.md` into your working notes, issue tracker, or task packet and confirm the execution model once with the user or task owner.
 
+If you want a concrete filled example rather than a blank template, inspect [`examples/demo_project/docs/runbooks/execution_contract_example.md`](../examples/demo_project/docs/runbooks/execution_contract_example.md).
+
 At minimum, confirm:
 
 - whether the default main-thread-agent ownership for normal commit and push should remain in place or be overridden
@@ -245,6 +247,8 @@ At minimum, confirm:
 - what E2E or user-visible validation is required before the task can be reported complete
 
 The template default is that the main-thread agent performs normal commit/push and only exception cases escalate. This confirmation should happen once at task start when a repository wants to change that default, not before every file edit.
+
+Important honesty note: the template ships the contract surface and the demo example, but it does not automatically prove that every future task in your repository instantiated one. If you want execution contracts to be mandatory rather than recommended, add a local checklist, task-packet rule, or validator around that expectation.
 
 Status-line and closeout preference to copy into local policy surfaces when relevant:
 

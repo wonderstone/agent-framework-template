@@ -1,0 +1,29 @@
+You are participating in a critical audit of the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/template_framework_drift_audit_v1/discussion_packet.md
+
+Task:
+- Audit whether the current template framework is actually honest and operationally sound for adopters.
+- Focus on expectation-vs-reality drift, governance gaps, doc overclaims, and missing executable proof.
+- Do not repeat the packet; challenge it.
+- If one of the packet's stated concerns is weak or already solved, say so explicitly.
+
+Required output shape:
+1. Verdict: is the framework currently reasonable, or does it have material drift risk?
+2. Top 3 findings only, ordered by severity.
+3. For each finding include:
+   - category: current bug / governance gap / doc overclaim / acceptable known limit
+   - why it matters to adopters
+   - smallest honest fix now
+4. One thing the packet is over-worried about, if any.
+5. Final recommendation:
+   - patch now
+   - document only
+   - continue discussion
+
+Constraints:
+- Prefer concrete repo surfaces over generic framework philosophy.
+- Be willing to say the current framework is mostly sound if the drift risks are minor.
+- Avoid proposing large redesign unless the current contract is actually misleading.
+- Treat session_state truthfulness, git closeout policy, execution-contract usability, and proof-vs-claim discipline as especially relevant.

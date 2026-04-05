@@ -62,6 +62,26 @@
 
 ---
 
+## Phase 4 — Formalize SKILL Contract And Harvest Governance
+
+**Goal**: Turn the framework-native SKILL contract and the post-task harvest loop from discussion-only surfaces into shipped design, template, validator, and bootstrap assets.
+
+**Status**: ✅ 2026-04-05
+
+| Item | Status |
+|---|---|
+| Freeze the framework-native SKILL contract and starter examples | ✅ 2026-04-05 |
+| Enforce field-level SKILL governance in the validator | ✅ 2026-04-05 |
+| Ship harvest-loop draft plus candidate and promotion artifact templates | ✅ 2026-04-05 |
+
+**Acceptance Criteria**:
+- [x] The repository ships a TYPE-A SKILL contract draft plus starter examples.
+- [x] The validator enforces canonical SKILL matrix shape, promotion-tier constraints, and reference-path integrity.
+- [x] Bootstrap and discovery surfaces expose the harvest-loop draft and artifact templates.
+- [x] Root validation, regression tests, and bootstrap smoke all pass after the rollout.
+
+---
+
 ## Completed Phases
 
 | Phase | Completed |
@@ -69,3 +89,4 @@
 | Phase 1 — Productize The Template | 2026-04-01 |
 | Phase 2 — Self-Host And Release Closeout | 2026-04-01 |
 | Phase 3 — Strengthen Developer Toolchain Contract | 2026-04-03 |
+| Phase 4 — Formalize SKILL Contract And Harvest Governance | 2026-04-05 |

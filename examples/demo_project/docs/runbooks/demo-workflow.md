@@ -23,6 +23,8 @@ python3 scripts/bootstrap_adoption.py ../demo-task-tracker \
 
 ## Audit Flow
 
+Before the external audit starts, freeze the execution style once in [execution_contract_example.md](execution_contract_example.md).
+
 1. Generate a task packet before external review.
 2. Record an audit receipt after one bounded execution pass.
 3. Write a handoff packet if the session stops before closeout.

@@ -209,6 +209,8 @@ Before any long-running or multi-step task, the agent should produce an executio
 
 The default is: main-thread agent handles normal `git add` / `commit` / standard `push`, and only exception cases are escalated. This confirmation is meant to override that default when needed, not to force per-step micromanagement.
 
+This repository ships the execution-contract template and one filled demo example at [`examples/demo_project/docs/runbooks/execution_contract_example.md`](examples/demo_project/docs/runbooks/execution_contract_example.md). It does not automatically prove that every adopting repository instantiates an execution contract for every long task unless that repository adds its own workflow or validation checks.
+
 Progress and closeout preference summary:
 
 - routine in-progress replies use `• 当前在做: ... | 下一步: ...`
@@ -263,6 +265,14 @@ The template ships a canonical runbook, three templates, and `scripts/git_audit_
 **Self-check gate** — every action follows **think → self-check → act**. Before touching any file, the agent answers five gate questions (file read? path protected? adapter loaded? sources consistent? scope clear?). If any answer is NO, the agent stops and resolves the problem before proceeding. This is enforced in Rule 12.
 
 **Enforcement rules** — rules 0–27 include explicit STOP conditions, recovery/progression hooks, user-acceptance gating, validation-toolchain prerequisites, leftover-state discipline, receipt-anchored closeout constraints, independent evaluation, and policy-audit activation. When a required pre-condition is not met, the agent states why it is blocked and waits — it does not guess, skip, or proceed with Low confidence. Key STOP triggers: unread target file, protected path, conflicting sources, unclear scope, unresolved handoff state, unverifiable acceptance criteria, or closeout claims without evidence.
+
+Current enforcement tier in this repository:
+
+- mechanically checked surfaces include `scripts/validate_template.py`, `scripts/active_docs_audit.py`, `scripts/preference_drift_audit.py`, unit tests, CI, and `scripts/closeout_truth_audit.py` when the optional hooks are installed
+- mechanically checked root-only self-hosting also now includes an obvious-stale-state audit for the repository's own `session_state.md`
+- instruction-bound surfaces still include adopter-specific `session_state.md` freshness, execution-contract instantiation, and most Rule 0–27 behavioral discipline outside the shipped hooks
+
+Adopters should not treat instruction-bound rules as hook-enforced guarantees unless they add repo-local checks for them.
 
 **Failure recovery** — when the agent makes a wrong assumption or produces an invalid change, Rule 13 requires it to state the failure explicitly, record it in `session_state.md` under Mid-Session Corrections, apply a defined recovery action, and only then resume. Stopping is always preferred over continuing on a known-wrong path.
 

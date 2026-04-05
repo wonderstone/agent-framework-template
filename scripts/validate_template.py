@@ -648,6 +648,55 @@ def _validate_session_state_template(root: Path) -> list[ValidationIssue]:
     return issues
 
 
+def _extract_session_state_field(text: str, label: str) -> str | None:
+    match = re.search(rf"^\*\*{re.escape(label)}\*\*:\s*(.+)$", text, flags=re.MULTILINE)
+    if match is None:
+        return None
+    return match.group(1).strip()
+
+
+def _normalize_state_value(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def _is_none_like_state(value: str) -> bool:
+    normalized = _normalize_state_value(value)
+    return (
+        normalized == "(none)"
+        or normalized == "n/a"
+        or normalized.startswith("none")
+        or normalized.startswith("no next step")
+    )
+
+
+def _validate_root_session_state_freshness(root: Path) -> list[ValidationIssue]:
+    text = _read(root / "session_state.md")
+    issues: list[ValidationIssue] = []
+    current_step = _extract_session_state_field(text, "Current Step")
+    next_step = _extract_session_state_field(text, "Next Planned Step")
+    uac_section = _extract_markdown_section(text, "User Acceptance Criteria") or ""
+
+    if current_step and next_step:
+        current_norm = _normalize_state_value(current_step)
+        if current_norm.startswith("no active work") and not _is_none_like_state(next_step):
+            issues.append(
+                ValidationIssue(
+                    "stale-root-session-state",
+                    "session_state.md: 'Current Step' says no active work but 'Next Planned Step' is not none-like",
+                )
+            )
+
+        if current_norm.startswith("no active work") and "- [ ]" in uac_section:
+            issues.append(
+                ValidationIssue(
+                    "stale-root-session-state",
+                    "session_state.md: 'Current Step' says no active work while User Acceptance Criteria still contain unchecked items",
+                )
+            )
+
+    return issues
+
+
 def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
     text = _read(root / "templates/execution_contract.template.md")
     issues: list[ValidationIssue] = []
@@ -1190,6 +1239,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_root_project_context,
         _validate_rule_sync,
         _validate_session_state_template,
+        _validate_root_session_state_freshness,
         _validate_execution_contract,
         _validate_closeout_rule_guards,
         _validate_preference_drift,

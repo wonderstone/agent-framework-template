@@ -1,0 +1,969 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d5b34-eaaf-7ce0-97c4-c530fec3209b
+--------
+user
+You are participating in a critical audit of the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/template_framework_drift_audit_v1/discussion_packet.md
+
+Task:
+- Audit whether the current template framework is actually honest and operationally sound for adopters.
+- Focus on expectation-vs-reality drift, governance gaps, doc overclaims, and missing executable proof.
+- Do not repeat the packet; challenge it.
+- If one of the packet's stated concerns is weak or already solved, say so explicitly.
+
+Required output shape:
+1. Verdict: is the framework currently reasonable, or does it have material drift risk?
+2. Top 3 findings only, ordered by severity.
+3. For each finding include:
+   - category: current bug / governance gap / doc overclaim / acceptable known limit
+   - why it matters to adopters
+   - smallest honest fix now
+4. One thing the packet is over-worried about, if any.
+5. Final recommendation:
+   - patch now
+   - document only
+   - continue discussion
+
+Constraints:
+- Prefer concrete repo surfaces over generic framework philosophy.
+- Be willing to say the current framework is mostly sound if the drift risks are minor.
+- Avoid proposing large redesign unless the current contract is actually misleading.
+- Treat session_state truthfulness, git closeout policy, execution-contract usability, and proof-vs-claim discipline as especially relevant.
+mcp startup: no servers
+codex
+I’m reading the audit packet first, then I’ll inspect the concrete repo surfaces it points at or contradicts so the findings stay grounded in what the template actually ships.
+exec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/template_framework_drift_audit_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — template_framework_drift_audit_v1
+
+- Generated at: 2026-04-05T01:12:16.284700+00:00
+- Owner: main-thread
+- Current round goal: Obtain sharp critique on the top current framework drift risks and decide whether to patch now.
+- Round exit rule: Freeze a plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+Is the current template framework contract honest and operationally sound for adopters, or are there real expectation-vs-reality drift risks that should be fixed now?
+
+## Why This Needs Discussion
+
+The repository has accumulated several governance and contract surfaces quickly. Before adding more layers, we need a critical audit of whether the template currently promises more than it reliably enforces or demonstrates.
+
+## Current Truth
+
+- The repository ships bootstrap, validator, discussion-loop, SKILL, harvest-loop, developer-toolchain, and traceability surfaces.
+- The validator does enforce SKILL reference-path integrity and governance-tier checks.
+- The full-stack example project-context file is filled, not a stub.
+exec
+/bin/zsh -lc 'rg --files .' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+./tmp/discussion/template_framework_drift_audit_v1/round1/claude.md
+./tmp/discussion/template_framework_drift_audit_v1/round1/codex.err
+./tmp/discussion/template_framework_drift_audit_v1/round1/prompt.txt
+./tmp/discussion/template_framework_drift_audit_v1/round1/claude.err
+./tmp/discussion/template_framework_drift_audit_v1/discussion_packet.md
+./tmp/discussion/skill_harvest_loop_v1/round1/copilot.md
+./tmp/discussion/skill_harvest_loop_v1/round1/claude.md
+./tmp/discussion/skill_harvest_loop_v1/round1/codex.err
+./tmp/discussion/skill_harvest_loop_v1/round1/gemini.md
+./tmp/discussion/skill_harvest_loop_v1/round1/gemini_retry.err
+./tmp/discussion/skill_harvest_loop_v1/round1/gemini_retry.md
+./tmp/discussion/skill_harvest_loop_v1/round1/codex.md
+./tmp/discussion/skill_harvest_loop_v1/round1/copilot.err
+./tmp/discussion/skill_harvest_loop_v1/round1/prompt.txt
+./tmp/discussion/skill_harvest_loop_v1/round1/gemini.err
+./tmp/discussion/skill_harvest_loop_v1/round1/claude.err
+./tmp/discussion/skill_harvest_loop_v1/discussion_packet.md
+./tmp/discussion/skill_harvest_loop_v1/round2/copilot.md
+./tmp/discussion/skill_harvest_loop_v1/round2/claude.md
+./tmp/discussion/skill_harvest_loop_v1/round2/codex.err
+codex
+I have the packet. Next I’m checking the actual contract surfaces: root state, README/adoption docs, execution-contract templates, and the guardrails/tests that are supposed to make those claims true.
+Plan update
+  → Inspect core adopter-facing contract surfaces and current state files
+  • Trace executable enforcement in scripts/tests for the packet’s highlighted risk areas
+  • Synthesize a verdict with only the top 3 evidence-backed findings
+exec
+/bin/zsh -lc "sed -n '1,220p' README.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' session_state.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# session_state.md
+
+> Cross-session state for agent-framework-template. Keep under ~100 lines.
+> When over limit: archive old phase content to docs/archive/.
+
+---
+
+## Current Goal
+
+Close out the SKILL mechanism implementation follow-up: field-level receipt and review matrix, stronger validator enforcement, and final git closeout.
+
+---
+
+## Working Hypothesis
+
+The remaining high-value gap is no longer broad architecture or starter assets; it is making the field-level receipt and review matrix real in the design, template, examples, and validator so the SKILL mechanism can be treated as operationally complete.
+
+**Confidence**: High
+
+**Evidence**: The TYPE-A SKILL draft, canonical template, starter examples, and first-pass validator already exist; the only explicit unresolved design boundary was the field-level receipt and review matrix plus a stronger truthfulness check for references.
+ succeeded in 0ms:
+# Agent Framework Template
+
+A minimal, reusable GitHub Copilot agent framework. Drop it into any project to give your AI coding assistant structured decision rules, state management, and a clean operating protocol.
+
+---
+
+## Why This Exists
+
+Most agent setups fail in one of three ways:
+
+- the rules live only in chat history
+- the project-specific truth sources are never made explicit
+- multi-step work cannot survive a reviewer swap or interrupted CLI session
+
+This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
+
+---
+
+## What's Included
+
+exec
+/bin/zsh -lc "sed -n '1,240p' docs/ADOPTION_GUIDE.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,240p' docs/DOC_FIRST_EXECUTION_GUIDELINES.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Doc-First Execution Guidelines
+
+This document freezes the default execution mode for this repository.
+
+It exists to remove ambiguity about how non-trivial implementation work should start, how detailed planning artifacts must be, and whether doc-first execution is optional.
+
+It is the repository default unless the user explicitly overrides it.
+
+## Default Execution Mode
+
+For this repository, the default mode is:
+
+1. document first
+2. validate the plan against current truth sources
+3. execute against the written plan
+4. update the plan or checklist before changing direction
+
+Non-trivial work should therefore begin from executable documentation, not from chat memory alone.
+
+## What Counts As Non-Trivial
+ succeeded in 0ms:
+# Adoption Guide
+
+Step-by-step guide for adopting this agent framework in a new project.
+
+---
+
+## Prerequisites
+
+- GitHub repository (new or existing)
+- A coding assistant that reads `.github/copilot-instructions.md` (GitHub Copilot, Cursor, Augment, etc.)
+- Python 3.11+ (to run the bootstrap, audit helper, and validation scripts)
+- Bash is optional — `scripts/validate-template.sh` is a thin wrapper that calls `scripts/validate_template.py`; you can run either
+
+---
+
+## Step 1 — Bootstrap Or Copy The Core Files
+
+### Recommended: bootstrap the target repository
+
+Run this from the template repository:
+codex
+The first pass confirms one packet concern immediately: the shipped `session_state.md` is stale against its own “No active work” / “independent review, then git closeout” claims. I’m now checking whether the repo also overstates enforcement around closeout, execution contracts, and proof.
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/execution_contract.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Execution Contract
+
+> Confirm this before any long-running or multi-step task starts.
+> Goal: align execution style once, then let the agent proceed autonomously inside that boundary.
+
+---
+
+## Task Summary
+
+- Goal: [one-sentence user-visible task goal]
+- Scope: [allowed modules / files / systems]
+- Out of Scope: [what should not be touched]
+
+## Optional Fast-Start Block
+
+Use this when the task is well-bounded and the repository wants a one-shot confirmation surface before execution begins.
+
+Execution Boundary:
+- Authorized scope: [file set or module scope]
+- Authorized ops: [read / edit / lint / test / state updates / dispatch]
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/runbooks/resumable-git-audit-pipeline.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' scripts/closeout_truth_audit.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' docs/COMPATIBILITY.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Resumable Git Audit Pipeline
+
+This runbook turns Git audit and reviewer handoff into a recoverable workflow rather than a chat-only memory exercise.
+
+## Goal
+
+Use this workflow whenever implementation, audit, and Git closeout may span multiple executors or multiple interrupted sessions.
+
+The point is not to find one perfect reviewer. The point is to preserve enough state that a different reviewer or CLI session can resume safely.
+
+## Core Roles
+
+| Role | Responsibility |
+|---|---|
+| `Planner` | Freeze truth sources, allowed files, validation, and acceptance boundary |
+| `Executor` | Perform the bounded implementation or investigation |
+| `Auditor` | Review the result, risks, and validation status |
+| `Gatekeeper` | Run hard gates outside the semantic auditor when possible |
+| `Owner Review` | Final acceptance, conflict resolution, and Git closeout |
+
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit closeout claims for receipt-anchor evidence in the same diff."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+CLAIM_PATTERNS = (
+    re.compile(r"\bcompleted\b", re.IGNORECASE),
+    re.compile(r"\baccepted\b", re.IGNORECASE),
+    re.compile(r"\bstatus=passed\b", re.IGNORECASE),
+    re.compile(r"\bdone\b", re.IGNORECASE),
+    re.compile(r"\bverified\b", re.IGNORECASE),
+    re.compile(r"\ball criteria met\b", re.IGNORECASE),
+)
+ succeeded in 0ms:
+# Compatibility
+
+This document explains what has been verified in this repository and where adopters should still do project-specific validation.
+
+---
+
+## Verified In This Repository
+
+The following are exercised directly in this template repository:
+
+| Surface | Verification |
+|---|---|
+| Bootstrap CLI | Unit tests plus `--dry-run` smoke commands in CI |
+| Template validator | Unit tests plus CI execution |
+| Active docs portability and stale-assertion audit | Standalone audit script plus validator integration for live docs and instruction surfaces |
+| Preference drift audit | Standalone audit script plus validator integration for progress/closeout contract drift |
+| SKILL contract template and starter examples | Structured validator checks canonical sections, review-matrix completeness, and referenced-path integrity |
+| SKILL harvest loop design and artifact templates | TYPE-A draft plus shipped candidate/receipt templates exercised by bootstrap and repository validation |
+| Git audit generator | Unit tests |
+| Core docs and file references | Structured validator |
+exec
+/bin/zsh -lc "sed -n '1,320p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Structured validator for the agent framework template."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from active_docs_audit import audit_repo as audit_active_docs
+from preference_drift_audit import audit_repo as audit_preference_drift
+
+exec
+/bin/zsh -lc "rg -n \"execution contract|closeout truth|session_state|required-core|pre-commit|pre-push|DOC_FIRST|task_complete|git closeout|receipt anchor|proof|advisory|manifest\" scripts tests docs .github templates examples -g '"'!tmp/**'"'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+docs/STRATEGY_MECHANISM_LAYERING.md:46:6. owner review and git closeout
+tests/test_closeout_truth_audit.py:26:    diff_text = """diff --git a/session_state.md b/session_state.md\n+++ b/session_state.md\n@@ -1 +1 @@\n+- task completed\n"""
+tests/test_closeout_truth_audit.py:31:    assert "receipt anchor" in issues[0]
+tests/test_closeout_truth_audit.py:35:    diff_text = """diff --git a/session_state.md b/session_state.md\n+++ b/session_state.md\n@@ -1 +1,2 @@\n+- task completed\n+- 15 passed in 0.23s\n"""
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:7:This is a design draft with shipped template/bootstrap adoption, manifest-gated required-core enforcement for newly bootstrapped adopters, and reminder-level validator support for softer guidance.
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:17:| Depends on | `Validation Toolchain`, `Build and Test Commands`, execution contract surfaces |
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:18:| Already changes | bootstrap output, template surfaces, manifest payloads, required-core hard-fail validation for manifest-based adopters, and reminder-level validator advisories |
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:31:1. the required core is enforced for newly bootstrapped manifest-based adopters
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:33:3. optional enrichment fields remain advisory
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:257:| `file` | diagnostics → lint | Stop after local static blockers are cleared unless runnable proof was explicitly requested |
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:330:2. newly bootstrapped adopters receive a manifest that declares the v1 required-core contract
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:331:3. adopted repos only hard-fail against the contract they actually carry in their manifest
+docs/DEVELOPER_TOOLCHAIN_DESIGN.md:370:3. describe enforcement precisely: required-core enforcement is live for manifest-based adopters, while optional enrichment remains advisory
+scripts/bootstrap_adoption.py:36:            "| Build | `python -m compileall src tests` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when runtime depends on build |",
+scripts/bootstrap_adoption.py:37:            "| Lint | `ruff check .` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
+scripts/bootstrap_adoption.py:107:            "| Build | `npm run build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when runtime depends on build |",
+scripts/bootstrap_adoption.py:108:            "| Lint | `npm run lint` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
+scripts/bootstrap_adoption.py:178:            "| Build | `python -m build` | `module` | `declared-unverified` | Stop after build blockers are cleared when runnable proof is unnecessary | Required when packaging matters |",
+scripts/bootstrap_adoption.py:179:            "| Lint | `ruff check .` | `file` | `declared-unverified` | Stop after lint when task scope is local and runnable proof is unnecessary | Recommended |",
+scripts/bootstrap_adoption.py:246:            "| Run | `none` | `service` | `not-applicable` | Stop at build or smoke unless runnable proof is explicitly requested | No live service runtime by default |",
+exec
+/bin/zsh -lc "sed -n '760,1280p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '320,760p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+            if re.search(rf"^- {re.escape(label)}:\s*(.+)$", text, flags=re.MULTILINE) is None:
+                issues.append(ValidationIssue("missing-skill-metadata", f"{relative}: {label}"))
+
+        if "| Name | Path | Required at invocation | Purpose |" not in text:
+            issues.append(
+                ValidationIssue(
+                    "missing-skill-reference-table",
+                    f"{relative}: references table must use the canonical columns Name / Path / Required at invocation / Purpose",
+                )
+            )
+
+        matrix_rows = _extract_first_table_after_heading(text, "Receipt And Review Matrix")
+        if len(matrix_rows) < 3:
+            issues.append(
+                ValidationIssue(
+                    "missing-skill-review-matrix",
+                    f"{relative}: receipt and review matrix must use a structured table",
+                )
+            )
+        else:
+ succeeded in 0ms:
+    "recommended_surface_kinds": ["Lint"],
+    "allow_surface_qualifiers": True,
+}
+
+SKILL_ALLOWED_TYPES = {"knowledge", "workflow", "verification", "guardrail"}
+SKILL_REQUIRED_HEADINGS = (
+    "## Purpose",
+    "## Triggers",
+    "### Positive Triggers",
+    "### Negative Triggers",
+    "### Expected Effect",
+    "## Entry Instructions",
+    "## References",
+    "## Governance",
+    "### Allowed Evidence",
+    "### Reviewer Gate",
+    "### Forbidden Direct Update Inputs",
+    "## Receipt And Review Matrix",
+    "## Degradation",
+)
+exec
+/bin/zsh -lc "sed -n '1,220p' .githooks/pre-commit" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,240p' .githooks/pre-push" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if [[ -f "${ROOT}/scripts/closeout_truth_audit.py" ]]; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/closeout_truth_audit.py" --root "${ROOT}"
+fi
+
+if [[ -f "${ROOT}/scripts/runtime_surface_guardrails.py" && -f "${ROOT}/.github/runtime_surface_registry.py" ]]; then
+  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/runtime_surface_guardrails.py" staged-check --root "${ROOT}"
+fi
+ succeeded in 0ms:
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if [[ -f "${ROOT}/scripts/runtime_surface_guardrails.py" && -f "${ROOT}/.github/runtime_surface_registry.py" ]]; then
+  extra_args=()
+  zero_sha="0000000000000000000000000000000000000000"
+
+  while read -r local_ref local_sha remote_ref remote_sha; do
+    if [[ -z "${local_sha:-}" || "${local_sha}" == "${zero_sha}" ]]; then
+      continue
+    fi
+    if [[ "${remote_sha:-$zero_sha}" == "${zero_sha}" ]]; then
+      extra_args+=("--commit-sha" "${local_sha}")
+    else
+      extra_args+=("--commit-range" "${remote_sha}..${local_sha}")
+    fi
+  done
+
+exec
+/bin/zsh -lc "sed -n '1,220p' tests/test_hook_scaffolding.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,200p' tests/test_closeout_truth_audit.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+from __future__ import annotations
+
+import importlib.util
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO_ROOT / "scripts" / "closeout_truth_audit.py"
+SPEC = importlib.util.spec_from_file_location("closeout_truth_audit", MODULE_PATH)
+assert SPEC is not None
+assert SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+audit_diff = MODULE.audit_diff
+
+
+def test_closeout_audit_passes_when_no_claims_are_added() -> None:
+    diff_text = """diff --git a/README.md b/README.md\n+++ b/README.md\n@@ -1 +1 @@\n+plain documentation update\n"""
+ succeeded in 0ms:
+from __future__ import annotations
+
+import importlib.util
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+BOOTSTRAP_MODULE_PATH = REPO_ROOT / "scripts" / "bootstrap_adoption.py"
+BOOTSTRAP_SPEC = importlib.util.spec_from_file_location("bootstrap_adoption_for_hooks", BOOTSTRAP_MODULE_PATH)
+assert BOOTSTRAP_SPEC is not None
+assert BOOTSTRAP_SPEC.loader is not None
+BOOTSTRAP_MODULE = importlib.util.module_from_spec(BOOTSTRAP_SPEC)
+sys.modules[BOOTSTRAP_SPEC.name] = BOOTSTRAP_MODULE
+BOOTSTRAP_SPEC.loader.exec_module(BOOTSTRAP_MODULE)
+
+bootstrap_repo = BOOTSTRAP_MODULE.bootstrap_repo
+
+
+def _run(
+codex
+The enforcement picture is mixed: some risks are genuinely guarded with tests and hooks, but several “should confirm” or “should use” contracts still look policy-heavy rather than operationally enforced. I’m checking where the docs are careful enough versus where they still lean on agent compliance.
+exec
+/bin/zsh -lc "sed -n '1,260p' scripts/active_docs_audit.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit active documentation for portability and stale framework assertions."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+@dataclass(frozen=True)
+class ActiveDocIssue:
+    kind: str
+    detail: str
+
+
+exec
+/bin/zsh -lc "sed -n '430,520p' docs/ADOPTION_GUIDE.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' scripts/preference_drift_audit.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' .github/agents/implementer.agent.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+  --constraints "- Keep the workflow lightweight." \
+  --candidate-directions "- Always require it for open design questions\n- Keep it optional" \
+  --evaluation-criteria "- Clarity\n- overhead\n- recoverability" \
+  --suggested-executors "- codex\n- claude-code\n- internal-subagent"
+```
+
+---
+
+## Next Upgrade Paths
+
+Start with the smallest shape that matches your team today, then grow into the heavier workflow only when you need it.
+
+| Starting point | Add next when you need... |
+|---|---|
+| `minimal` profile | cross-session state, stronger docs routing, and a repeatable bootstrap path |
+| `standard` profile | reviewer specialization, committed demo patterns, and CI-enforced integrity |
+| `full` profile | domain-specific role governance, packet-heavy audits, and internal operating standardization |
+
+If you are unsure, begin with `standard`. It gives the best balance of real guardrails without the full reviewer-role surface area.
+
+ succeeded in 0ms:
+---
+name: Implementer
+description: >
+  Execution, validation, and code-change agent. Use when you have a clear plan
+  and need to make precise file edits, run validations, and close out a subtask.
+---
+
+# Implementer Agent
+
+## Role
+
+I execute changes, validate outcomes, and close out subtasks. I do not design.
+
+## When to Use Me
+
+- Applying a plan produced by the Architect agent
+- Making a specific, bounded code change with known acceptance criteria
+- Running validation after a change (lint, type check, tests)
+- Completing the Git closeout for a finished subtask
+- Updating documentation that must stay in sync with a code change
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit framework surfaces for preference-alignment drift."""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+@dataclass(frozen=True)
+class DriftIssue:
+    kind: str
+    detail: str
+
+
+REQUIRED_SNIPPETS: dict[str, tuple[str, ...]] = {
+exec
+/bin/zsh -lc "rg -n \"execution_contract|Execution Contract|Long-Loop Closeout Contract|Step 3A|confirmed execution contract|do not enter autonomous\" . -g '"'!tmp/**'"'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+./templates/execution_contract.template.md:1:# Execution Contract
+./templates/execution_contract.template.md:43:## Long-Loop Closeout Contract
+./templates/project-context.template.md:39:| `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
+./templates/project-context.template.md:75:| `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
+./scripts/bootstrap_adoption.py:430:        "templates/execution_contract.template.md",
+./scripts/preference_drift_audit.py:26:    "templates/execution_contract.template.md": (
+./scripts/preference_drift_audit.py:56:    "templates/execution_contract.template.md": (
+./scripts/validate_template.py:81:    "templates/execution_contract.template.md",
+./scripts/validate_template.py:118:        "## Step 3A — Confirm The Execution Contract",
+./scripts/validate_template.py:179:    "templates/execution_contract.template.md",
+./scripts/validate_template.py:238:    "templates/execution_contract.template.md",
+./scripts/validate_template.py:651:def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
+./scripts/validate_template.py:652:    text = _read(root / "templates/execution_contract.template.md")
+./scripts/validate_template.py:659:        "## Long-Loop Closeout Contract",
+./scripts/validate_template.py:1193:        _validate_execution_contract,
+./README.md:61:  execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+./README.md:202:Before any long-running or multi-step task, the agent should produce an execution contract for user confirmation. Use [`templates/execution_contract.template.md`](templates/execution_contract.template.md) to confirm:
+./README.md:348:| Long-task execution contract | `templates/execution_contract.template.md` |
+./CHANGELOG.md:12:- Optional fast-start execution block in `templates/execution_contract.template.md` to freeze planning surfaces, execution boundary, UAC, decomposition, and long-loop closeout rules at task start.
+./CHANGELOG.md:22:- `templates/execution_contract.template.md` now carries explicit long-loop closeout, validation, host-closeout, and status-line fields.
+exec
+/bin/zsh -lc "sed -n '400,470p' docs/FRAMEWORK_ARCHITECTURE.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' examples/demo_project/session_state.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1010,1075p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# session_state.md
+
+> Cross-session state for Demo Task Tracker.
+
+---
+
+## Current Goal
+
+Demonstrate how the framework looks inside a small adopted repository with resumable audit artifacts.
+
+---
+
+## Working Hypothesis
+
+If the demo stays intentionally small, adopters will understand the customization points faster than they would from generic prose alone.
+
+**Confidence**: High
+
+**Evidence**: The project context, roadmap, code, tests, and packet examples all point at the same feature slice.
+
+ succeeded in 0ms:
+2. **Promote**: durable insights → appropriate TYPE-A docs
+3. **Rotate**: clear phase content from `session_state.md`; load next phase criteria
+4. **Mark**: ROADMAP.md row → `✅ YYYY-MM-DD`
+5. **Git closeout**: main thread commits and normally pushes after hard gates pass; only exception cases are escalated
+
+---
+
+## Long-Task Autonomous Execution
+
+Multi-step tasks are the primary operational mode. The framework's default execution posture is autonomous forward progress — not wait-and-confirm. This posture is established by Rule 20 in `.github/copilot-instructions.md`.
+
+Before entering that mode, the agent should emit a short execution contract for user confirmation. This is a one-time agreement on execution style, not a request for per-step permission.
+
+Long tasks most often fail operationally not because implementation is impossible, but because internal progress checkpoints get mistaken for true closeout. To keep while-style execution stable, the framework freezes four things before execution begins:
+
+1. the progress unit
+2. the intermediate checkpoint event
+3. the true closeout boundary
+4. the host closeout action reserved for that true boundary only
+
+ succeeded in 0ms:
+| Rule 18 (Resumable Audit) | Handoff packets cover tactical session interruptions; leftover units cover strategic deferrals that survive phase rotation |
+| Rule 25 (Receipt-Anchored Closeout) | `implementation_complete_live_blocked` cannot be written as "completed" — Rule 25 enforces this at the diff level |
+| Rule 22 (UAC Gate) | UAC defines acceptance conditions; scope classification defines which state the scope is currently in relative to those conditions |
+
+Full concept documentation: `docs/LEFTOVER_UNIT_CONTRACT.md`
+
+---
+
+## Rule 25: Receipt-Anchored Closeout (🔴 Mandatory)
+
+Writing "completed", "accepted", or "status=passed" in a truth source is a **claim** — not a fact. A claim without a receipt anchor is indistinguishable from a placeholder.
+
+### The Rule
+
+When any of the following strings appear as **new additions** in `session_state.md`, `ROADMAP.md`, or docs:
+
+```
+completed · accepted · status=passed · done · verified · all criteria met
+```
+
+exec
+/bin/zsh -lc "sed -n '1,120p' CHANGELOG.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,120p' ROADMAP.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# ROADMAP
+
+> Phase planning and acceptance criteria for agent-framework-template.
+
+---
+
+## Phase 1 — Productize The Template
+
+**Goal**: Turn the framework from a policy-heavy template into a more adoptable package with tooling, CI, demo assets, and reusable reviewer-role material.
+
+**Status**: ✅ 2026-04-01
+
+| Item | Status |
+|---|---|
+| Ship audit packet, receipt, and handoff tooling | ✅ 2026-04-01 |
+| Add strategy/mechanism and reviewer-role example pack | ✅ 2026-04-01 |
+| Add bootstrap, validator, CI, demo repo, and release assets | ✅ 2026-04-01 |
+
+**Acceptance Criteria**:
+- [x] The repository ships runnable bootstrap and validation tooling.
+ succeeded in 0ms:
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on Keep a Changelog and this repository uses Semantic Versioning.
+
+## [Unreleased]
+
+### Added
+- Stable closeout and progress formatting docs at `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` and `docs/PROGRESS_UPDATE_TEMPLATE.md`.
+- While-loop closeout state fields in `templates/session_state.template.md` for progress unit, true closeout boundary, and host closeout action.
+- Optional fast-start execution block in `templates/execution_contract.template.md` to freeze planning surfaces, execution boundary, UAC, decomposition, and long-loop closeout rules at task start.
+- Rule 8 closeout guardrails for irreversible host closeout and hook-only repair paths.
+- Developer Toolchain discussion and formal design docs at `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` and `docs/DEVELOPER_TOOLCHAIN_DESIGN.md`.
+- Active-doc portability and stale-assertion auditing via `scripts/active_docs_audit.py`, including validator and bootstrap integration.
+
+### Changed
+- Root project metadata is now self-hosted: the repository ships a real project adapter and roadmap instead of template placeholders.
+- Generated Python caches are now ignored and can be cleaned without polluting the working tree.
+- Rule 8 now separates in-progress status lines from final closeout behavior and treats host closeout actions such as `task_complete` as the machine-facing completion signal.
+exec
+/bin/zsh -lc 'git status --short' in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc 'git log --oneline -5' in /Users/mac/Desktop/agent-framework-template succeeded in 1.76s:
+2026-04-05 13:16:05.601 xcodebuild[10203:80563621]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-05 13:16:05.845 xcodebuild[10203:80563618] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-PFv96g6u' (errno=Operation not permitted)
+2026-04-05 13:16:06.286 xcodebuild[10226:80563730]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-05 13:16:06.414 xcodebuild[10226:80563727] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+8e700b3 skills: add harvest loop contract and artifacts
+2763ac6 skills: enforce review matrix and references
+392463e skills: add first-pass template and validation
+543acca docs: freeze skill mechanism v1 draft
+7ccb023 docs: standardize claude cli auth guidance
+ succeeded in 1.77s:
+2026-04-05 13:16:05.600 xcodebuild[10204:80563620]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-05 13:16:05.845 xcodebuild[10204:80563619] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-6RzwqwbA' (errno=Operation not permitted)
+2026-04-05 13:16:06.286 xcodebuild[10225:80563729]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-05 13:16:06.414 xcodebuild[10225:80563728] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+?? tmp/discussion/template_framework_drift_audit_v1/
+codex
+I have enough context to narrow the audit. I’m pulling exact line references for the likely findings so the verdict stays tied to specific shipped surfaces rather than broad framework criticism.
+Plan update
+  ✓ Inspect core adopter-facing contract surfaces and current state files
+  ✓ Trace executable enforcement in scripts/tests for the packet’s highlighted risk areas
+  → Synthesize a verdict with only the top 3 evidence-backed findings
+exec
+/bin/zsh -lc "nl -ba session_state.md | sed -n '1,120p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba README.md | sed -n '190,235p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+     1	# session_state.md
+     2	
+     3	> Cross-session state for agent-framework-template. Keep under ~100 lines.
+     4	> When over limit: archive old phase content to docs/archive/.
+     5	
+     6	---
+     7	
+     8	## Current Goal
+     9	
+    10	Close out the SKILL mechanism implementation follow-up: field-level receipt and review matrix, stronger validator enforcement, and final git closeout.
+    11	
+    12	---
+    13	
+    14	## Working Hypothesis
+    15	
+    16	The remaining high-value gap is no longer broad architecture or starter assets; it is making the field-level receipt and review matrix real in the design, template, examples, and validator so the SKILL mechanism can be treated as operationally complete.
+    17	
+    18	**Confidence**: High
+    19	
+    20	**Evidence**: The TYPE-A SKILL draft, canonical template, starter examples, and first-pass validator already exist; the only explicit unresolved design boundary was the field-level receipt and review matrix plus a stronger truthfulness check for references.
+ succeeded in 0ms:
+   190	#    Edit your-repo/.github/instructions/project-context.instructions.md
+   191	#    Replace all [placeholders] with real values, including the Developer Toolchain section
+   192	```
+   193	
+   194	### Full setup
+   195	
+   196	See [`docs/ADOPTION_GUIDE.md`](docs/ADOPTION_GUIDE.md) for a complete walkthrough.
+   197	
+   198	---
+   199	
+   200	## Pre-Execution Confirmation
+   201	
+   202	Before any long-running or multi-step task, the agent should produce an execution contract for user confirmation. Use [`templates/execution_contract.template.md`](templates/execution_contract.template.md) to confirm:
+   203	
+   204	- whether the default main-thread-agent ownership for normal commit / push should stay in place or be overridden
+   205	- whether CLI or subagent fan-out is expected and what the fallback plan is
+   206	- whether the task runs in autonomous while-loop mode
+   207	- what technical plus end-to-end or user-visible validation must pass before completion is reported
+   208	- what scope, escalation, and state-update rules apply
+   209	
+exec
+/bin/zsh -lc "nl -ba scripts/validate_template.py | sed -n '635,705p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba .github/agents/implementer.agent.md | sed -n '20,85p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba scripts/closeout_truth_audit.py | sed -n '1,140p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    20	- Updating documentation that must stay in sync with a code change
+    21	
+    22	## Inputs I Expect
+    23	
+    24	- The implementation checklist from the Architect (or a clear task description)
+    25	- The list of files to touch
+    26	- The acceptance criteria to verify after the change
+    27	- The confirmed execution contract for any long-running or multi-step task
+    28	
+    29	## How I Execute Each Step
+    30	
+    31	For every file change, I run the full **think → self-check → act** gate before touching anything:
+    32	
+    33	### THINK
+    34	State in one sentence: what am I about to change and why?
+    35	
+    36	### SELF-CHECK (gate — all must pass before I act)
+    37	
+    38	| Question | If NO |
+    39	|---|---|
+ succeeded in 0ms:
+   635	def _validate_session_state_template(root: Path) -> list[ValidationIssue]:
+   636	    text = _read(root / "templates/session_state.template.md")
+   637	    issues: list[ValidationIssue] = []
+   638	    required_snippets = (
+   639	        "**Current Step**:",
+   640	        "**Next Planned Step**:",
+   641	        "**Progress Unit**:",
+   642	        "**True Closeout Boundary**:",
+   643	        "**Host Closeout Action**:",
+   644	    )
+   645	    for snippet in required_snippets:
+   646	        if snippet not in text:
+   647	            issues.append(ValidationIssue("missing-session-state-snippet", snippet))
+   648	    return issues
+   649	
+   650	
+   651	def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
+   652	    text = _read(root / "templates/execution_contract.template.md")
+   653	    issues: list[ValidationIssue] = []
+   654	    required_snippets = (
+ succeeded in 0ms:
+     1	#!/usr/bin/env python3
+     2	"""Audit closeout claims for receipt-anchor evidence in the same diff."""
+     3	
+     4	from __future__ import annotations
+     5	
+     6	import argparse
+     7	import re
+     8	import subprocess
+     9	from dataclasses import dataclass
+    10	from pathlib import Path
+    11	
+    12	
+    13	CLAIM_PATTERNS = (
+    14	    re.compile(r"\bcompleted\b", re.IGNORECASE),
+    15	    re.compile(r"\baccepted\b", re.IGNORECASE),
+    16	    re.compile(r"\bstatus=passed\b", re.IGNORECASE),
+    17	    re.compile(r"\bdone\b", re.IGNORECASE),
+    18	    re.compile(r"\bverified\b", re.IGNORECASE),
+    19	    re.compile(r"\ball criteria met\b", re.IGNORECASE),
+    20	)
+exec
+/bin/zsh -lc "nl -ba docs/ADOPTION_GUIDE.md | sed -n '219,255p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+   219	## Step 3 — Initialize session_state.md
+   220	
+   221	Copy `templates/session_state.template.md` to the project root as `session_state.md`.
+   222	
+   223	Fill in:
+   224	- **Current Goal**: one sentence describing what you are working on right now
+   225	- **Working Hypothesis**: state the current working assumption (e.g., "The fix requires X" or "The root cause is Y") — even for well-understood tasks, a brief hypothesis anchors the cognitive loop
+   226	- **Confidence**: High / Medium / Low
+   227	- **Acceptance Criteria**: the observable conditions that mark your first phase complete
+   228	
+   229	Leave everything else blank or with placeholder text until the first subtask is confirmed done.
+   230	
+   231	---
+   232	
+   233	## Step 3A — Confirm The Execution Contract
+   234	
+   235	Before the first long-running task, copy `templates/execution_contract.template.md` into your working notes, issue tracker, or task packet and confirm the execution model once with the user or task owner.
+   236	
+   237	At minimum, confirm:
+   238	
+exec
+/bin/zsh -lc "nl -ba .githooks/pre-commit | sed -n '1,80p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba docs/runbooks/resumable-git-audit-pipeline.md | sed -n '1,120p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+     1	#!/usr/bin/env bash
+     2	set -euo pipefail
+     3	
+     4	ROOT="$(git rev-parse --show-toplevel)"
+     5	
+     6	if [[ -f "${ROOT}/scripts/closeout_truth_audit.py" ]]; then
+     7	  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/closeout_truth_audit.py" --root "${ROOT}"
+     8	fi
+     9	
+    10	if [[ -f "${ROOT}/scripts/runtime_surface_guardrails.py" && -f "${ROOT}/.github/runtime_surface_registry.py" ]]; then
+    11	  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/runtime_surface_guardrails.py" staged-check --root "${ROOT}"
+    12	fi
+ succeeded in 0ms:
+     1	# Resumable Git Audit Pipeline
+     2	
+     3	This runbook turns Git audit and reviewer handoff into a recoverable workflow rather than a chat-only memory exercise.
+     4	
+     5	## Goal
+     6	
+     7	Use this workflow whenever implementation, audit, and Git closeout may span multiple executors or multiple interrupted sessions.
+     8	
+     9	The point is not to find one perfect reviewer. The point is to preserve enough state that a different reviewer or CLI session can resume safely.
+    10	
+    11	## Core Roles
+    12	
+    13	| Role | Responsibility |
+    14	|---|---|
+    15	| `Planner` | Freeze truth sources, allowed files, validation, and acceptance boundary |
+    16	| `Executor` | Perform the bounded implementation or investigation |
+    17	| `Auditor` | Review the result, risks, and validation status |
+    18	| `Gatekeeper` | Run hard gates outside the semantic auditor when possible |
+    19	| `Owner Review` | Final acceptance, conflict resolution, and Git closeout |
+    20	
+exec
+/bin/zsh -lc "nl -ba docs/COMPATIBILITY.md | sed -n '1,80p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba tests/test_hook_scaffolding.py | sed -n '74,105p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    74	    _init_repo(tmp_path)
+    75	    _bootstrap_with_hooks(tmp_path)
+    76	
+    77	    result = _run(["git", "config", "core.hooksPath"], cwd=tmp_path)
+    78	
+    79	    assert result.stdout.strip() == ".githooks"
+    80	
+    81	
+    82	def test_pre_commit_hook_blocks_unanchored_closeout_claim(tmp_path: Path) -> None:
+    83	    _init_repo(tmp_path)
+    84	    _bootstrap_with_hooks(tmp_path)
+    85	
+    86	    session_state = tmp_path / "session_state.md"
+    87	    session_state.write_text(session_state.read_text(encoding="utf-8") + "\ncompleted\n", encoding="utf-8")
+    88	    _run(["git", "add", "session_state.md"], cwd=tmp_path)
+    89	
+    90	    result = _run(["bash", ".githooks/pre-commit"], cwd=tmp_path, check=False)
+    91	
+    92	    assert result.returncode == 1
+    93	    assert "closeout truth audit failed" in result.stdout
+ succeeded in 0ms:
+     1	# Compatibility
+     2	
+     3	This document explains what has been verified in this repository and where adopters should still do project-specific validation.
+     4	
+     5	---
+     6	
+     7	## Verified In This Repository
+     8	
+     9	The following are exercised directly in this template repository:
+    10	
+    11	| Surface | Verification |
+    12	|---|---|
+    13	| Bootstrap CLI | Unit tests plus `--dry-run` smoke commands in CI |
+    14	| Template validator | Unit tests plus CI execution |
+    15	| Active docs portability and stale-assertion audit | Standalone audit script plus validator integration for live docs and instruction surfaces |
+    16	| Preference drift audit | Standalone audit script plus validator integration for progress/closeout contract drift |
+    17	| SKILL contract template and starter examples | Structured validator checks canonical sections, review-matrix completeness, and referenced-path integrity |
+    18	| SKILL harvest loop design and artifact templates | TYPE-A draft plus shipped candidate/receipt templates exercised by bootstrap and repository validation |
+    19	| Git audit generator | Unit tests |
+    20	| Core docs and file references | Structured validator |
+exec
+/bin/zsh -lc "nl -ba scripts/validate_template.py | sed -n '1160,1215p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+  1160	
+  1161	    return advisories
+  1162	
+  1163	
+  1164	def validate_repo(root: Path) -> list[ValidationIssue]:
+  1165	    if (root / ADOPTER_MANIFEST_PATH).is_file():
+  1166	        issues = _validate_adopted_repo(root)
+  1167	        manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+  1168	        contract = manifest.get("developer_toolchain_contract")
+  1169	        if isinstance(contract, dict):
+  1170	            issues.extend(
+  1171	                _validate_developer_toolchain_contract(
+  1172	                    root / ".github/instructions/project-context.instructions.md",
+  1173	                    project_type=manifest.get("project_type"),
+  1174	                    contract=contract,
+  1175	                )
+  1176	            )
+  1177	        issues.extend(_validate_preference_drift(root))
+  1178	        issues.extend(_validate_active_docs(root))
+  1179	        issues.extend(_validate_skill_contract_files(root))
+codex
+**Verdict**
+
+The framework is directionally reasonable, but it currently has **material drift risk**. The repo ships real mechanisms, but its own self-hosting truthfulness is already broken, and two adopter-facing contracts are still stronger in prose than in executable proof.
+
+**Top 3 Findings**
+
+1. Root state truth is currently false. Category: `current bug`. Evidence: [`session_state.md`](/Users/mac/Desktop/agent-framework-template/session_state.md#L8) still says the active goal is to close out the SKILL follow-up and that there is “No active work” with “Independent review, then git closeout” next, even though the file also records that wave as completed and the roadmap is already through Phase 3 in [`ROADMAP.md`](/Users/mac/Desktop/agent-framework-template/ROADMAP.md#L41). Why it matters to adopters: this repo is supposed to prove session-state discipline by example, and it currently demonstrates the opposite. Smallest honest fix now: update or rotate the root [`session_state.md`](/Users/mac/Desktop/agent-framework-template/session_state.md#L1) immediately, then add one self-hosting validator check so the template repo fails when its root state is obviously stale instead of only validating [`templates/session_state.template.md`](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py#L635).
+
+2. The execution-contract surface is presented as operationally required, but it is still mostly a documentation ritual. Category: `doc overclaim`. Evidence: README says “Before any long-running or multi-step task, the agent should produce an execution contract” in [`README.md`](/Users/mac/Desktop/agent-framework-template/README.md#L200), the adoption guide repeats that in [`docs/ADOPTION_GUIDE.md`](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md#L233), and the implementer agent says it will not enter autonomous execution until confirmed in [`.github/agents/implementer.agent.md`](/Users/mac/Desktop/agent-framework-template/.github/agents/implementer.agent.md#L68). But the validator only checks that the template contains certain strings in [`scripts/validate_template.py`](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py#L651), and the repo ships no completed execution-contract example or enforcement path proving adopters will actually use it. Why it matters to adopters: they may believe commit ownership, closeout boundary, and validation gate behavior are operationally settled when they are still dependent on agent obedience. Smallest honest fix now: either ship one filled execution-contract example in the demo path, or soften the README/adoption wording from expected behavior to recommended practice until there is executable proof.
+
+3. Proof-vs-claim discipline is only partially real; the closeout audit is a heuristic and optional for adopters. Category: `governance gap`. Evidence: the audit only regex-matches claims and any anchor-like line in the same diff in [`scripts/closeout_truth_audit.py`](/Users/mac/Desktop/agent-framework-template/scripts/closeout_truth_audit.py#L13), and hook enforcement exists only when adopters install the optional hooks in [`.githooks/pre-commit`](/Users/mac/Desktop/agent-framework-template/.githooks/pre-commit#L1). The repo does test that hook path in [`tests/test_hook_scaffolding.py`](/Users/mac/Desktop/agent-framework-template/tests/test_hook_scaffolding.py#L82), but the rule in [`.github/copilot-instructions.md`](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L1016) reads stronger than what is mechanically guaranteed. Why it matters to adopters: they can think they inherited strong closeout-proof governance when they actually inherited a lightweight anti-placeholder check plus optional installation. Smallest honest fix now: document this as a heuristic guard unless hooks are installed, and tighten the accepted anchors to explicit receipt-shaped evidence instead of any matching line like `N passed`.
+
+**One Thing The Packet Is Over-Worried About**
+
+The packet is over-worried that git closeout policy is still too abstract. That part is more mature than it gives credit for: the repo has a concrete runbook in [`docs/runbooks/resumable-git-audit-pipeline.md`](/Users/mac/Desktop/agent-framework-template/docs/runbooks/resumable-git-audit-pipeline.md#L5), a pre-commit closeout audit hook in [`.githooks/pre-commit`](/Users/mac/Desktop/agent-framework-template/.githooks/pre-commit#L1), and tests proving the hook blocks unanchored closeout claims in [`tests/test_hook_scaffolding.py`](/Users/mac/Desktop/agent-framework-template/tests/test_hook_scaffolding.py#L82). The weakness is not absence of a model; it is optionality and self-hosting inconsistency.
+
+**Final Recommendation**
+
+`patch now`
+
+The fixes are small and honesty-restoring: repair root state, add one self-hosting stale-state check, and either prove the execution-contract path with one concrete example or soften the current wording.
+tokens used
+71,688
+**Verdict**
+
+The framework is directionally reasonable, but it currently has **material drift risk**. The repo ships real mechanisms, but its own self-hosting truthfulness is already broken, and two adopter-facing contracts are still stronger in prose than in executable proof.
+
+**Top 3 Findings**
+
+1. Root state truth is currently false. Category: `current bug`. Evidence: [`session_state.md`](/Users/mac/Desktop/agent-framework-template/session_state.md#L8) still says the active goal is to close out the SKILL follow-up and that there is “No active work” with “Independent review, then git closeout” next, even though the file also records that wave as completed and the roadmap is already through Phase 3 in [`ROADMAP.md`](/Users/mac/Desktop/agent-framework-template/ROADMAP.md#L41). Why it matters to adopters: this repo is supposed to prove session-state discipline by example, and it currently demonstrates the opposite. Smallest honest fix now: update or rotate the root [`session_state.md`](/Users/mac/Desktop/agent-framework-template/session_state.md#L1) immediately, then add one self-hosting validator check so the template repo fails when its root state is obviously stale instead of only validating [`templates/session_state.template.md`](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py#L635).
+
+2. The execution-contract surface is presented as operationally required, but it is still mostly a documentation ritual. Category: `doc overclaim`. Evidence: README says “Before any long-running or multi-step task, the agent should produce an execution contract” in [`README.md`](/Users/mac/Desktop/agent-framework-template/README.md#L200), the adoption guide repeats that in [`docs/ADOPTION_GUIDE.md`](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md#L233), and the implementer agent says it will not enter autonomous execution until confirmed in [`.github/agents/implementer.agent.md`](/Users/mac/Desktop/agent-framework-template/.github/agents/implementer.agent.md#L68). But the validator only checks that the template contains certain strings in [`scripts/validate_template.py`](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py#L651), and the repo ships no completed execution-contract example or enforcement path proving adopters will actually use it. Why it matters to adopters: they may believe commit ownership, closeout boundary, and validation gate behavior are operationally settled when they are still dependent on agent obedience. Smallest honest fix now: either ship one filled execution-contract example in the demo path, or soften the README/adoption wording from expected behavior to recommended practice until there is executable proof.
+
+3. Proof-vs-claim discipline is only partially real; the closeout audit is a heuristic and optional for adopters. Category: `governance gap`. Evidence: the audit only regex-matches claims and any anchor-like line in the same diff in [`scripts/closeout_truth_audit.py`](/Users/mac/Desktop/agent-framework-template/scripts/closeout_truth_audit.py#L13), and hook enforcement exists only when adopters install the optional hooks in [`.githooks/pre-commit`](/Users/mac/Desktop/agent-framework-template/.githooks/pre-commit#L1). The repo does test that hook path in [`tests/test_hook_scaffolding.py`](/Users/mac/Desktop/agent-framework-template/tests/test_hook_scaffolding.py#L82), but the rule in [`.github/copilot-instructions.md`](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L1016) reads stronger than what is mechanically guaranteed. Why it matters to adopters: they can think they inherited strong closeout-proof governance when they actually inherited a lightweight anti-placeholder check plus optional installation. Smallest honest fix now: document this as a heuristic guard unless hooks are installed, and tighten the accepted anchors to explicit receipt-shaped evidence instead of any matching line like `N passed`.
+
+**One Thing The Packet Is Over-Worried About**
+
+The packet is over-worried that git closeout policy is still too abstract. That part is more mature than it gives credit for: the repo has a concrete runbook in [`docs/runbooks/resumable-git-audit-pipeline.md`](/Users/mac/Desktop/agent-framework-template/docs/runbooks/resumable-git-audit-pipeline.md#L5), a pre-commit closeout audit hook in [`.githooks/pre-commit`](/Users/mac/Desktop/agent-framework-template/.githooks/pre-commit#L1), and tests proving the hook blocks unanchored closeout claims in [`tests/test_hook_scaffolding.py`](/Users/mac/Desktop/agent-framework-template/tests/test_hook_scaffolding.py#L82). The weakness is not absence of a model; it is optionality and self-hosting inconsistency.
+
+**Final Recommendation**
+
+`patch now`
+
+The fixes are small and honesty-restoring: repair root state, add one self-hosting stale-state check, and either prove the execution-contract path with one concrete example or soften the current wording.

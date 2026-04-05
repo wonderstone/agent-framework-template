@@ -119,6 +119,54 @@ def test_validate_repo_reports_readme_rule_range_mismatch(tmp_path: Path) -> Non
     assert ValidationIssue("readme-rule-range-mismatch", "Rule 0–27") in issues
 
 
+def test_validate_repo_reports_stale_root_session_state_no_active_work_with_next_step(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    session_state = repo_copy / "session_state.md"
+    session_state.write_text(
+        session_state.read_text(encoding="utf-8").replace(
+            "**Current Step**: Implement the root `session_state.md` stale-state audit and its tests.\n\n**Next Planned Step**: Re-run validation, then commit and push the drift-audit changes.",
+            "**Current Step**: No active work.\n\n**Next Planned Step**: Independent review, then git closeout.",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "stale-root-session-state",
+        "session_state.md: 'Current Step' says no active work but 'Next Planned Step' is not none-like",
+    ) in issues
+
+
+def test_validate_repo_reports_stale_root_session_state_no_active_work_with_unchecked_uac(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    session_state = repo_copy / "session_state.md"
+    updated = session_state.read_text(encoding="utf-8")
+    updated = updated.replace(
+        "**Current Step**: Implement the root `session_state.md` stale-state audit and its tests.",
+        "**Current Step**: No active work.",
+        1,
+    )
+    updated = updated.replace(
+        "- [ ] Validation for touched surfaces passes after the stale-state audit is added.",
+        "- [ ] Validation for touched surfaces passes after the stale-state audit is added.",
+        1,
+    )
+    session_state.write_text(updated, encoding="utf-8")
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "stale-root-session-state",
+        "session_state.md: 'Current Step' says no active work while User Acceptance Criteria still contain unchecked items",
+    ) in issues
+
+
 def test_validate_repo_reports_receipt_closeout_rule_mismatch(tmp_path: Path) -> None:
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
