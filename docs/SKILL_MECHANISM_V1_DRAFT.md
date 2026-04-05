@@ -14,9 +14,9 @@ This is a design draft. It freezes the canonical framework-native contract and i
 |---|---|
 | Status | Draft v1 |
 | Scope | Framework-level skill contract and governance model |
-| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout |
-| Already changes | design expectations for future skill templates, validators, and adapter surfaces |
-| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a field-level receipt matrix |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, and `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` |
+| Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
+| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
 
 Normative note:
 
@@ -241,14 +241,14 @@ The canonical v1 follow-up question is now frozen into the design itself.
 
 Each canonical field uses the following default matrix:
 
-| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
-|---|---|---|---|
-| `purpose` | 1-2 only | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `triggers` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `entry_instructions` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `references` | 1-4 | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |
-| `governance` | 1-2 only | `dual-reviewer` | `dual-reviewer`; owner review required |
-| `degradation` | 1-3 | `single-reviewer` | `dual-reviewer`; owner review required |
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override | Promotion tier |
+|---|---|---|---|---|
+| `purpose` | 1-2 only | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `triggers` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `entry_instructions` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+| `references` | 1-4 | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `delegated-safe` |
+| `governance` | 1-2 only | `dual-reviewer` | `dual-reviewer`; owner review required | `human-only` |
+| `degradation` | 1-3 | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
 
 Matrix rule:
 
@@ -256,6 +256,7 @@ Matrix rule:
 2. `references` is the most flexible field because it often grows through examples or support files, but even there the reference must remain truthful and reviewable
 3. `governance` and `degradation` are not metadata-only fields; they use stricter review because they change how the skill can evolve and how it behaves under capability gaps
 4. every `guardrail` skill applies its override column even when a repository uses a looser default elsewhere
+5. detailed harvest and promotion-governance semantics live in `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, but the per-field authority table belongs directly in this canonical contract because it is part of the same field-native truth surface
 
 ---
 
@@ -272,6 +273,7 @@ The v1 validator contract should hard-fail when:
 3. a named reference does not resolve to an existing artifact
 4. runtime-specific behavior is claimed without a matching degradation declaration
 5. `entry_instructions` inlines what should remain in referenced artifacts and collapses progressive disclosure
+6. the receipt and review matrix omits the canonical `promotion_tier` column or uses unsupported field-authority values
 
 ### Advisory Checks
 
@@ -337,9 +339,9 @@ The next likely implementation steps are:
 1. a canonical skill template surface
 2. validator support for the hard-fail and advisory checks defined here
 3. one or more repository-local starter examples covering at least two skill types
-4. a later follow-up on the field-level receipt and review matrix
+4. a promotion-governance follow-up that turns receipt-bearing evidence into candidate packets and promotion receipts without letting the harvester self-classify its own authority
 
-That receipt and review matrix is now defined at the design level, but downstream templates and validators still need to consume it consistently.
+That matrix and field-level promotion authority are now defined at the design level, but downstream templates, validators, and promotion artifacts still need to consume them consistently.
 
 Open follow-up boundary:
 
@@ -370,4 +372,4 @@ This document complements the rest of the framework like this:
 
 ## Current Decision Summary
 
-The v1 framework should standardize a small framework-native skill contract, keep vendor syntax and package mechanics outside the canonical core, require human review for all normative field changes, and make honest degradation mandatory whenever runtime features differ.
+The v1 framework should standardize a small framework-native skill contract, keep vendor syntax and package mechanics outside the canonical core, freeze field-level promotion authority in a human-authored table, and make honest degradation mandatory whenever runtime features differ.

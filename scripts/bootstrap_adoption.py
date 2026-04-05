@@ -410,6 +410,7 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
         "docs/FRAMEWORK_ARCHITECTURE.md",
         "docs/LEFTOVER_UNIT_CONTRACT.md",
+        "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
         "docs/SKILL_MECHANISM_V1_DRAFT.md",
         "docs/runbooks/multi-model-discussion-loop.md",
         "docs/RUNTIME_SURFACE_PROTECTION.md",
@@ -432,6 +433,8 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "templates/root_cause_note.template.md",
         "templates/roadmap.template.md",
         "templates/session_state.template.md",
+        "templates/skill_candidate_packet.template.md",
+        "templates/skill_promotion_receipt.template.md",
         "templates/skill.template.md",
     ),
     "full": (

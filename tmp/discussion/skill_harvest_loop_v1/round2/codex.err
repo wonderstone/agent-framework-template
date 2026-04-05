@@ -1,0 +1,175 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d5b15-d9ba-7a83-a461-e72786bdd4d8
+--------
+user
+Read `/Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_harvest_loop_v1/discussion_packet.md`, especially the Round 1 synthesis and the Round 2 kickoff block.
+
+We are not reopening the whole workflow question. The narrow decision is:
+
+What is the minimal canonical field-classification model that can support delegated SKILL promotion honestly without letting the harvester self-classify its own authority?
+
+Compare exactly these three options:
+
+1. Per-field `promotion_tier` table in the canonical SKILL schema.
+2. Section-level mutable-zone map.
+3. Hybrid: section zones plus a small per-field override table.
+
+Use the existing framework truth as a constraint:
+
+- The canonical v1 SKILL contract already has six load-bearing fields: `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, `degradation`.
+- There is already a field-level receipt and review matrix.
+- We want delegated, evidence-bounded promotion.
+- We do not want direct transcript-to-skill mutation.
+- The design must stay portable across executor types and vendor CLIs.
+
+Respond in this exact structure:
+
+## Verdict
+- Choose A, B, or C.
+- Give one-sentence rationale.
+
+## Why The Other Two Lose
+- One bullet per rejected option.
+
+## Minimal Contract Shape
+- List the smallest set of schema additions or changes needed.
+- Be concrete about whether this belongs in the canonical SKILL doc, the skill template, validator contract, or promotion receipts.
+
+## Validator Strategy
+- Explain what can be mechanically enforced.
+- Explain what still needs escalation or human ownership.
+
+## Drift Failure Mode
+- Name the most likely way your chosen model still drifts.
+- Give the tightest mitigation.
+
+## Migration Path
+- Explain how the current v1 contract could adopt your chosen model with the least disruption.
+
+## Narrowest Remaining Question
+- If one question still remains after this round, state only the narrowest one.
+
+Constraints:
+
+- Do not propose a fourth option.
+- Do not re-argue for full autonomous promotion.
+- Do not assume a specific vendor executor is the sole reviewer.
+- Prefer the smallest honest contract over the most expressive one.
+mcp startup: no servers
+codex
+I’m reading the discussion packet first to anchor on the existing Round 1 synthesis and the Round 2 kickoff constraints, then I’ll answer only the narrow field-classification decision in the exact structure you requested.
+exec
+/bin/zsh -lc "sed -n '1,260p' /Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_harvest_loop_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — skill_harvest_loop_v1
+
+- Generated at: 2026-04-05T00:00:00+00:00
+- Owner: GitHub Copilot
+- Current round goal: Decide whether and how the framework should turn finished task history into review-gated SKILL improvements without relying on a human to manually inspect every conversation.
+- Round exit rule: Freeze a concrete mechanism direction, narrow to one sharper governance question, or stop if the proposal cannot stay truthful.
+
+## Decision Question
+
+How should this framework add a post-task SKILL-harvest workflow that makes the agent layer improve from real usage while minimizing direct human review and still preventing silent prompt drift?
+
+## Why This Needs Discussion
+
+The framework now has a formal SKILL contract, starter examples, a validator, and a field-level receipt and review matrix. What it does not yet have is the operational loop that turns finished task history into trustworthy candidate improvements. The missing mechanism is not whether agents can learn from usage in principle, but how to do so without creating automatic transcript-to-skill mutation.
+
+## Current Truth
+
+- The repository already distinguishes canonical framework-native skills from vendor adapters.
+- The SKILL draft already forbids raw transcripts and model summaries from directly mutating canonical skill fields.
+- The current review matrix still assumes human approval as the review primitive, but it does not yet say whether that review can be delegated to a role, a subagent, an external CLI, or the main thread.
+exec
+/bin/zsh -lc 'rg -n "Round 1 synthesis|Round 2 kickoff|promotion_tier|mutable-zone|field-level receipt|review matrix|canonical v1 SKILL contract|purpose|triggers|entry_instructions|references|governance|degradation" /Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_harvest_loop_v1/discussion_packet.md' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+6:- Round exit rule: Freeze a concrete mechanism direction, narrow to one sharper governance question, or stop if the proposal cannot stay truthful.
+14:The framework now has a formal SKILL contract, starter examples, a validator, and a field-level receipt and review matrix. What it does not yet have is the operational loop that turns finished task history into trustworthy candidate improvements. The missing mechanism is not whether agents can learn from usage in principle, but how to do so without creating automatic transcript-to-skill mutation.
+20:- The current review matrix still assumes human approval as the review primitive, but it does not yet say whether that review can be delegated to a role, a subagent, an external CLI, or the main thread.
+36:3. Confidence-tiered auto-promotion: low-risk fields such as references or gotcha appendices may promote automatically from strong receipts, while normative fields still require delegated review.
+43:- Drift resistance: can the workflow resist silent degradation from repeated weak proposals?
+61:4. Prefer concrete workflow and governance proposals over generic warnings.
+80:- Best contract shape: add per-field `promotion_tier`, `candidate_packet`, `promotion_receipt`, and reviewer-role exclusion rules.
+82:- Narrowest next question: should `promotion_tier` be a human-authored immutable per-field annotation in the SKILL schema?
+112:- Narrowest next question: which canonical SKILL fields are informational, normative, or constitutional for promotion-governance purposes?
+118:- Shared governance boundary: candidate truth must remain distinct from canonical truth. Receipts and candidate packets may accumulate aggressively; canonical mutation must stay explicit, typed, and reversible.
+120:- Most reusable mechanism pieces already exist in-framework: closeout receipts, reviewer roles, validators, audit logs, and append-only packets. The missing layer is a promotion-governance contract that binds field class -> allowed authority -> minimum evidence -> escalation triggers.
+121:- Main unresolved choice: whether the framework should encode this as a per-field `promotion_tier` table in the canonical SKILL contract, a section-level mutable-zone map, or a hybrid of both. The round strongly suggests that runtime reviewers should not be allowed to improvise that classification.
+127:- Question freeze: choose the minimal canonical field-classification model for SKILL promotion governance.
+128:- Option A: per-field `promotion_tier` table attached directly to the canonical SKILL schema.
+129:- Option B: section-level mutable-zone map, where entire sections are marked delegated-safe, delegated-reviewed, or human-only.
+131:- Existing truth to reuse: the canonical v1 contract already exposes six load-bearing fields (`purpose`, `triggers`, `entry_instructions`, `references`, `governance`, `degradation`) and a field-level receipt/review matrix. The new mechanism should extend that truth rather than invent a parallel taxonomy.
+codex
+## Verdict
+- Choose A.
+- A is the smallest honest contract because the framework already treats the six canonical SKILL fields as the load-bearing unit, so attaching authority directly to those fields reuses existing truth and prevents runtime actors from inventing their own classification layer.
+
+## Why The Other Two Lose
+- B loses because section zones introduce a second taxonomy beside the canonical field model, which is less portable, less mechanically checkable, and too coarse once one section contains fields with different authority weight.
+- C loses because the override table becomes the real authority surface in practice, so the hybrid keeps section-level ambiguity while quietly reintroducing per-field governance anyway.
+
+## Minimal Contract Shape
+- Canonical SKILL doc: add one immutable field-classification table keyed by the six canonical fields: `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, `degradation`.
+- Canonical SKILL doc: for each field, record only the minimum needed governance metadata: `promotion_tier`, `minimum_evidence`, and `escalation_triggers`.
+- Skill template: expose the same fixed table so every skill instance declares the authority class up front rather than inheriting ad hoc reviewer judgment.
+- Validator contract: require the table to exist, require every canonical field to have exactly one classification entry, and reject unknown fields or runtime-added classes.
+- Promotion receipts: record `affected_fields`, the matched canonical `promotion_tier`, evidence actually supplied, reviewer role or executor, and whether escalation was triggered.
+
+## Validator Strategy
+- Mechanically enforceable: field coverage, allowed enum values for `promotion_tier`, required evidence fields per tier, mismatch detection between proposed patch scope and declared field authority, prohibition on receipts that classify fields not present in the canonical table, and rejection of direct transcript-origin mutations into canonical fields.
+- Still needs escalation or human ownership: defining the initial tier assignments, changing tier assignments later, deciding whether evidence is semantically sufficient when the validator only sees structure, and resolving contradictions or borderline cases where a proposal is formally valid but substantively overreaching.
+
+## Drift Failure Mode
+- The most likely drift is tier laundering by gradual over-permissive assignment of a normative field into a lower `promotion_tier`, after which delegated reviewers can keep making technically valid but substantively expansive edits.
+- The tightest mitigation is to treat the field-classification table itself as constitutional and human-owned: no delegated actor may modify it, and any change to that table requires a separate explicit review path outside normal promotion receipts.
+
+## Migration Path
+- Keep the current v1 contract intact and add a single governance annex or table that classifies the existing six fields.
+- Map the existing field-level receipt and review matrix onto that table rather than replacing it.
+- Update the validator to read the new table and compare promotion receipts against it.
+- Update promotion receipts to name affected canonical fields explicitly.
+- Leave skill content shape unchanged; only add the fixed authority metadata and corresponding receipt checks.
+
+## Narrowest Remaining Question
+- What exact `promotion_tier` enum should the canonical table use for the six existing fields?
+tokens used
+5,854
+## Verdict
+- Choose A.
+- A is the smallest honest contract because the framework already treats the six canonical SKILL fields as the load-bearing unit, so attaching authority directly to those fields reuses existing truth and prevents runtime actors from inventing their own classification layer.
+
+## Why The Other Two Lose
+- B loses because section zones introduce a second taxonomy beside the canonical field model, which is less portable, less mechanically checkable, and too coarse once one section contains fields with different authority weight.
+- C loses because the override table becomes the real authority surface in practice, so the hybrid keeps section-level ambiguity while quietly reintroducing per-field governance anyway.
+
+## Minimal Contract Shape
+- Canonical SKILL doc: add one immutable field-classification table keyed by the six canonical fields: `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, `degradation`.
+- Canonical SKILL doc: for each field, record only the minimum needed governance metadata: `promotion_tier`, `minimum_evidence`, and `escalation_triggers`.
+- Skill template: expose the same fixed table so every skill instance declares the authority class up front rather than inheriting ad hoc reviewer judgment.
+- Validator contract: require the table to exist, require every canonical field to have exactly one classification entry, and reject unknown fields or runtime-added classes.
+- Promotion receipts: record `affected_fields`, the matched canonical `promotion_tier`, evidence actually supplied, reviewer role or executor, and whether escalation was triggered.
+
+## Validator Strategy
+- Mechanically enforceable: field coverage, allowed enum values for `promotion_tier`, required evidence fields per tier, mismatch detection between proposed patch scope and declared field authority, prohibition on receipts that classify fields not present in the canonical table, and rejection of direct transcript-origin mutations into canonical fields.
+- Still needs escalation or human ownership: defining the initial tier assignments, changing tier assignments later, deciding whether evidence is semantically sufficient when the validator only sees structure, and resolving contradictions or borderline cases where a proposal is formally valid but substantively overreaching.
+
+## Drift Failure Mode
+- The most likely drift is tier laundering by gradual over-permissive assignment of a normative field into a lower `promotion_tier`, after which delegated reviewers can keep making technically valid but substantively expansive edits.
+- The tightest mitigation is to treat the field-classification table itself as constitutional and human-owned: no delegated actor may modify it, and any change to that table requires a separate explicit review path outside normal promotion receipts.
+
+## Migration Path
+- Keep the current v1 contract intact and add a single governance annex or table that classifies the existing six fields.
+- Map the existing field-level receipt and review matrix onto that table rather than replacing it.
+- Update the validator to read the new table and compare promotion receipts against it.
+- Update promotion receipts to name affected canonical fields explicitly.
+- Leave skill content shape unchanged; only add the fixed authority metadata and corresponding receipt checks.
+
+## Narrowest Remaining Question
+- What exact `promotion_tier` enum should the canonical table use for the six existing fields?

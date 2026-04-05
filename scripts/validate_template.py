@@ -51,6 +51,7 @@ REQUIRED_FILES = (
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
+    "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
@@ -85,6 +86,8 @@ REQUIRED_FILES = (
     "templates/roadmap.template.md",
     "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
+    "templates/skill_candidate_packet.template.md",
+    "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
     "tests/test_active_docs_audit.py",
     "tests/test_closeout_truth_audit.py",
@@ -139,6 +142,13 @@ REQUIRED_SECTIONS = {
         "## Validator Contract",
         "## Portability And Honest Degradation",
     ),
+    "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md": (
+        "## Core Decision",
+        "## Promotion Authority Model",
+        "## Canonical Artifacts",
+        "## Validator Contract",
+        "## Migration Boundary",
+    ),
     "docs/PROGRESS_UPDATE_TEMPLATE.md": (
         "## Recommended Template",
         "## Rules For Good Use",
@@ -167,6 +177,8 @@ README_REQUIRED_REFERENCES = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/skill_candidate_packet.template.md",
+    "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
     "examples/skills/",
     "scripts/closeout_truth_audit.py",
@@ -191,6 +203,7 @@ INDEX_REQUIRED_ROWS = (
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/COMPATIBILITY.md",
+    "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
@@ -210,6 +223,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+    "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
@@ -222,6 +236,8 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/skill_candidate_packet.template.md",
+    "templates/skill_promotion_receipt.template.md",
     "python3 -m pytest tests/ -q",
     '${TMPDIR:-/tmp}/agent-framework-template-smoke',
     "examples/demo_project/tmp/git_audit/",
@@ -329,6 +345,7 @@ SKILL_REQUIRED_METADATA_LABELS = (
 )
 SKILL_RUNTIME_IGNORE_PARTS = {".git", ".venv", "node_modules", "tmp", "__pycache__"}
 SKILL_ALLOWED_REVIEW_THRESHOLDS = {"single-reviewer", "dual-reviewer", "owner-only"}
+SKILL_ALLOWED_PROMOTION_TIERS = {"delegated-safe", "delegated-reviewed", "human-only"}
 SKILL_REQUIRED_MATRIX_FIELDS = (
     "purpose",
     "triggers",
@@ -766,18 +783,19 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
                 "Proposal evidence tiers",
                 "Minimum reviewer threshold",
                 "Guardrail override",
+                "Promotion tier",
             ]
             if header != expected_header:
                 issues.append(
                     ValidationIssue(
                         "invalid-skill-review-matrix-header",
-                        f"{relative}: receipt and review matrix must use the canonical columns Field / Proposal evidence tiers / Minimum reviewer threshold / Guardrail override",
+                        f"{relative}: receipt and review matrix must use the canonical columns Field / Proposal evidence tiers / Minimum reviewer threshold / Guardrail override / Promotion tier",
                     )
                 )
 
             matrix_by_field: dict[str, list[str]] = {}
             for row in matrix_rows[2:]:
-                if len(row) != 4:
+                if len(row) != 5:
                     continue
                 field = row[0].strip().strip("`")
                 matrix_by_field[field] = row
@@ -798,6 +816,23 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
                         ValidationIssue(
                             "invalid-skill-review-threshold",
                             f"{relative}: row '{field}' uses unsupported reviewer threshold '{threshold}'",
+                        )
+                    )
+
+                promotion_tier = row[4].strip().strip("`")
+                if promotion_tier and promotion_tier not in SKILL_ALLOWED_PROMOTION_TIERS and not is_template:
+                    issues.append(
+                        ValidationIssue(
+                            "invalid-skill-promotion-tier",
+                            f"{relative}: row '{field}' uses unsupported promotion tier '{promotion_tier}'",
+                        )
+                    )
+
+                if field == "governance" and promotion_tier and promotion_tier != "human-only" and not is_template:
+                    issues.append(
+                        ValidationIssue(
+                            "invalid-skill-governance-promotion-tier",
+                            f"{relative}: row 'governance' must use promotion tier 'human-only'",
                         )
                     )
 

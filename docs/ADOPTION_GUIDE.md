@@ -58,6 +58,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layers work (optional, keep for ref)
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
   COMPATIBILITY.md                 ← verified surfaces and known limits
+  SKILL_HARVEST_LOOP_V1_DRAFT.md   ← formal v1 design draft for post-task SKILL harvest and promotion governance
   SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design draft for the framework-native SKILL contract
   DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design draft for the Developer Toolchain surface
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and alternative viewpoints for that surface
@@ -76,6 +77,8 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
+  skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
   project-context.template.md      ← blank project adapter to fill in
@@ -188,11 +191,13 @@ When doing so, define the role by judgment boundary first, not by tool name. For
 
 If you want concrete starting points instead of a blank role profile, keep `docs/ROLE_STRATEGY_EXAMPLES.md` and adapt the examples that fit your repository.
 
-If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md` and `templates/skill.template.md` together. The draft defines the canonical framework-native contract, while the template gives you one concrete file shape to fill in.
+If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `templates/skill.template.md` together. The first draft defines the canonical framework-native contract, the harvest draft defines post-task promotion governance, and the template gives you one concrete file shape to fill in.
 
 If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers one `workflow` skill and one `guardrail` skill.
 
 When you do so, keep the field-level receipt and review matrix intact. It is the mechanism that turns broad "humans approve" guidance into an actual per-field update policy.
+
+If your repository also wants receipt-bearing harvest artifacts rather than inventing them later, keep `templates/skill_candidate_packet.template.md` and `templates/skill_promotion_receipt.template.md` too.
 
 If you want a ready-made starter pack rather than starting from scratch, keep `examples/reviewer_roles/`. The template ships 10 formal role profiles split into:
 
@@ -351,6 +356,7 @@ The following files are optional and can be removed for simpler projects:
 | `templates/git_audit_*.template.md` + `scripts/git_audit_pipeline.py` | Same as above |
 | `docs/runbooks/multi-model-discussion-loop.md` | Open design questions do not need a durable multi-round discussion workflow |
 | `templates/discussion_packet.template.md` + `scripts/discussion_pipeline.py` | Same as above |
+| `templates/skill_candidate_packet.template.md` + `templates/skill_promotion_receipt.template.md` | You want post-task SKILL harvest artifacts without inventing the packet/receipt shape yourself |
 | `templates/reviewer_role_profile.template.md` | Same as above |
 | `templates/` | All templates have been applied |
 

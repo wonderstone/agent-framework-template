@@ -174,7 +174,7 @@ def test_validate_repo_reports_missing_skill_review_matrix_row(tmp_path: Path) -
     skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
     skill_example.write_text(
         skill_example.read_text(encoding="utf-8").replace(
-            "| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |\n",
+            "| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |\n",
             "",
             1,
         ),
@@ -186,6 +186,50 @@ def test_validate_repo_reports_missing_skill_review_matrix_row(tmp_path: Path) -
     assert ValidationIssue(
         "missing-skill-review-matrix-row",
         "examples/skills/01_discussion_packet_workflow.md: receipt and review matrix is missing row 'degradation'",
+    ) in issues
+
+
+def test_validate_repo_reports_invalid_skill_promotion_tier(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace(
+            "| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `delegated-safe` |",
+            "| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `mystery-tier` |",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "invalid-skill-promotion-tier",
+        "examples/skills/01_discussion_packet_workflow.md: row 'references' uses unsupported promotion tier 'mystery-tier'",
+    ) in issues
+
+
+def test_validate_repo_reports_invalid_skill_governance_promotion_tier(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace(
+            "| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required | `human-only` |",
+            "| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "invalid-skill-governance-promotion-tier",
+        "examples/skills/01_discussion_packet_workflow.md: row 'governance' must use promotion tier 'human-only'",
     ) in issues
 
 

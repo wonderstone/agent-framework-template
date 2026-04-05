@@ -56,14 +56,14 @@ Route open design questions into one durable packet before execution begins so l
 
 ## Receipt And Review Matrix
 
-| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |
-|---|---|---|---|
-| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |
-| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |
-| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required |
-| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override | Promotion tier |
+|---|---|---|---|---|
+| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `delegated-safe` |
+| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required | `human-only` |
+| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
 
 ## Degradation
 

@@ -1,0 +1,48 @@
+You are participating in a framework design discussion about a self-improving SKILL workflow.
+
+Task boundary:
+- Read-only analysis only.
+- Do not edit files.
+- Do not propose code changes.
+- Focus on governance, delegation, evidence, and workflow shape.
+
+Primary artifact:
+- Read /Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_harvest_loop_v1/discussion_packet.md before responding.
+
+Context:
+- The framework already has a canonical SKILL contract, starter examples, a validator, and a field-level receipt/review matrix.
+- The missing piece is the post-task workflow that harvests useful information from finished work and turns it into candidate SKILL improvements.
+- The user wants this workflow to become as autonomous as possible and explicitly wants us to consider delegated review by role, CLI, subagent, or main-thread owner rather than mandatory direct human inspection on every change.
+- The system must still resist silent prompt drift.
+
+Please answer in markdown using exactly these sections:
+
+## Verdict
+- Support / revise / reject the overall direction of a delegated, minimally human-gated skill-harvest loop.
+
+## Recommended Workflow
+- Propose the best end-to-end flow from task closeout to candidate extraction to review to canonical promotion.
+- Name the stages explicitly.
+
+## Delegation Boundary
+- Which stages can be automated?
+- Which stages should be delegated to a role rather than a human?
+- Which stages, if any, must still require a direct human decision?
+
+## Risk Controls
+- What are the top risks if this workflow is too autonomous?
+- What concrete controls would keep drift visible?
+
+## Best Contract Shape
+- What new artifacts or fields should the framework add? For example: candidate packet, promotion receipt, promotion decision, delegated reviewer role, confidence tier, exception class.
+
+## Strongest Disagreement With The Current Direction
+- Name the biggest thing you would change about the current framing.
+
+## Narrowest Next Question
+- If a second round is needed, give one sharply scoped question only.
+
+Output constraints:
+- 450-750 words.
+- Be opinionated.
+- Assume the main thread will make the final synthesis.

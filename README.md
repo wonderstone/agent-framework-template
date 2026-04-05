@@ -37,6 +37,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  SKILL_HARVEST_LOOP_V1_DRAFT.md   ← formal v1 design for post-task SKILL harvest and promotion governance
   SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design for the framework-native SKILL contract
   TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design for traceability and recovery layout
   AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history behind that design
@@ -58,6 +59,8 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for design debates
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
+  skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
   failure_packet.template.md       ← progressive runtime failure packet
   project-context.template.md      ← blank project adapter
@@ -216,9 +219,11 @@ If a repository wants roadmap/design-first execution to be the default for non-t
 
 If a repository wants open design questions to go through a durable multi-model discussion before coding, it can also ship [`docs/runbooks/multi-model-discussion-loop.md`](docs/runbooks/multi-model-discussion-loop.md), keep [`templates/discussion_packet.template.md`](templates/discussion_packet.template.md), and use [`scripts/discussion_pipeline.py`](scripts/discussion_pipeline.py) to collect executor feedback into one append-only Markdown packet.
 
-If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
+If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), [`docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`](docs/SKILL_HARVEST_LOOP_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
 
 The current SKILL contract now also includes a field-level receipt and review matrix, so repositories can say which evidence tiers may propose changes to `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, and `degradation`, and how `guardrail` skills become stricter.
+
+If a repository wants to make the harvest loop executable instead of leaving it as design-only guidance, it can also keep [`templates/skill_candidate_packet.template.md`](templates/skill_candidate_packet.template.md) and [`templates/skill_promotion_receipt.template.md`](templates/skill_promotion_receipt.template.md) as the default candidate/proof artifacts.
 
 ---
 
@@ -341,6 +346,8 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 | Adoption bootstrap flow | `scripts/bootstrap_adoption.py` |
 | Doc-first execution default | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` + `templates/doc_first_execution_guidelines.template.md` |
 | Long-task execution contract | `templates/execution_contract.template.md` |
+| SKILL harvest candidate packet | `templates/skill_candidate_packet.template.md` |
+| SKILL promotion receipt | `templates/skill_promotion_receipt.template.md` |
 | Runtime failure capture | `templates/failure_packet.template.md` |
 | Root-cause closeout note | `templates/root_cause_note.template.md` |
 | Closeout truth audit | `scripts/closeout_truth_audit.py` |

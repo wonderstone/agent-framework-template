@@ -1,0 +1,53 @@
+Read `/Users/mac/Desktop/agent-framework-template/tmp/discussion/skill_harvest_loop_v1/discussion_packet.md`, especially the Round 1 synthesis and the Round 2 kickoff block.
+
+We are not reopening the whole workflow question. The narrow decision is:
+
+What is the minimal canonical field-classification model that can support delegated SKILL promotion honestly without letting the harvester self-classify its own authority?
+
+Compare exactly these three options:
+
+1. Per-field `promotion_tier` table in the canonical SKILL schema.
+2. Section-level mutable-zone map.
+3. Hybrid: section zones plus a small per-field override table.
+
+Use the existing framework truth as a constraint:
+
+- The canonical v1 SKILL contract already has six load-bearing fields: `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, `degradation`.
+- There is already a field-level receipt and review matrix.
+- We want delegated, evidence-bounded promotion.
+- We do not want direct transcript-to-skill mutation.
+- The design must stay portable across executor types and vendor CLIs.
+
+Respond in this exact structure:
+
+## Verdict
+- Choose A, B, or C.
+- Give one-sentence rationale.
+
+## Why The Other Two Lose
+- One bullet per rejected option.
+
+## Minimal Contract Shape
+- List the smallest set of schema additions or changes needed.
+- Be concrete about whether this belongs in the canonical SKILL doc, the skill template, validator contract, or promotion receipts.
+
+## Validator Strategy
+- Explain what can be mechanically enforced.
+- Explain what still needs escalation or human ownership.
+
+## Drift Failure Mode
+- Name the most likely way your chosen model still drifts.
+- Give the tightest mitigation.
+
+## Migration Path
+- Explain how the current v1 contract could adopt your chosen model with the least disruption.
+
+## Narrowest Remaining Question
+- If one question still remains after this round, state only the narrowest one.
+
+Constraints:
+
+- Do not propose a fourth option.
+- Do not re-argue for full autonomous promotion.
+- Do not assume a specific vendor executor is the sole reviewer.
+- Prefer the smallest honest contract over the most expressive one.
