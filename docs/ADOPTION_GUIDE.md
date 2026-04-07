@@ -65,6 +65,7 @@ docs/
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and alternative viewpoints for that surface
   AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history for AI-era traceability, diagnosis, runtime evidence, and recovery mechanisms
   TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout
+  ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md   ← mechanism-first plan for checkpoint, sync-audit, repair, and rule rebase work
   LEFTOVER_UNIT_CONTRACT.md        ← how to record truthful partial-work state
   STRATEGY_MECHANISM_LAYERING.md   ← keep if you want formal reviewer or agent role splits
   ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
@@ -72,12 +73,14 @@ docs/
   runbooks/
     multi-model-discussion-loop.md ← recommended for framework choice, plan review, and other open design questions
     resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
+    state-reconciliation.md        ← recommended when execution-state truth surfaces must be reconciled before closeout
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
   discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  execution_progress_receipt.template.md ← checkpoint-bearing progress receipt for long-running work
   skill_invocation_receipt.template.md ← runtime receipt template for real skill invocation evidence
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
@@ -87,6 +90,7 @@ templates/
   skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
   skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
+  drift_reconciliation_packet.template.md ← bounded recovery packet for unresolved execution-state drift
   project-context.template.md      ← blank project adapter to fill in
   root_cause_note.template.md      ← closeout note distinguishing cause-suspected from cause-established recovery
   session_state.template.md        ← blank session state to fill in
@@ -109,6 +113,8 @@ scripts/
   discussion_pipeline.py           ← generator for discussion packet creation and append-only feedback/synthesis
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
   install_git_hooks.sh             ← activates optional `.githooks/` in the adopter repo
+  state_sync_audit.py              ← contradiction-focused sync audit for task artifacts, `session_state.md`, and `ROADMAP.md`
+  state_sync_pipeline.py           ← helper for progress receipts and drift reconciliation packets
   skill_evolution_pipeline.py      ← helper for initializing invocation receipts and candidate packets from execution evidence
   runtime_surface_guardrails.py    ← registry-driven runtime guard runner
   validate_template.py             ← structured validator used locally and in CI
@@ -187,6 +193,14 @@ That means:
 3. multi-runtime repos may qualify labels with parentheses, for example `Run (frontend)` and `Run (backend)`
 
 If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
+
+If your project wants long-running execution checkpoints to stay honest instead of living only in chat memory, also keep these surfaces together:
+
+1. `templates/execution_progress_receipt.template.md`
+2. `templates/drift_reconciliation_packet.template.md`
+3. `docs/runbooks/state-reconciliation.md`
+4. `scripts/state_sync_pipeline.py`
+5. `scripts/state_sync_audit.py`
 
 If your project wants framework choice, architecture debates, or plan review to happen in a durable multi-model loop before coding, also keep the `discussion|debate|framework choice|plan review|architecture option` trigger mapped to `docs/runbooks/multi-model-discussion-loop.md`.
 

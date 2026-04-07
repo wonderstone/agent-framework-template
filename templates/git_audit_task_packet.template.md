@@ -5,6 +5,10 @@
 - Owner: {{owner}}
 - Executor Plan: {{executor_plan}}
 
+## Start Here
+
+{{start_here}}
+
 ## Goal
 
 {{goal}}
@@ -28,6 +32,14 @@
 ## Acceptance Boundary
 
 {{acceptance_boundary}}
+
+## Checkpoint Contract
+
+- Progress Unit: {{progress_unit}}
+- Checkpoint Rule: {{checkpoint_rule}}
+- Truth Surfaces: {{truth_surfaces}}
+- State Sync Schedule: {{state_sync_schedule}}
+- Closeout Boundary: {{closeout_boundary}}
 
 ## Notes
 

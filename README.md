@@ -49,17 +49,20 @@ docs/
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
   RUNTIME_SURFACE_PROTECTION.md    ← guard-registry pattern for live user-facing paths
+  ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md ← mechanism-first plan for checkpoint, sync-audit, repair, and rule rebase work
   PROGRESS_UPDATE_TEMPLATE.md      ← stable format for in-progress while-loop status updates
   CLOSEOUT_SUMMARY_TEMPLATE.md     ← stable format for final closeout summaries
   runbooks/
     multi-model-discussion-loop.md ← append-only discussion workflow for open design questions
     resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
+    state-reconciliation.md        ← drift-packet workflow for reconciling truth surfaces before closeout
   archive/                         ← TYPE-C docs (phase reports, analyses)
 
 templates/
   discussion_packet.template.md   ← append-only discussion packet for design debates
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  execution_progress_receipt.template.md ← receipt-bearing checkpoint artifact for long-running execution
   skill_invocation_receipt.template.md ← runtime invocation evidence surface for skill use
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
@@ -69,6 +72,7 @@ templates/
   skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
   skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
   failure_packet.template.md       ← progressive runtime failure packet
+  drift_reconciliation_packet.template.md ← reconciliation packet for unresolved execution-state drift
   project-context.template.md      ← blank project adapter
   root_cause_note.template.md      ← closeout note for cause-suspected vs cause-established recovery
   session_state.template.md        ← blank cross-session state file
@@ -106,6 +110,8 @@ scripts/
   closeout_truth_audit.py         ← diff-aware receipt-anchor audit for truth-source closeout claims
   discussion_pipeline.py          ← generates and extends discussion packets for multi-model debate
   preference_drift_audit.py       ← detects agent preference drift against declared project-context rules
+  state_sync_audit.py             ← contradiction-focused audit for task packets, receipts, session_state, and ROADMAP sync
+  state_sync_pipeline.py          ← helper for progress receipts and drift reconciliation packets
   install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
   skill_evolution_pipeline.py     ← initializes invocation receipts and candidate packets for execution-side skill evolution
   runtime_surface_guardrails.py   ← registry-driven runner for runtime surface staged/live checks
@@ -251,12 +257,22 @@ Before any long-running or multi-step task, the agent should produce an executio
 - whether the default main-thread-agent ownership for normal commit / push should stay in place or be overridden
 - whether CLI or subagent fan-out is expected and what the fallback plan is
 - whether the task runs in autonomous while-loop mode
+- what stable task ID, checkpoint rule, truth surfaces, and state-sync schedule govern the task
 - what technical plus end-to-end or user-visible validation must pass before completion is reported
 - what scope, escalation, and state-update rules apply
 
 The default is: main-thread agent handles normal `git add` / `commit` / standard `push`, and only exception cases are escalated. This confirmation is meant to override that default when needed, not to force per-step micromanagement.
 
 This repository ships the execution-contract template and one filled demo example at [`examples/demo_project/docs/runbooks/execution_contract_example.md`](examples/demo_project/docs/runbooks/execution_contract_example.md). It does not automatically prove that every adopting repository instantiates an execution contract for every long task unless that repository adds its own workflow or validation checks.
+
+When repositories want checkpoint truth to be mechanically recoverable instead of chat-only, they should also keep the state-sync surfaces together:
+
+- [`docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md`](docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md)
+- [`templates/execution_progress_receipt.template.md`](templates/execution_progress_receipt.template.md)
+- [`templates/drift_reconciliation_packet.template.md`](templates/drift_reconciliation_packet.template.md)
+- [`docs/runbooks/state-reconciliation.md`](docs/runbooks/state-reconciliation.md)
+- [`scripts/state_sync_pipeline.py`](scripts/state_sync_pipeline.py)
+- [`scripts/state_sync_audit.py`](scripts/state_sync_audit.py)
 
 The template now absorbs Google's five skill patterns asymmetrically: Wrapper, Reviewer, and Pipeline ship as concrete starter scaffolds, Generator stays bounded to schema-backed artifact generation, and Inversion remains deferred until the framework can name a truthful host-runtime contract.
 

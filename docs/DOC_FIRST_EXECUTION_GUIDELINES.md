@@ -42,7 +42,7 @@ At minimum, the planning artifact must include:
 5. validation commands
 6. user-visible acceptance criteria
 7. stop conditions, non-goals, or explicit deferrals
-8. for while-style tasks, the progress unit, true closeout boundary, and checkpoint rule
+8. for while-style tasks, the task ID, progress unit, checkpoint rule, truth surfaces, state-sync schedule, and true closeout boundary
 
 If those elements are absent, the plan is not implementation-ready.
 
@@ -64,6 +64,7 @@ This means:
 - the validation doc says how truth is checked
 - the state doc says what the current step is right now
 - while-style tasks distinguish internal progress checkpoints from the true closeout boundary before execution starts
+- while-style tasks also name which truth surfaces must sync at each checkpoint instead of leaving that obligation in chat memory
 
 ## Default Agent Behavior
 
@@ -73,7 +74,7 @@ When the user asks for a new phase, subsystem, or meaningful behavior change, th
 2. if there are multiple viable approaches, create a durable discussion surface and resolve the choice there next
 3. create or update the execution checklist after the direction is chosen
 4. sync validation commands and entry docs
-5. freeze the progress unit, check-in point, and true closeout boundary for while-style work
+5. freeze the task ID, progress unit, checkpoint rule, truth surfaces, state-sync schedule, and true closeout boundary for while-style work
 6. update current state tracking
 7. begin implementation only after those planning surfaces exist
 
@@ -90,8 +91,24 @@ If the task will run in a while-style or autonomous multi-batch loop, the planni
 Minimum rule:
 
 - finishing one module, slice, review pass, or batch is a progress update only unless the user explicitly declared it the closeout boundary
+- each declared checkpoint must say which truth surfaces change there and what receipt-bearing artifact proves the checkpoint occurred
 - final closeout is allowed only at the true boundary, an explicit blocker, or a user-requested checkpoint
 - if the host exposes a closeout action such as `task_complete`, reserve it for that true boundary only
+
+## Truth-Sync Contract For While-Style Work
+
+For while-style or autonomous work, the planning stack is incomplete unless it also answers:
+
+1. what stable task ID ties the task packet, progress receipts, and any drift packet together
+2. which truth surfaces must reflect a checkpoint, blocker, handoff, or closeout
+3. how a future agent can audit whether that reflection actually happened
+
+Minimum anti-drift contract:
+
+- the execution contract records `Task ID`, `Progress unit`, `Checkpoint rule`, `Truth surfaces`, and `State sync schedule`
+- the task packet repeats that checkpoint contract inside the bounded execution scope
+- at each meaningful checkpoint, the task emits a progress receipt or equivalent receipt-bearing artifact
+- unresolved drift is reconciled through a drift packet before closeout or next-stage dispatch continues
 
 ## Document Update Rule
 
@@ -107,6 +124,7 @@ Forbidden behavior:
 4. entering while-style execution without a written distinction between progress checkpoints and the true closeout boundary
 5. treating internal batch completion as permission to emit final closeout
 6. starting implementation while framework selection, architecture direction, or plan-review disagreement still lives only in chat memory
+7. declaring a while-style checkpoint without naming which truth surfaces should now be in sync
 
 ## Template Implications
 

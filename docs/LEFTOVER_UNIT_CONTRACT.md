@@ -181,3 +181,19 @@ The leftover unit contract and the resumable audit artifact system (Rule 18) add
 A handoff packet captures "I was doing X and had to stop." A leftover unit captures "We decided to stop at this boundary for these reasons and here is how to come back."
 
 Use handoff packets for tactical interruptions. Use leftover units for strategic deferral.
+
+## Relationship To Drift Reconciliation
+
+Not every mismatch between execution artifacts and truth surfaces is a leftover.
+
+A leftover means the repository has truthfully decided to stop at a bounded slice.
+
+Drift means the repository's truth surfaces no longer agree about what happened.
+
+Use this decision rule:
+
+1. if work intentionally stops at a stable boundary, record a leftover unit
+2. if `session_state.md`, `ROADMAP.md`, task packets, handoff packets, or progress receipts disagree, open a drift reconciliation packet first
+3. only after reconciliation may the work be classified as resumed, handed off, or left as a leftover
+
+This distinction matters because a leftover is an honest boundary, while drift is a contradiction that must be repaired before closeout or next-stage dispatch.

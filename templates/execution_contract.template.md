@@ -42,8 +42,13 @@ Decomposition Decision:
 
 ## Long-Loop Closeout Contract
 
+- Task ID: [stable task slug shared by task packet, progress receipts, handoff packets, and drift packets]
 - Progress unit: [module / batch / slice / review pass]
+- Checkpoint rule: [what must happen before one progress unit counts as reflected into truth surfaces]
+- Truth surfaces: [session_state.md / ROADMAP.md / task packet / progress receipt / leftover record / other]
+- State sync schedule: [when each truth surface is updated: checkpoint / handoff / blocker / closeout]
 - True closeout boundary: [full task complete / explicit blocker / user-requested checkpoint]
+- Closeout boundary confirmation: [how the true boundary is reflected into truth surfaces before final closeout]
 - Intermediate batch rule: finishing one progress unit is a progress update only, not final closeout
 - Host closeout rule: do not trigger `task_complete` or equivalent host closeout action until the true closeout boundary is reached
 
@@ -138,6 +143,8 @@ Rule: stop at the minimum layer needed by the task scope unless runnable or user
 ### 7. State And Handoff Rules
 
 - Update `session_state.md` when: [decision / checkpoint / interruption / blocker]
+- Progress receipt path: [e.g. `tmp/git_audit/<task_slug>/progress_receipts/` / custom]
+- Drift reconciliation path: [e.g. `tmp/git_audit/<task_slug>/drift_packet.md` / custom]
 - Use packet / receipt / handoff artifacts when: [multi-executor / interrupted session / external audit]
 - Host closeout action available: [none / `task_complete` / other]
 - Platform continuation markers to ignore as completion signals: [e.g. `Continued with Autopilot` / none]

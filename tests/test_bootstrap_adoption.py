@@ -56,15 +56,19 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DESIGN.md").exists()
     assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DISCUSSION.md").exists()
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
+    assert (tmp_path / "docs" / "ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
     assert (tmp_path / "docs" / "SKILL_EXECUTION_LAYER_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "SKILL_HARVEST_LOOP_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "SKILL_MECHANISM_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "runbooks" / "multi-model-discussion-loop.md").exists()
+    assert (tmp_path / "docs" / "runbooks" / "state-reconciliation.md").exists()
     assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
     assert (tmp_path / "templates" / "discussion_packet.template.md").exists()
+    assert (tmp_path / "templates" / "drift_reconciliation_packet.template.md").exists()
     assert (tmp_path / "templates" / "execution_contract.template.md").exists()
+    assert (tmp_path / "templates" / "execution_progress_receipt.template.md").exists()
     assert (tmp_path / "templates" / "skill_invocation_receipt.template.md").exists()
     assert (tmp_path / "templates" / "skill_candidate_packet.template.md").exists()
     assert (tmp_path / "templates" / "skill_promotion_receipt.template.md").exists()
@@ -79,10 +83,25 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (
         tmp_path / "examples" / "demo_project" / "docs" / "runbooks" / "execution_contract_example.md"
     ).exists()
+    assert (
+        tmp_path
+        / "examples"
+        / "demo_project"
+        / "tmp"
+        / "git_audit"
+        / "add_task_priority"
+        / "progress_receipts"
+        / "0001_priority_review_started.md"
+    ).exists()
+    assert (
+        tmp_path / "examples" / "demo_project" / "tmp" / "git_audit" / "add_task_priority" / "drift_packet.md"
+    ).exists()
     assert (tmp_path / "examples" / "full_stack_project" / "README.md").exists()
     assert (tmp_path / "examples" / "reviewer_roles" / "10_docs_spec_drift_reviewer.md").exists()
     assert (tmp_path / "scripts" / "closeout_truth_audit.py").exists()
     assert (tmp_path / "scripts" / "discussion_pipeline.py").exists()
+    assert (tmp_path / "scripts" / "state_sync_audit.py").exists()
+    assert (tmp_path / "scripts" / "state_sync_pipeline.py").exists()
     assert (tmp_path / "scripts" / "skill_evolution_pipeline.py").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
 

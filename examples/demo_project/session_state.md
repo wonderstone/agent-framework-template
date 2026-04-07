@@ -37,9 +37,23 @@ If the demo stays intentionally small, adopters will understand the customizatio
 
 ## Active Work
 
+**Active Task ID**: none
+
 **Current Step**: Keep the demo aligned with the productized template.
 
 **Next Planned Step**: Use the demo as the first walkthrough for new adopters.
+
+**Progress Unit**: walkthrough refresh
+
+**Checkpoint Rule**: update the demo state and example artifacts together whenever the walkthrough contract changes.
+
+**Truth Surfaces**: `examples/demo_project/session_state.md`, `examples/demo_project/ROADMAP.md`, and `examples/demo_project/tmp/git_audit/add_task_priority/`.
+
+**State Sync Schedule**: checkpoint or example refresh only; no live autonomous execution in the committed demo.
+
+**True Closeout Boundary**: demo walkthrough and example artifacts agree.
+
+**Host Closeout Action**: none
 
 ---
 
@@ -52,6 +66,12 @@ If the demo stays intentionally small, adopters will understand the customizatio
 ---
 
 ## Blocker / Decision Needed
+
+- (none)
+
+---
+
+## Leftover Units
 
 - (none)
 

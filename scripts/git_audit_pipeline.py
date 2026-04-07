@@ -61,6 +61,12 @@ class TaskPacketOptions:
     executor_plan: str
     notes: str
     output_root: Path
+    start_here: str = "- Read the declared truth sources first"
+    progress_unit: str = "- none"
+    checkpoint_rule: str = "- none"
+    truth_surfaces: str = "- none"
+    state_sync_schedule: str = "- none"
+    closeout_boundary: str = "- none"
 
 
 @dataclass(frozen=True)
@@ -98,12 +104,18 @@ def create_task_packet(options: TaskPacketOptions) -> Path:
             "task_id": options.task_id,
             "owner": options.owner,
             "executor_plan": options.executor_plan,
+            "start_here": _normalize_block(options.start_here),
             "goal": options.goal,
             "truth_sources": _normalize_block(options.truth_sources),
             "allowed_files": _normalize_block(options.allowed_files),
             "do_not_touch": _normalize_block(options.do_not_touch),
             "validation": _normalize_block(options.validation),
             "acceptance_boundary": _normalize_block(options.acceptance_boundary),
+            "progress_unit": options.progress_unit.strip() or "- none",
+            "checkpoint_rule": options.checkpoint_rule.strip() or "- none",
+            "truth_surfaces": options.truth_surfaces.strip() or "- none",
+            "state_sync_schedule": options.state_sync_schedule.strip() or "- none",
+            "closeout_boundary": options.closeout_boundary.strip() or "- none",
             "notes": _normalize_block(options.notes),
         },
     )
@@ -165,6 +177,12 @@ def _build_parser() -> argparse.ArgumentParser:
     init_task.add_argument("--acceptance-boundary", required=True)
     init_task.add_argument("--owner", default="main-thread")
     init_task.add_argument("--executor-plan", default="planner -> executor -> auditor -> gatekeeper")
+    init_task.add_argument("--start-here", default="- Read the declared truth sources first")
+    init_task.add_argument("--progress-unit", default="- none")
+    init_task.add_argument("--checkpoint-rule", default="- none")
+    init_task.add_argument("--truth-surfaces", default="- none")
+    init_task.add_argument("--state-sync-schedule", default="- none")
+    init_task.add_argument("--closeout-boundary", default="- none")
     init_task.add_argument("--notes", default="- none")
     init_task.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
 
@@ -210,6 +228,12 @@ def main() -> int:
                 acceptance_boundary=args.acceptance_boundary,
                 owner=args.owner,
                 executor_plan=args.executor_plan,
+                start_here=args.start_here,
+                progress_unit=args.progress_unit,
+                checkpoint_rule=args.checkpoint_rule,
+                truth_surfaces=args.truth_surfaces,
+                state_sync_schedule=args.state_sync_schedule,
+                closeout_boundary=args.closeout_boundary,
                 notes=args.notes,
                 output_root=args.output_root,
             )

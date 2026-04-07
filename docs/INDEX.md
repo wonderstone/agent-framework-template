@@ -11,6 +11,7 @@
 |---|---|
 | `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
+| `docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md` | Executable plan for shipping anti-drift mechanisms first, then rebasing execution-lifecycle rules onto pipeline plus anti-drift surfaces |
 | `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` | Stable closeout-summary format for `task_complete.summary`, including visible markers and global state fields |
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Stable progress-update format for while-style work, clearly separated from final closeout |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanism |
@@ -45,8 +46,9 @@
 |---|---|
 | `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit, replaceable reviewers, and Git closeout recovery |
+| `docs/runbooks/state-reconciliation.md` | Drift-packet workflow for reconciling `session_state.md`, `ROADMAP.md`, receipts, and handoff truth before closeout |
 
 ---
 
-*Last updated: 2026-04-08 — added the SKILL five-pattern execution plan v1 doc*
+*Last updated: 2026-04-08 — added the anti-drift rule refactor plan and state-reconciliation runbook*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

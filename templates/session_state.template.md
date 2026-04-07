@@ -48,11 +48,19 @@
 <!-- Active Work is always structured as a Current Step / Next Planned Step pair. -->
 <!-- There is no free-form single-line description — use Current Step for that. -->
 
+**Active Task ID**: [stable task slug / none]
+
 **Current Step**: [What the agent is doing right now — one sentence]
 
 **Next Planned Step**: [What the agent will do after this step completes — one sentence]
 
 **Progress Unit**: [module / batch / slice / review pass / n/a]
+
+**Checkpoint Rule**: [what must happen before a progress unit counts as reflected]
+
+**Truth Surfaces**: [session_state.md / ROADMAP.md / task packet / progress receipt / leftover record / n/a]
+
+**State Sync Schedule**: [checkpoint / handoff / blocker / closeout / n/a]
 
 **True Closeout Boundary**: [full task complete / explicit blocker / user-requested checkpoint / n/a]
 
@@ -71,6 +79,14 @@
 
 <!-- Items stalled on external input or a user decision — use this to trigger Rule 14 STOP -->
 <!-- Format: [what is blocked] — [what decision or input is needed] -->
+- (none)
+
+---
+
+## Leftover Units
+
+<!-- Leftovers survive interruptions that should not be misrepresented as completion. -->
+<!-- Format each item with the five required leftover fields. -->
 - (none)
 
 ---

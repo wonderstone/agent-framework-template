@@ -31,6 +31,7 @@ description: >
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | [Discussion history and alternative viewpoints for Developer Toolchain — keep if useful] |
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | [Formal v1 design draft for user-surface mapping, failure capture, runtime evidence ownership, and root-cause closeout — keep if useful] |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | [Discussion history and alternative viewpoints for AI-era traceability and recovery — keep if useful] |
+| `docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md` | [Mechanism-first plan for checkpoint, sync-audit, repair, and rule rebase work — keep if useful] |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | [Repository-default doc-first planning rule and required planning surfaces] |
 | `ARCHITECTURE.md` | [System architecture — create if needed] |
 | `ROADMAP.md` | Phase planning and acceptance targets |
@@ -38,6 +39,8 @@ description: >
 | `docs/INDEX.md` | TYPE-A doc navigation index |
 | `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
 | `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
+| `templates/execution_progress_receipt.template.md` | [Checkpoint-bearing progress receipt for long-running tasks — keep if useful] |
+| `templates/drift_reconciliation_packet.template.md` | [Drift packet template for execution-state reconciliation — keep if useful] |
 | `templates/discussion_packet.template.md` | [Append-only packet template for multi-model discussion loops — keep if useful] |
 | `templates/skill_invocation_receipt.template.md` | [Invocation receipt template for runtime skill evidence and typed evolution lineage — keep if useful] |
 | `templates/skill_candidate_packet.template.md` | [Candidate packet template for post-task SKILL harvest — keep if useful] |
@@ -48,6 +51,7 @@ description: >
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from workflow mechanism |
 | `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit and Git closeout |
+| `docs/runbooks/state-reconciliation.md` | Drift-packet workflow for reconciling `session_state.md`, `ROADMAP.md`, and task artifacts before closeout |
 
 ## Task Recovery Sequence
 
@@ -77,6 +81,7 @@ description: >
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `discussion\|debate\|framework choice\|plan review\|architecture option\|second round` | `docs/runbooks/multi-model-discussion-loop.md` |
+| `checkpoint\|state sync\|drift\|reconciliation\|progress receipt` | `docs/runbooks/state-reconciliation.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |

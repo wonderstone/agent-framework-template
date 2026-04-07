@@ -17,6 +17,8 @@ Layer 4 — Code / Config Files     (loaded immediately before any edit)
 
 The framework also ships a **resumable audit artifact system**. It is **not** a fifth instruction layer. It is an operational recovery mechanism that runs alongside the four-layer loading model.
 
+The framework also ships an **anti-drift execution-control surface**. It is also **not** a fifth instruction layer. It is a checkpoint and reconciliation mechanism that keeps `session_state.md`, `ROADMAP.md`, and task artifacts from silently diverging.
+
 The framework also ships a **discussion-loop artifact system** for open design questions. It is also **not** a fifth instruction layer. It is a mechanism for freezing the question, collecting append-only feedback, and converging before implementation starts.
 
 The framework also distinguishes **strategy** from **mechanism**:
@@ -151,10 +153,16 @@ session_state.md structure:
   Working Hypothesis    — current assumption + confidence (High/Medium/Low) + evidence
   Plan                  — chosen approach + steps (max 5) + rationale; set by Rule 16
   Active Work
+      Active Task ID      — stable task slug for checkpointed long work
     Current Step        — what the agent is doing right now (one sentence)
     Next Planned Step   — what the agent will do after this step (one sentence)
+      Progress Unit       — checkpoint granularity for while-style work
+      Checkpoint Rule     — what must happen before the checkpoint counts as reflected
+      Truth Surfaces      — which durable surfaces must sync at that checkpoint
+      State Sync Schedule — when those surfaces update (checkpoint / handoff / blocker / closeout)
   Completed This Phase  — verified subtasks; cleared on graduation
   Blocker / Decision Needed — items stalled on external input or a required decision
+   Leftover Units        — truthful partial-work boundaries that survive session rollover
   Mid-Session Corrections   — mistakes and course corrections; never cleared mid-session
   Acceptance Criteria   — observable conditions marking phase complete
   Phase Decisions       — key choices made this phase with rationale
@@ -174,8 +182,10 @@ These artifacts are operational state, not instruction layers:
 | Artifact | Purpose | Default location |
 |---|---|---|
 | `task packet` | Freeze goal, truth sources, allowed files, do-not-touch list, validation, acceptance boundary | `tmp/git_audit/<task_slug>/task_packet.md` |
+| `progress receipt` | Record one checkpoint-bearing execution event plus expected truth-surface effect | `tmp/git_audit/<task_slug>/progress_receipts/0001_<status>.md` |
 | `audit receipt` | Record what a given executor or reviewer changed and verified | `tmp/git_audit/<task_slug>/audit_receipt.md` |
 | `handoff packet` | Capture resume point, blocker, and next executor when a session is interrupted | `tmp/git_audit/<task_slug>/handoff_packet.md` |
+| `drift packet` | Record contradictions between execution artifacts and truth surfaces plus the repair path | `tmp/git_audit/<task_slug>/drift_packet.md` |
 
 These artifacts matter because semantic reviewers are replaceable, but hard gates are not. A new CLI session or reviewer should be able to resume from the artifacts without reconstructing state from memory alone.
 
@@ -197,10 +207,12 @@ They do not change the layer order:
 
 1. Freeze a task packet before fan-out or external audit
 2. Execute a bounded scope
-3. Record an audit receipt
-4. If execution stops or ownership changes, create a handoff packet
-5. Run hard gates outside the semantic auditor
-6. Return to the main thread for owner review and Git closeout
+3. Emit a progress receipt at the declared checkpoint or blocker boundary
+4. Record an audit receipt
+5. If execution stops or ownership changes, create a handoff packet
+6. If the sync audit detects contradiction, open a drift packet and reconcile before closeout continues
+7. Run hard gates outside the semantic auditor
+8. Return to the main thread for owner review and Git closeout
 
 ## Discussion Loop Artifacts
 

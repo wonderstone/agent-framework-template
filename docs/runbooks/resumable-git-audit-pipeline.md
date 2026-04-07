@@ -25,8 +25,10 @@ The auditor is replaceable. The hard gate should not be.
 | Artifact | Purpose | Default path |
 |---|---|---|
 | `task packet` | Freeze the task before fan-out or external review | `tmp/git_audit/<task_slug>/task_packet.md` |
+| `progress receipt` | Record one checkpoint-bearing execution event and its expected truth-surface effect | `tmp/git_audit/<task_slug>/progress_receipts/0001_<status>.md` |
 | `audit receipt` | Record what happened in one scoped execution or review pass | `tmp/git_audit/<task_slug>/audit_receipt.md` |
 | `handoff packet` | Preserve resume point and blocker when switching executor | `tmp/git_audit/<task_slug>/handoff_packet.md` |
+| `drift packet` | Record contradictions between task artifacts and truth surfaces plus the reconciliation path | `tmp/git_audit/<task_slug>/drift_packet.md` |
 
 ## When To Use It
 
@@ -41,10 +43,12 @@ Use this workflow when any of the following is true:
 
 1. Generate a task packet before dispatch.
 2. Run the bounded execution.
-3. Record an audit receipt after that execution.
-4. If the session stops or ownership changes, write a handoff packet before resuming elsewhere.
-5. Run hard gates.
-6. Return to main-thread owner review and Git closeout.
+3. Emit a progress receipt when a declared checkpoint or blocker boundary is crossed.
+4. Record an audit receipt after that execution.
+5. If the session stops or ownership changes, write a handoff packet before resuming elsewhere.
+6. If a sync audit detects contradiction, open or update a drift packet before closeout continues.
+7. Run hard gates.
+8. Return to main-thread owner review and Git closeout.
 
 ## Hard-Gate Principle
 

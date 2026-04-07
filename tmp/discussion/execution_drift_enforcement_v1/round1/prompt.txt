@@ -1,0 +1,34 @@
+Read this packet first:
+
+tmp/discussion/execution_drift_enforcement_v1/discussion_packet.md
+
+You are participating in a design round for the agent-framework-template repository.
+
+Task:
+- answer the packet's decision question directly
+- be critical and implementation-minded
+- do not give generic advice like “improve prompting” or “write clearer instructions” unless you also convert it into a shippable mechanism
+- optimize for enforceable template changes that can materially reduce execution drift between real progress and `session_state.md` / `ROADMAP.md`
+
+Required output shape:
+1. Verdict: choose one of `freeze-plan`, `continue-discussion`, or `stop`
+2. Top 3 findings, each with:
+   - category
+   - why it matters
+   - smallest honest next step
+3. Proposed anti-drift mechanism table with columns:
+   - mechanism
+   - template surface(s)
+   - enforcement level (`hard-fail`, `advisory`, `repair-loop`, or `workflow-only`)
+   - why this level is honest
+4. Ordered rollout plan (max 5 steps)
+5. One thing the template must explicitly avoid
+6. Final recommendation in one sentence
+
+Important constraints:
+- separate prevention from detection and from repair
+- say which parts belong in validator, which belong in scripts/tools, and which belong in runbooks/pipelines
+- do not pretend the template has full runtime orchestration power if it does not
+- prefer a design that still works when agents are imperfect
+
+Return plain text only.

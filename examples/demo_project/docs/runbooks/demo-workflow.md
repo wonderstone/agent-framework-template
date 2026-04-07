@@ -26,10 +26,33 @@ python3 scripts/bootstrap_adoption.py ../demo-task-tracker \
 Before the external audit starts, freeze the execution style once in [execution_contract_example.md](execution_contract_example.md).
 
 1. Generate a task packet before external review.
-2. Record an audit receipt after one bounded execution pass.
-3. Write a handoff packet if the session stops before closeout.
+2. Emit a progress receipt at each real checkpoint or blocker.
+3. Record an audit receipt after one bounded execution pass.
+4. Write a handoff packet if the session stops before closeout.
+5. If `session_state.md`, `ROADMAP.md`, and the receipts no longer agree, open a drift packet before closeout.
 
-The committed files under `tmp/git_audit/add_task_priority/` illustrate that flow.
+The committed files under `tmp/git_audit/add_task_priority/` illustrate that flow, including one progress receipt and one reconciliation packet.
+
+### Suggested Commands
+
+```bash
+python3 scripts/state_sync_pipeline.py record-progress \
+  --task-id add_task_priority \
+  --status checkpoint_reached \
+  --progress-unit review-pass \
+  --summary "Priority output path reached visible checkpoint" \
+  --touched-files "- examples/demo_project/src/task_tracker.py\n- examples/demo_project/tests/test_task_tracker.py" \
+  --expected-state-effect "- session_state.md: current step reflects the review checkpoint\n- ROADMAP.md: no change until closeout" \
+  --evidence-links "- pytest examples/demo_project/tests/test_task_tracker.py -q"
+
+python3 scripts/state_sync_pipeline.py upsert-drift \
+  --task-id add_task_priority \
+  --detected-by state_sync_audit.py \
+  --staleness-evidence "- session_state.md still showed active review after closeout" \
+  --surfaces-to-reconcile "- examples/demo_project/session_state.md\n- examples/demo_project/ROADMAP.md" \
+  --reconciliation-steps "- update the state doc\n- confirm the focused test still passes" \
+  --reconciliation-receipt-id add_task_priority-0001
+```
 
 ## Failure And Recovery Flow
 

@@ -126,7 +126,7 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_next
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "**Next Planned Step**: None until the next scaffold-proof or wording-sync task is opened.",
+        "**Next Planned Step**: None until the next framework workstream is opened.",
         "**Next Planned Step**: Independent review, then git closeout.",
         1,
     )
@@ -147,8 +147,8 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_unch
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "- [x] When the validator runs, it can distinguish shipped scaffold truth from decorative pattern labels.",
-        "- [ ] When the validator runs, it can distinguish shipped scaffold truth from decorative pattern labels.",
+        "- [x] When drift remains unresolved, the repository can detect it mechanically and block closeout or next-stage dispatch.",
+        "- [ ] When drift remains unresolved, the repository can detect it mechanically and block closeout or next-stage dispatch.",
         1,
     )
     session_state.write_text(updated, encoding="utf-8")
@@ -179,6 +179,43 @@ def test_validate_repo_reports_receipt_closeout_rule_mismatch(tmp_path: Path) ->
     assert ValidationIssue(
         "receipt-closeout-rule-mismatch", "docs/RUNTIME_SURFACE_PROTECTION.md"
     ) in issues
+
+
+def test_validate_repo_reports_missing_task_packet_checkpoint_contract(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    task_packet_template = repo_copy / "templates" / "git_audit_task_packet.template.md"
+    task_packet_template.write_text(
+        task_packet_template.read_text(encoding="utf-8").replace("## Checkpoint Contract\n\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-task-packet-snippet",
+        "templates/git_audit_task_packet.template.md: ## Checkpoint Contract",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_state_sync_hook(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    pre_commit = repo_copy / ".githooks" / "pre-commit"
+    pre_commit.write_text(
+        pre_commit.read_text(encoding="utf-8").replace(
+            'if [[ -f "${ROOT}/scripts/state_sync_audit.py" ]]; then\n  PYTHONDONTWRITEBYTECODE=1 python3 "${ROOT}/scripts/state_sync_audit.py" --root "${ROOT}"\nfi\n\n',
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("missing-state-sync-hook", ".githooks/pre-commit") in issues
 
 
 def test_validate_repo_reports_missing_capability_asset(tmp_path: Path) -> None:

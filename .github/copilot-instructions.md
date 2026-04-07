@@ -47,58 +47,73 @@ When a keyword appears in the user's message:
 1. Load the project adapter
 2. Follow the `keyword → canonical doc` mapping
 3. If the topic involves default values, ports, or feature flags: check runtime config locations before changing any defaults
+- For checkpointed long tasks, `Active Work` must also carry: `Active Task ID`, `Progress Unit`, `Checkpoint Rule`, `Truth Surfaces`, and `State Sync Schedule`
 
 ---
 
 ## Rule 4: Validation After Every Change (🔴 Mandatory)
 
 | Change scope | Minimum validation | Toolchain tier (Rule 23) |
-|---|---|---|
-| Single file | Check diagnostics / lint for that file | Unit |
+4. `tmp/git_audit/<task_slug>/task_packet.md` — scope plus checkpoint contract (if task is in progress)
+5. `tmp/git_audit/<task_slug>/handoff_packet.md` or `tmp/git_audit/<task_slug>/drift_packet.md` — resume point, blocker, or reconciliation status (if present)
+6. Only the files listed in the task packet's allowed-files — no speculative reading
 | Single module | Run focused test suite for that module | Unit + Integration |
 | Cross-module or public contract | Run workspace-level static check | Integration + E2E |
 | Before commit | Static check clean, or known issues documented | All tiers |
 
-**Forbidden**: making a code change and immediately starting the next change without any validation.
-
+2. emit a progress receipt at the declared checkpoint boundary when the checkpoint contract says one is required
+3. do not trigger host closeout actions at internal batch boundaries
+4. reserve final closeout for the declared true boundary, a real blocker, or an explicit user-requested checkpoint
 ---
 
 ## Rule 5: Dispatch Decision Disclosure (🔴 Mandatory)
 
 When a task can be split into 2+ independent scopes, evaluate dispatch before proceeding serially. The disclosure is user-visible — not just in the status line.
 
-Full decomposition criteria, serial exemptions, executor assignment, and disclosure format: **Rule 15**.
+4. if the task has a checkpoint contract, emit the matching progress receipt or reconcile drift before moving on
+5. Status line / closeout summary: update `Next` or the final closeout summary appropriately
 
 ---
 
-## Rule 6: Document Organization (🔴 Mandatory)
+5. UPDATE       → Write Current Step + Next Planned Step in session_state.md and emit the declared checkpoint artifact when one boundary was crossed
 
 | Type | Definition | Location |
 |---|---|---|
 | **TYPE-A** | Long-lived: architecture, runbooks, API specs, guides | `docs/` or module root |
+| **Progress receipt** | Record one checkpoint-bearing execution event and its expected truth-surface effect | At each declared checkpoint, blocker, or meaningful batch boundary |
 | **TYPE-B** | Module-local, evolves with code | module directory |
 | **TYPE-C** | Phase reports, one-time analyses, summaries | `docs/archive/` |
+| **Drift packet** | Record contradictions between execution artifacts and truth surfaces plus the reconciliation path | When sync audit detects unresolved drift |
 
 - **Forbidden**: process/phase docs in `docs/` root or module root
 - **Required**: update `docs/INDEX.md` when any TYPE-A doc is added or removed
 
 ---
 
+   progress_receipts/
+      0001_<status>.md
 ## Rule 7: Cross-Session State (🔴 Mandatory)
 
+   drift_packet.md
 - Before any multi-step or cross-day task: read `session_state.md`
 - Update `session_state.md` when: sub-phase completes · major decision made · task interrupted · current goal diverges from actual state
 - **Technical Insights** section: permanent — never auto-delete; supersede explicitly
 - If `session_state.md` exceeds ~100 lines: archive old phase content to `docs/archive/`
-
-### Rollover Triggers (perform at the next checkpoint — do not interrupt mid-task)
-
-Rollover is required when **any one** of these conditions is true:
+3. Emit a progress receipt at each declared checkpoint or blocker boundary
+4. Record an audit receipt with touched files, validation, and risks
+5. If interrupted, create a handoff packet before switching executor
+6. If the sync audit finds contradiction, open or update a drift packet before dispatch or closeout continues
+7. Run hard gates
+8. Return to main-thread owner review and Git closeout
 
 1. `session_state.md` exceeds ~100 lines or is visibly beyond two readable screens
 2. The "Active Work" section has multiple date-appended blocks stacking up
+- Task ID:            [stable task slug]
 3. The recent receipt window holds more than 3 entries and older entries no longer affect current decisions
 4. A phase has completed but its full receipt log is still in `session_state.md`
+- Checkpoint rule:   [what makes one progress unit reflected]
+- Truth surfaces:    [session_state.md / ROADMAP.md / task packet / receipts / leftovers / other]
+- State sync schedule:[checkpoint / handoff / blocker / closeout]
 5. The file contains content from a phase that has been marked ✅ in ROADMAP
 
 These are governance thresholds, not hard interrupts. Complete the current bounded step first, then roll over at the next natural checkpoint.
@@ -107,6 +122,7 @@ These are governance thresholds, not hard interrupts. Complete the current bound
 
 1. Copy old phase narrative and excess receipts to a new TYPE-C archive doc (`docs/archive/Phase_N_<Name>_YYYY-MM-DD.md`)
 2. Write the date and scope at the top of the archive doc
+- Writing declared progress receipts and drift packets in `tmp/git_audit/`
 3. Keep only in `session_state.md`: current goal, working hypothesis, active work, recent receipt window (≤ 3), decisions, insights
 4. If the archive becomes a long-term reference, add a link back from the corresponding TYPE-A doc or from the summary section of `session_state.md`
 
@@ -116,13 +132,18 @@ These are governance thresholds, not hard interrupts. Complete the current bound
 
 Trigger a context reset when any of the following is true:
 
+| Checkpoint contract | Task packet names `Progress Unit`, `Checkpoint Rule`, `Truth Surfaces`, and `State Sync Schedule` when the task is checkpointed | Add the missing checkpoint contract before dispatching |
 - The session is approaching context limits and the task is not yet complete
 - A new executor (CLI or subagent) is picking up from a handoff packet (Rule 18/19)
+- **Required**: if the stop condition is caused by contradiction between truth surfaces, open or update a drift packet before converting the stop into a leftover
 - A phase boundary is crossed and the next phase has different canonical docs
 
+
+Closeout is also blocked when `scripts/state_sync_audit.py` reports unresolved drift or when `tmp/git_audit/<task_slug>/drift_packet.md` remains open or in progress.
 **Reset entry sequence** — the new session reads these in order, nothing else:
 
 1. `.github/copilot-instructions.md` — operating rules (always loaded)
+- Any checkpoint-bearing progress receipts and any drift packet for the task
 2. `.github/instructions/project-context.instructions.md` — project adapter
 3. `session_state.md` — current goal, hypothesis, plan, and active work
 4. `tmp/git_audit/<task_slug>/handoff_packet.md` — resume point and blocker (if task is in progress)
@@ -757,7 +778,7 @@ Every dispatched task must be sent with a verified task packet and must terminat
 
 ### Pre-Dispatch Readiness Gate
 
-Before freezing the task packet and dispatching any executor, verify all four conditions. Do not dispatch if any condition fails.
+Before freezing the task packet and dispatching any executor, verify all five conditions. Do not dispatch if any condition fails.
 
 | Condition | Check | If it fails |
 |---|---|---|

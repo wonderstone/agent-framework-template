@@ -70,6 +70,29 @@ These surfaces are complementary.
 
 They should not be merged into one giant template, and they should not be allowed to drift into separate contradictory truth sources.
 
+## Relationship To Anti-Drift Execution Control
+
+Traceability and anti-drift are adjacent but different.
+
+Traceability answers:
+
+1. what user-visible surface was affected
+2. where evidence should come from
+3. whether cause is only suspected or actually established
+
+Anti-drift answers:
+
+1. whether execution checkpoints were reflected into `session_state.md`, `ROADMAP.md`, and receipt-bearing artifacts
+2. whether handoff, blocker, leftover, and closeout surfaces still agree with one another
+3. whether unresolved drift blocks dispatch or closeout
+
+The framework therefore keeps both layers:
+
+1. traceability for user-surface and recovery truth
+2. anti-drift for execution-state integrity at pipeline boundaries
+
+They should interoperate, not replace each other.
+
 ---
 
 ## v1 Design Goals

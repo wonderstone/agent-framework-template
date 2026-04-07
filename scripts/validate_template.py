@@ -39,6 +39,7 @@ REQUIRED_FILES = (
     "LICENSE",
     "VERSION",
     "docs/ADOPTION_GUIDE.md",
+    "docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md",
     "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
     "docs/COMPATIBILITY.md",
@@ -58,6 +59,7 @@ REQUIRED_FILES = (
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/multi-model-discussion-loop.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
+    "docs/runbooks/state-reconciliation.md",
     "examples/skills/01_discussion_packet_workflow.md",
     "examples/skills/02_no_placeholder_runtime_guardrail.md",
     "examples/demo_project/README.md",
@@ -78,13 +80,17 @@ REQUIRED_FILES = (
     "scripts/git_audit_pipeline.py",
     "scripts/install_git_hooks.sh",
     "scripts/preference_drift_audit.py",
+    "scripts/state_sync_audit.py",
+    "scripts/state_sync_pipeline.py",
     "scripts/runtime_surface_guardrails.py",
     "scripts/skill_evolution_pipeline.py",
     "scripts/validate-template.sh",
     "scripts/validate_template.py",
     "templates/discussion_packet.template.md",
+    "templates/drift_reconciliation_packet.template.md",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/execution_contract.template.md",
+    "templates/execution_progress_receipt.template.md",
     "templates/failure_packet.template.md",
     "templates/project-context.template.md",
     "templates/reviewer_role_profile.template.md",
@@ -110,6 +116,8 @@ REQUIRED_FILES = (
     "tests/test_discussion_pipeline.py",
     "tests/test_git_audit_pipeline.py",
     "tests/test_hook_scaffolding.py",
+    "tests/test_state_sync_audit.py",
+    "tests/test_state_sync_pipeline.py",
     "tests/test_runtime_surface_guardrails.py",
     "tests/test_skill_evolution_pipeline.py",
     "tests/test_validate_template.py",
@@ -197,10 +205,14 @@ README_REQUIRED_REFERENCES = (
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
+    "docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/state-reconciliation.md",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/execution_progress_receipt.template.md",
+    "templates/drift_reconciliation_packet.template.md",
     "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
@@ -212,6 +224,8 @@ README_REQUIRED_REFERENCES = (
     "examples/skills/",
     "scripts/closeout_truth_audit.py",
     "scripts/discussion_pipeline.py",
+    "scripts/state_sync_audit.py",
+    "scripts/state_sync_pipeline.py",
     "scripts/runtime_surface_guardrails.py",
     "scripts/skill_evolution_pipeline.py",
 )
@@ -240,11 +254,13 @@ INDEX_REQUIRED_ROWS = (
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
+    "docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md",
     "docs/runbooks/multi-model-discussion-loop.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
+    "docs/runbooks/state-reconciliation.md",
 )
 
 ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
@@ -263,11 +279,14 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "## Developer Toolchain",
     "Primary language: Python",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/state-reconciliation.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/execution_progress_receipt.template.md",
+    "templates/drift_reconciliation_packet.template.md",
     "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
@@ -525,6 +544,13 @@ STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
     "examples/full_stack_project/README.md",
     "examples/reviewer_roles/01_goal_acceptance_owner.md",
     "examples/reviewer_roles/10_docs_spec_drift_reviewer.md",
+    "docs/runbooks/state-reconciliation.md",
+    "scripts/state_sync_audit.py",
+    "scripts/state_sync_pipeline.py",
+    "templates/execution_progress_receipt.template.md",
+    "templates/drift_reconciliation_packet.template.md",
+    "examples/demo_project/tmp/git_audit/add_task_priority/drift_packet.md",
+    "examples/demo_project/tmp/git_audit/add_task_priority/progress_receipts/0001_priority_review_started.md",
 )
 
 SKILL_ALLOWED_TYPES = {"knowledge", "workflow", "verification", "guardrail"}
@@ -881,11 +907,16 @@ def _validate_session_state_template(root: Path) -> list[ValidationIssue]:
     text = _read(root / "templates/session_state.template.md")
     issues: list[ValidationIssue] = []
     required_snippets = (
+        "**Active Task ID**:",
         "**Current Step**:",
         "**Next Planned Step**:",
         "**Progress Unit**:",
+        "**Checkpoint Rule**:",
+        "**Truth Surfaces**:",
+        "**State Sync Schedule**:",
         "**True Closeout Boundary**:",
         "**Host Closeout Action**:",
+        "## Leftover Units",
     )
     for snippet in required_snippets:
         if snippet not in text:
@@ -951,8 +982,13 @@ def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
         "Working Hypothesis:",
         "Decomposition Decision:",
         "## Long-Loop Closeout Contract",
+        "Task ID:",
         "Progress unit:",
+        "Checkpoint rule:",
+        "Truth surfaces:",
+        "State sync schedule:",
         "True closeout boundary:",
+        "Closeout boundary confirmation:",
         "Intermediate batch rule:",
         "Host closeout rule:",
         "Maximum file scope per dispatched subtask:",
@@ -968,6 +1004,8 @@ def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
         "Gap check before closeout:",
         "Host closeout action available:",
         "Platform continuation markers to ignore as completion signals:",
+        "Progress receipt path:",
+        "Drift reconciliation path:",
         "Status line rule:",
         "Final closeout summary lives in:",
         "Closeout summary template:",
@@ -977,6 +1015,37 @@ def _validate_execution_contract(root: Path) -> list[ValidationIssue]:
     for snippet in required_snippets:
         if snippet not in text:
             issues.append(ValidationIssue("missing-execution-contract-snippet", snippet))
+    return issues
+
+
+def _validate_git_audit_task_packet_template(root: Path) -> list[ValidationIssue]:
+    text = _read(root / "templates/git_audit_task_packet.template.md")
+    issues: list[ValidationIssue] = []
+    required_snippets = (
+        "## Start Here",
+        "## Checkpoint Contract",
+        "- Progress Unit:",
+        "- Checkpoint Rule:",
+        "- Truth Surfaces:",
+        "- State Sync Schedule:",
+        "- Closeout Boundary:",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-task-packet-snippet", f"templates/git_audit_task_packet.template.md: {snippet}"))
+    return issues
+
+
+def _validate_state_sync_hooks(root: Path) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    pre_commit = _read(root / ".githooks/pre-commit")
+    if "scripts/state_sync_audit.py" not in pre_commit:
+        issues.append(ValidationIssue("missing-state-sync-hook", ".githooks/pre-commit"))
+
+    pre_push = _read(root / ".githooks/pre-push")
+    if "scripts/state_sync_audit.py" not in pre_push:
+        issues.append(ValidationIssue("missing-state-sync-hook", ".githooks/pre-push"))
+
     return issues
 
 
@@ -1828,6 +1897,8 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_session_state_template,
         _validate_root_session_state_freshness,
         _validate_execution_contract,
+        _validate_git_audit_task_packet_template,
+        _validate_state_sync_hooks,
         _validate_closeout_rule_guards,
         _validate_preference_drift,
         _validate_active_docs,

@@ -29,8 +29,13 @@ Decomposition Decision:
 
 ## Long-Loop Closeout Contract
 
+- Task ID: add_task_priority
 - Progress unit: review pass
+- Checkpoint rule: each review-pass checkpoint emits a progress receipt and updates `examples/demo_project/session_state.md` before another executor resumes.
+- Truth surfaces: `examples/demo_project/session_state.md`, `examples/demo_project/ROADMAP.md`, `tmp/git_audit/add_task_priority/task_packet.md`, progress receipts, audit receipt, handoff packet, and drift packet.
+- State sync schedule: checkpoint → progress receipt + session state, blocker or handoff → handoff packet + session state, closeout → roadmap or receipt trail + final state sync.
 - True closeout boundary: feature implemented, focused tests pass, and packet or receipt artifacts are truthful
+- Closeout boundary confirmation: the final receipt trail and demo state surfaces agree that the feature is complete and no drift packet remains open.
 - Intermediate batch rule: finishing one file edit is progress only, not final closeout
 - Host closeout rule: do not trigger host closeout until the demo feature and audit artifacts agree
 
@@ -102,6 +107,8 @@ Decomposition Decision:
 ### 7. State And Handoff Rules
 
 - Update `session_state.md` when: feature checkpoint reached, blocker appears, or the owner changes
+- Progress receipt path: `tmp/git_audit/add_task_priority/progress_receipts/`
+- Drift reconciliation path: `tmp/git_audit/add_task_priority/drift_packet.md`
 - Use packet or receipt or handoff artifacts when: review is interrupted or another executor must resume
 - Host closeout action available: none
 - Status line rule: routine progress uses `• 当前在做: ... | 下一步: ...`

@@ -82,6 +82,27 @@
 
 ---
 
+## Phase 5 — Ship Anti-Drift Execution Control
+
+**Goal**: Turn anti-drift from a discussion-only concern into shipped checkpoint contracts, progress receipts, sync auditing, reconciliation workflow, and rule-layer dependencies.
+
+**Status**: ✅ 2026-04-08
+
+| Item | Status |
+|---|---|
+| Freeze checkpoint contract fields across execution surfaces | ✅ 2026-04-08 |
+| Add progress receipt and drift reconciliation assets | ✅ 2026-04-08 |
+| Wire sync audit into hooks, validator, bootstrap, and examples | ✅ 2026-04-08 |
+| Rebase execution-lifecycle rules onto the shipped anti-drift mechanisms | ✅ 2026-04-08 |
+
+**Acceptance Criteria**:
+- [x] Long-running task surfaces now declare task ID, checkpoint rule, truth surfaces, and state-sync schedule.
+- [x] The repository ships receipt-bearing checkpoint and reconciliation artifacts plus helper scripts.
+- [x] Hooks and validator can detect unresolved drift and block closeout honestly.
+- [x] Standard-profile bootstrap includes the anti-drift docs, templates, scripts, and demo artifacts.
+
+---
+
 ## Completed Phases
 
 | Phase | Completed |
@@ -90,3 +111,4 @@
 | Phase 2 — Self-Host And Release Closeout | 2026-04-01 |
 | Phase 3 — Strengthen Developer Toolchain Contract | 2026-04-03 |
 | Phase 4 — Formalize SKILL Contract And Harvest Governance | 2026-04-05 |
+| Phase 5 — Ship Anti-Drift Execution Control | 2026-04-08 |

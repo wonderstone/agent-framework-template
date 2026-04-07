@@ -1,0 +1,302 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d69ba-1d66-76f2-927e-2ffbe1655907
+--------
+user
+Read this packet first:
+
+tmp/discussion/execution_drift_enforcement_v1/discussion_packet.md
+
+You are participating in a design round for the agent-framework-template repository.
+
+Task:
+- answer the packet's decision question directly
+- be critical and implementation-minded
+- do not give generic advice like “improve prompting” or “write clearer instructions” unless you also convert it into a shippable mechanism
+- optimize for enforceable template changes that can materially reduce execution drift between real progress and `session_state.md` / `ROADMAP.md`
+
+Required output shape:
+1. Verdict: choose one of `freeze-plan`, `continue-discussion`, or `stop`
+2. Top 3 findings, each with:
+   - category
+   - why it matters
+   - smallest honest next step
+3. Proposed anti-drift mechanism table with columns:
+   - mechanism
+   - template surface(s)
+   - enforcement level (`hard-fail`, `advisory`, `repair-loop`, or `workflow-only`)
+   - why this level is honest
+4. Ordered rollout plan (max 5 steps)
+5. One thing the template must explicitly avoid
+6. Final recommendation in one sentence
+
+Important constraints:
+- separate prevention from detection and from repair
+- say which parts belong in validator, which belong in scripts/tools, and which belong in runbooks/pipelines
+- do not pretend the template has full runtime orchestration power if it does not
+- prefer a design that still works when agents are imperfect
+
+Return plain text only.
+mcp startup: no servers
+codex
+I’m reading the packet first, then I’ll answer in the requested structure with a concrete anti-drift design split across validator, scripts/tools, and runbooks.
+exec
+/bin/zsh -lc "sed -n '1,240p' tmp/discussion/execution_drift_enforcement_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — execution_drift_enforcement_v1
+
+- Generated at: 2026-04-08T00:00:00+00:00
+- Owner: main-thread
+- Current round goal: Obtain an implementation-ready anti-drift plan
+- Round exit rule: Freeze a concrete plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+How should the template harden its execution layer so adopted-project agents stop drifting away from `session_state.md`, `ROADMAP.md`, and other plan or progress truth surfaces during long-running implementation?
+
+## Why This Needs Discussion
+
+Adopted repositories are reporting a repeated failure mode: the planning and governance layer is strong on paper, but execution often drifts. Agents start from a good `session_state.md`, `ROADMAP.md`, or execution contract, then proceed for a while and stop updating those truth surfaces. The result is a stale plan, false progress visibility, and recovery surfaces that no longer describe the real project state.
+
+This is not a wording problem. It is an execution-control problem. The user wants implementable mechanisms: more tools, stronger validators, better repair loops, and pipeline constraints that can materially reduce or eliminate this drift rather than merely reminding agents to behave better.
+
+## Current Truth
+
+The template already ships strong planning and governance surfaces:
+codex
+I have the packet. I’m checking the existing template surfaces quickly so the recommendation stays honest about what can be enforced here versus what belongs in workflow and repair tooling.
+exec
+/bin/zsh -lc "rg --files | rg '("'^|/)(session_state'"\\.md|ROADMAP\\.md|validator|validate|receipt|runbook|discussion|handoff|contract|state)'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+session_state.md
+ROADMAP.md
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/copilot.md
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.md
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/codex.err
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/gemini.md
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/codex.md
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/copilot.err
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/prompt.txt
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/gemini.err
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.err
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/discussion_packet.md
+scripts/validate-template.sh
+scripts/discussion_pipeline.py
+scripts/validate_template.py
+tmp/discussion/skill_harvest_loop_v1/round1/copilot.md
+tmp/discussion/skill_harvest_loop_v1/round1/claude.md
+tmp/discussion/skill_harvest_loop_v1/round1/codex.err
+tmp/discussion/skill_harvest_loop_v1/round1/gemini.md
+tmp/discussion/skill_harvest_loop_v1/round1/gemini_retry.err
+exec
+/bin/zsh -lc "find . -maxdepth 3 -type d | rg 'template|scripts|runbook|validator|tools|tmp'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+./docs/runbooks
+./examples/demo_project/tmp
+./scripts
+./scripts/__pycache__
+./scripts/execution_budget
+./templates
+./tmp
+./tmp/git_audit
+./tmp/git_audit/template_smoke
+./tmp/git_audit/strategy_smoke
+./tmp/discussion
+./tmp/discussion/skill_hard_fail_mechanicalization_v1
+./tmp/discussion/skill_mechanism_v1
+./tmp/discussion/skill_harvest_loop_v1
+./tmp/discussion/execution_drift_enforcement_v1
+./tmp/discussion/template_framework_drift_audit_v1
+./tmp/discussion/skill_self_evolution_execution_gap_v1
+./tmp/discussion/skill_five_patterns_execution_adoption_v1
+./tmp/discussion/skill_five_pattern_acceptance_desync_v1
+codex
+The repo already has validator and runbook surfaces, so I’m grounding the recommendation in those instead of inventing orchestration the template can’t actually enforce at runtime.
+exec
+/bin/zsh -lc "sed -n '1,220p' examples/demo_project/docs/runbooks/execution_contract_example.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Demo Execution Contract
+
+> Filled example for the committed `add_task_priority` demo task.
+
+---
+
+## Task Summary
+
+- Goal: add task priority labels to the demo CLI without breaking resumable audit review.
+- Scope: `src/task_tracker.py`, `tests/test_task_tracker.py`, `tmp/git_audit/add_task_priority/`, and the demo roadmap or state surfaces needed for truthful closeout.
+- Out of Scope: unrelated CLI features, packaging changes, or framework-level rule edits.
+
+## Optional Fast-Start Block
+
+Execution Boundary:
+- Authorized scope: demo project code, tests, and the bounded audit artifacts for `add_task_priority`
+- Authorized ops: read, edit, run focused tests, update task packet or receipt artifacts, and normal git closeout for the bounded demo task
+- Hard stops: protected-path conflicts, destructive git operations, source-of-truth conflicts, or scope expansion beyond the demo feature
+- Check-in point: feature acceptance reached, explicit blocker found, or review handoff required
+
+exec
+/bin/zsh -lc "sed -n '1,240p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Structured validator for the agent framework template."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from active_docs_audit import audit_repo as audit_active_docs
+from preference_drift_audit import audit_repo as audit_preference_drift
+
+exec
+/bin/zsh -lc "sed -n '1,220p' docs/runbooks/resumable-git-audit-pipeline.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Resumable Git Audit Pipeline
+
+This runbook turns Git audit and reviewer handoff into a recoverable workflow rather than a chat-only memory exercise.
+
+## Goal
+
+Use this workflow whenever implementation, audit, and Git closeout may span multiple executors or multiple interrupted sessions.
+
+The point is not to find one perfect reviewer. The point is to preserve enough state that a different reviewer or CLI session can resume safely.
+
+## Core Roles
+
+| Role | Responsibility |
+|---|---|
+| `Planner` | Freeze truth sources, allowed files, validation, and acceptance boundary |
+| `Executor` | Perform the bounded implementation or investigation |
+| `Auditor` | Review the result, risks, and validation status |
+| `Gatekeeper` | Run hard gates outside the semantic auditor when possible |
+| `Owner Review` | Final acceptance, conflict resolution, and Git closeout |
+
+codex
+I’ve confirmed the template already has packet/receipt patterns and a closeout audit model. The gap is mostly mid-task state sync, so the answer will center on event receipts, sync checkpoints, and a repair path rather than pretending a final validator can solve runtime drift.
+exec
+/bin/zsh -lc "sed -n '1,220p' templates/session_state.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' scripts/closeout_truth_audit.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' templates/roadmap.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# session_state.md
+
+> Cross-session state for [Project Name]. Keep under ~100 lines.
+> When over limit: archive old phase content to docs/archive/.
+
+---
+
+## Current Goal
+
+<!-- One sentence: what is the agent working toward this session/phase -->
+[Replace with current goal]
+
+---
+
+## Working Hypothesis
+
+<!-- What the agent currently believes is true about the problem or solution -->
+<!-- Always state a hypothesis, even for well-understood tasks (e.g., "The fix requires X") -->
+<!-- Update explicitly when evidence conflicts; never silently shift position -->
+[Replace with working hypothesis]
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit closeout claims for receipt-anchor evidence in the same diff."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+CLAIM_PATTERNS = (
+    re.compile(r"\bcompleted\b", re.IGNORECASE),
+    re.compile(r"\baccepted\b", re.IGNORECASE),
+    re.compile(r"\bstatus=passed\b", re.IGNORECASE),
+    re.compile(r"\bdone\b", re.IGNORECASE),
+    re.compile(r"\bverified\b", re.IGNORECASE),
+    re.compile(r"\ball criteria met\b", re.IGNORECASE),
+)
+ succeeded in 0ms:
+# ROADMAP
+
+> Phase planning and acceptance criteria for [Project Name].
+> Update phase rows to `✅ YYYY-MM-DD` when all criteria are met.
+
+---
+
+## Phase 1 — [Phase Name]
+
+**Goal**: [One sentence describing what this phase achieves]
+
+**Status**: 🔄 Active
+
+| Item | Status |
+|---|---|
+| [Subtask A] | ○ pending |
+| [Subtask B] | ○ pending |
+
+**Acceptance Criteria**:
+- [ ] [Observable condition A]
+codex
+1. Verdict: freeze-plan
+
+2. Top 3 findings
+
+- category: prevention gap
+  why it matters: The template has truth surfaces, but it does not define a mechanical rule for when progress must be reflected into them. That makes `session_state.md` and `ROADMAP.md` optional narrative outputs instead of execution-coupled surfaces.
+  smallest honest next step: Add a required execution-sync contract to the task packet and execution contract with three fields only: `progress_unit`, `sync_required_events`, and `state_owner_surfaces`.
+
+- category: detection gap
+  why it matters: The current closeout audit catches unsupported completion claims, but it does not detect the more common failure mode: code/tests/receipts move forward while state surfaces stay stale.
+  smallest honest next step: Ship a `state_sync_audit.py` validator that compares changed implementation files, task receipts, and a `Last Synced Receipt` field in `session_state.md` and `ROADMAP.md`.
+
+- category: repair gap
+  why it matters: Hard-failing drift without a bounded reconciliation path just creates blocked tasks and more stale docs. Imperfect agents need a repair loop, not only a prohibition.
+  smallest honest next step: Add a `reconcile-drift` script that either updates the state surfaces from the latest receipt or generates a `drift_packet.md` with explicit contradictions to resolve before closeout.
+
+3. Proposed anti-drift mechanism table
+
+| mechanism | template surface(s) | enforcement level | why this level is honest |
+|---|---|---|---|
+| Execution-sync contract on every non-trivial task: require `progress_unit`, `sync_required_events`, `state_owner_surfaces`, `task_slug` | validator: extend `scripts/validate_template.py`; scripts/tools: extend task/init generator or `scripts/git_audit_pipeline.py`; runbooks: execution contract and adoption guide | hard-fail | The template can honestly require these fields to exist in task artifacts, even if it cannot force perfect runtime behavior. |
+| Structured execution receipt ledger per task, with event types like `code_changed`, `validation_ran`, `scope_changed`, `blocked`, `done` | scripts/tools: new `scripts/execution_state.py emit-receipt`; templates: new receipt template or NDJSON schema under `tmp/execution/<task_slug>/`; runbooks: demo workflow | workflow-only | The template cannot intercept every edit in every client, so receipt emission is strongest when routed through tool wrappers and runbooks, not as a universal hard gate. |
+| `Last Synced Receipt` field in `session_state.md` and active `ROADMAP.md` phase, updated when state is reconciled | validator: `state_sync_audit.py`; templates: `templates/session_state.template.md`, `templates/roadmap.template.md`; scripts/tools: reconcile helper | hard-fail | This is mechanically checkable at commit/push/CI time: latest required receipt exists, and truth surfaces point to it or explicitly declare no state impact. |
+| Diff-aware drift audit: fail if implementation-scope files or validation receipts changed after the last synced receipt and no reconciliation receipt exists | validator: new `scripts/state_sync_audit.py`; runbooks/pipelines: pre-commit, pre-push, CI | hard-fail | The template can enforce checkpoint integrity at repository boundaries even though it cannot watch the agent continuously. |
+| Drift repair loop: generate `tmp/execution/<task_slug>/drift_packet.md` listing unsynced receipts, contradictory claims, and missing surface updates | scripts/tools: `scripts/execution_state.py reconcile-drift`; runbooks: resumable audit pipeline, handoff workflow | repair-loop | Some contradictions need human or agent judgment. The honest move is to force explicit reconciliation before closeout, not guess. |
+| Optional wrapper commands for common execution steps so receipts are emitted automatically when adopters use the toolchain | scripts/tools: wrappers for test/lint/task steps; docs: developer toolchain and adoption guide | advisory | This materially reduces drift for adopters who opt in, but it is not universal because many repos and executors will still run raw commands. |
+| Handoff gate: ownership change is invalid unless latest receipt is synced or a drift packet exists | validator: audit handoff artifacts; runbooks: resumable handoff pipeline | repair-loop | Ownership transitions are a high-drift moment. The template can require either synchronized state or an explicit repair artifact before handoff. |
+
+Prevention belongs mostly in scripts/tools and templates: execution-sync contract, receipt schema, wrapper commands.
+Detection belongs in validator and pipelines: `state_sync_audit.py`, hook/CI checks, contradiction rules.
+Repair belongs in scripts/tools plus runbooks: `reconcile-drift`, `drift_packet.md`, handoff rules.
+
+4. Ordered rollout plan
+
+1. Add the minimum state-sync schema: execution-sync contract fields, receipt schema, and `Last Synced Receipt` fields in `session_state.md` and `ROADMAP.md`.
+2. Ship `scripts/state_sync_audit.py` and wire it into pre-commit, pre-push, and CI with one initial hard rule: implementation changes or validation receipts require a newer synced receipt reference or an explicit no-impact reconciliation receipt.
+3. Add `scripts/execution_state.py` with `emit-receipt`, `reconcile-state`, and `reconcile-drift` commands so the validator has a usable repair path.
+4. Update runbooks and demo project to make the workflow concrete: start task, emit receipts during bounded passes, reconcile state before handoff/closeout.
+5. Only after the repair path works, add stricter contradiction checks between latest receipt status and roadmap/session claims.
+
+5. One thing the template must explicitly avoid
+
+Do not claim “every meaningful action will automatically update `session_state.md` and `ROADMAP.md` in real time”; the template does not control all executors or commands, so the honest contract is checkpoint enforcement plus repair, not full runtime orchestration.
+
+6. Final recommendation in one sentence
+
+Freeze a combined B+C+D plan: make progress event receipts the source for mid-task detection, require truth surfaces to point at the latest synced receipt at repository checkpoints, and force drift into an explicit reconciliation loop instead of trusting prose discipline.
+tokens used
+18,298

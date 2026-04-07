@@ -1,0 +1,101 @@
+You are participating in a design round for the agent-framework-template repository.
+
+Decision packet follows.
+
+# Discussion Packet — execution_drift_enforcement_v1
+
+- Generated at: 2026-04-08T00:00:00+00:00
+- Owner: main-thread
+- Current round goal: Obtain an implementation-ready anti-drift plan
+- Round exit rule: Freeze a concrete plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+How should the template harden its execution layer so adopted-project agents stop drifting away from `session_state.md`, `ROADMAP.md`, and other plan or progress truth surfaces during long-running implementation?
+
+## Why This Needs Discussion
+
+Adopted repositories are reporting a repeated failure mode: the planning and governance layer is strong on paper, but execution often drifts. Agents start from a good `session_state.md`, `ROADMAP.md`, or execution contract, then proceed for a while and stop updating those truth surfaces. The result is a stale plan, false progress visibility, and recovery surfaces that no longer describe the real project state.
+
+This is not a wording problem. It is an execution-control problem. The user wants implementable mechanisms: more tools, stronger validators, better repair loops, and pipeline constraints that can materially reduce or eliminate this drift rather than merely reminding agents to behave better.
+
+## Current Truth
+
+The template already ships strong planning and governance surfaces:
+
+1. `session_state.md`
+2. `ROADMAP.md`
+3. execution contracts and doc-first execution guidance
+4. receipt-anchored closeout and git-audit artifacts
+5. Developer Toolchain and validation surfaces
+6. discussion-loop and resumable handoff workflows
+
+But the current weakness is execution-time freshness and synchronization. The template mostly relies on instruction-following plus lightweight validator checks. It does not yet have a strong always-on enforcement path that says:
+
+1. which state surfaces must change after which execution events
+2. how those updates are detected mechanically
+3. what repair path runs when drift is detected mid-task rather than at closeout only
+4. how long-running tasks keep state surfaces honest without depending on agent memory alone
+
+## Constraints
+
+Be concrete, critical, and implementation-minded. Do not answer with “train the agent better” or “write clearer rules” alone. Prefer mechanisms that can actually ship in this template repo: helper scripts, validator rules, task-packet requirements, receipt-driven state updates, execution pipeline hooks, state reconciliation tools, and bounded stop rules. Distinguish between what can hard-fail, what should stay advisory, and what needs a repair workflow instead of a prohibition.
+
+Do not assume we can fully eliminate all drift with one validator pass at closeout. The better answer may combine:
+
+1. stronger runtime instrumentation or receipts
+2. mid-task synchronization checkpoints
+3. diff-aware or state-aware auditing tools
+4. explicit leftover-unit or repair pipelines
+5. narrower scope declarations that reduce opportunities for state divergence
+
+The answer must be useful to repositories that adopt this template, not only to this template repo itself.
+
+## Candidate Directions
+
+Direction A: Add a state-sync auditor that compares `session_state.md`, `ROADMAP.md`, receipts, and changed files, then fails when truth surfaces are stale or contradictory.
+
+Direction B: Add an execution-progress pipeline where every subtask or batch emits a receipt that must be reflected into state surfaces before the next stage can proceed.
+
+Direction C: Add a repair-first workflow for drift: detect stale state, open a drift packet, reconcile the truth surfaces, and only then allow closeout or next-stage execution.
+
+Direction D: Add more tool support inside the template for state mutation itself, such as scripts that update `session_state.md` / `ROADMAP.md` from a structured event model rather than relying on free-form prose edits.
+
+Direction E: Combine A, B, C, and D asymmetrically: some pieces hard-fail, some stay advisory, and some become explicit repair loops.
+
+## Evaluation Criteria
+
+Judge proposals against these questions:
+
+1. Does the plan reduce execution-time drift rather than only improving post-hoc reporting?
+2. Can the plan ship as concrete template surfaces: scripts, validators, templates, examples, or runbooks?
+3. Does the plan preserve honest governance boundaries instead of pretending the template has full orchestration power it does not have?
+4. Can adopters actually use it across different repository types?
+5. Does it define what hard-fails, what stays advisory, and what enters a repair pipeline?
+6. Does it improve recovery when drift still happens rather than assuming perfect prevention?
+
+## Requested Output Shape
+
+Do not just recommend a direction. Return an implementation-shaped answer with:
+
+1. Verdict: choose one of `freeze-plan`, `continue-discussion`, or `stop`
+2. Top 3 findings, each with:
+   - category
+   - why it matters
+   - smallest honest next step
+3. Proposed anti-drift mechanism table with columns:
+   - mechanism
+   - template surface(s)
+   - enforcement level (`hard-fail`, `advisory`, `repair-loop`, or `workflow-only`)
+   - why this level is honest
+4. Ordered rollout plan (max 5 steps)
+5. One thing the template must explicitly avoid
+6. Final recommendation in one sentence
+
+Important constraints:
+- separate prevention from detection and from repair
+- say which parts belong in validator, which belong in scripts/tools, and which belong in runbooks/pipelines
+- do not pretend the template has full runtime orchestration power if it does not
+- prefer a design that still works when agents are imperfect
+
+Return plain text only.

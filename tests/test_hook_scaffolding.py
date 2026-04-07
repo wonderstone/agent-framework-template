@@ -62,7 +62,7 @@ def _bootstrap_with_hooks(path: Path) -> None:
     bootstrap_repo(
         target_dir=path,
         project_name="Hook Demo",
-        profile="minimal",
+        profile="standard",
         project_type="cli-tool",
         capabilities=("closeout-audit", "runtime-guards", "git-hooks"),
     )
@@ -93,12 +93,31 @@ def test_pre_commit_hook_blocks_unanchored_closeout_claim(tmp_path: Path) -> Non
     assert "closeout truth audit failed" in result.stdout
 
 
+def test_pre_commit_hook_blocks_unsynced_progress_receipt(tmp_path: Path) -> None:
+    _init_repo(tmp_path)
+    _bootstrap_with_hooks(tmp_path)
+
+    receipt = tmp_path / "tmp" / "git_audit" / "demo_task" / "progress_receipts" / "0001_started.md"
+    receipt.parent.mkdir(parents=True, exist_ok=True)
+    receipt.write_text(
+        "# Execution Progress Receipt\n\n- Status: checkpoint_reached\n",
+        encoding="utf-8",
+    )
+    _run(["git", "add", str(receipt.relative_to(tmp_path))], cwd=tmp_path)
+
+    result = _run(["bash", ".githooks/pre-commit"], cwd=tmp_path, check=False)
+
+    assert result.returncode == 1
+    assert "state sync audit failed" in result.stdout
+    assert "unsynced-progress-receipt" in result.stdout
+
+
 def test_pre_push_hook_blocks_runtime_surface_regression(tmp_path: Path) -> None:
     _init_repo(tmp_path)
     _bootstrap_with_hooks(tmp_path)
 
     _run(["git", "add", "."], cwd=tmp_path)
-    _run(["git", "commit", "-m", "baseline"], cwd=tmp_path)
+    _run(["git", "commit", "--no-verify", "-m", "baseline"], cwd=tmp_path)
 
     source = tmp_path / "src" / "handler.py"
     source.parent.mkdir(parents=True, exist_ok=True)
@@ -127,7 +146,7 @@ def test_pre_push_hook_requires_clean_worktree(tmp_path: Path) -> None:
     source.parent.mkdir(parents=True, exist_ok=True)
     source.write_text("canonical output\n", encoding="utf-8")
     _run(["git", "add", "."], cwd=tmp_path)
-    _run(["git", "commit", "-m", "baseline"], cwd=tmp_path)
+    _run(["git", "commit", "--no-verify", "-m", "baseline"], cwd=tmp_path)
 
     source.write_text("PLACEHOLDER_RESPONSE_MARKER\n", encoding="utf-8")
     head_sha = _run(["git", "rev-parse", "HEAD"], cwd=tmp_path).stdout.strip()
@@ -170,7 +189,7 @@ def test_pre_push_hook_blocks_untracked_runtime_surface_files(tmp_path: Path) ->
     _bootstrap_with_hooks(tmp_path)
 
     _run(["git", "add", "."], cwd=tmp_path)
-    _run(["git", "commit", "-m", "baseline"], cwd=tmp_path)
+    _run(["git", "commit", "--no-verify", "-m", "baseline"], cwd=tmp_path)
     head_sha = _run(["git", "rev-parse", "HEAD"], cwd=tmp_path).stdout.strip()
 
     untracked = tmp_path / "src" / "untracked.py"
@@ -186,3 +205,32 @@ def test_pre_push_hook_blocks_untracked_runtime_surface_files(tmp_path: Path) ->
 
     assert result.returncode == 1
     assert "requires a clean working tree" in result.stdout
+
+
+def test_pre_push_hook_blocks_open_drift_packet(tmp_path: Path) -> None:
+    _init_repo(tmp_path)
+    _bootstrap_with_hooks(tmp_path)
+
+    _run(["git", "add", "."], cwd=tmp_path)
+    _run(["git", "commit", "--no-verify", "-m", "baseline"], cwd=tmp_path)
+
+    packet = tmp_path / "tmp" / "git_audit" / "demo_task" / "drift_packet.md"
+    packet.parent.mkdir(parents=True, exist_ok=True)
+    packet.write_text(
+        "# Drift Reconciliation Packet\n\n- Status: open\n",
+        encoding="utf-8",
+    )
+    _run(["git", "add", str(packet.relative_to(tmp_path))], cwd=tmp_path)
+    _run(["git", "commit", "--no-verify", "-m", "open drift"], cwd=tmp_path)
+    head_sha = _run(["git", "rev-parse", "HEAD"], cwd=tmp_path).stdout.strip()
+
+    result = _run(
+        ["bash", ".githooks/pre-push"],
+        cwd=tmp_path,
+        check=False,
+        input_text=f"refs/heads/main {head_sha} refs/heads/main 0000000000000000000000000000000000000000\n",
+    )
+
+    assert result.returncode == 1
+    assert "state sync audit failed" in result.stdout
+    assert "unresolved-drift-packet" in result.stdout
