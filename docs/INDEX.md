@@ -18,6 +18,7 @@
 | `docs/COMPATIBILITY.md` | What is validated in this repository and what adopters still need to verify locally |
 | `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` | Formal v1 design draft for post-task SKILL harvest and per-field promotion-governance |
 | `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` | Formal v1 design draft for runtime invocation evidence, bounded candidate triggers, and typed SKILL evolution lineage |
+| `docs/SKILL_FIVE_PATTERN_EXECUTION_PLAN_V1.md` | Doc-first execution plan for absorbing Google's five SKILL patterns into concrete template surfaces |
 | `docs/SKILL_MECHANISM_V1_DRAFT.md` | Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion surface for making language diagnostics, lint, build, run, and debug tooling first-class agent inputs |
@@ -47,5 +48,5 @@
 
 ---
 
-*Last updated: 2026-04-07 — added the SKILL execution layer v1 design draft*
+*Last updated: 2026-04-08 — added the SKILL five-pattern execution plan v1 doc*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

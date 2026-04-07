@@ -1,0 +1,37 @@
+You are participating in a design discussion about the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_five_patterns_execution_adoption_v1/discussion_packet.md
+
+Task:
+- Evaluate whether and how this template should absorb Google's five SKILL design patterns: Tool Wrapper, Generator, Reviewer, Inversion, and Pipeline.
+- Focus especially on the repo's known weakness: SKILL surfaces can become too abstract, and the execution layer can remain too thin to help future adopted projects.
+- Distinguish clearly between what should become canonical template contract, what should become execution-layer scaffolding, what should stay example-only, and what should be rejected or deferred.
+- Assume the user wants the resulting template to guide future agent frameworks concretely, with reusable execution surfaces that are actually useful in adopted repos.
+
+Required output shape:
+1. Verdict: how should the template absorb the five patterns?
+2. Top 3 findings only, ordered by severity.
+3. For each finding include:
+   - category: abstraction drift / execution gap / governance fit / bootstrapability / validator fit / adopter utility
+   - why it matters
+   - smallest honest next step
+4. Pattern mapping table:
+   - Tool Wrapper -> [canonical contract / execution scaffold / example only / reject]
+   - Generator -> [...]
+   - Reviewer -> [...]
+   - Inversion -> [...]
+   - Pipeline -> [...]
+   with one-line reason for each.
+5. One thing this template must not do while absorbing these patterns.
+6. Final recommendation:
+   - freeze-plan
+   - continue-discussion
+   - stop
+
+Constraints:
+- Be critical, not promotional.
+- Do not assume all five patterns deserve equal framework weight.
+- Prefer durable, bootstrap-shippable, validator-friendly surfaces over broad conceptual advice.
+- Keep governance truthfulness intact.
+- Do not recommend fake runtime power or vague pattern catalogs with no shipped artifacts.

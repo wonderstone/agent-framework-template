@@ -63,6 +63,23 @@ Decision rationale:
 2. adapters should consume canonical truth, not define it
 3. packaging is useful, but it should follow truthful local contracts instead of substituting for them
 
+## Five-Pattern Absorption Boundary
+
+The five Google skill patterns are useful as execution prompts, but they are not a second canonical SKILL taxonomy.
+
+The canonical contract therefore keeps these boundaries in v1:
+
+1. the canonical contract does not add a required `pattern` field
+2. Wrapper, Reviewer, and Pipeline may ship only as execution scaffolds or starter surfaces
+3. Generator is limited to bounded artifact generation backed by a real output contract
+4. Inversion stays deferred until a host-runtime contract and degradation path exist
+
+Design rule:
+
+pattern names alone do not earn constitutional status.
+
+They only become framework truth when the repository can ship them as real artifacts, bootstrap them honestly, validate them structurally, and show at least one adopter-useful proof surface.
+
 ---
 
 ## v1 Design Goals

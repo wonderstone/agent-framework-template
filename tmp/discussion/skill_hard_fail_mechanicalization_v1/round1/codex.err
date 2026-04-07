@@ -1,0 +1,697 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d6817-2cb9-7bc2-812d-ad6adb4d66a7
+--------
+user
+You are participating in a narrow validator-design discussion for the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_hard_fail_mechanicalization_v1/discussion_packet.md
+
+Focus files to inspect:
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- scripts/validate_template.py
+- tests/test_validate_template.py
+- templates/skill.template.md
+- templates/skill_tool_wrapper.template.md
+- templates/skill_reviewer_gate.template.md
+- templates/skill_pipeline.template.md
+- templates/skill_artifact_generator.template.md
+- examples/skills/01_discussion_packet_workflow.md
+- examples/skills/02_no_placeholder_runtime_guardrail.md
+- examples/skills/03_developer_toolchain_wrapper.md
+- examples/skills/04_receipt_anchored_reviewer.md
+- examples/skills/05_staged_handoff_pipeline.md
+- examples/skills/06_bounded_artifact_generator.md
+
+Task:
+- Recommend how to mechanically implement Hard-Fail checks 2, 4, and 5 from docs/SKILL_MECHANISM_V1_DRAFT.md inside scripts/validate_template.py.
+- Check 2: trigger conditions are too weak to be actionable.
+- Check 4: runtime-specific behavior is claimed without a matching degradation declaration.
+- Check 5: entry_instructions inlines what should remain in referenced artifacts and collapses progressive disclosure.
+- The key constraint is honesty: prefer bounded, testable enforcement over fake semantic certainty.
+
+Required output shape:
+1. Verdict: `IMPLEMENT-NOW`, `PARTIAL-IMPLEMENT`, or `DO-NOT-IMPLEMENT-YET`.
+2. For each of checks 2, 4, and 5:
+   - recommended enforcement shape
+   - whether it should be hard-fail, advisory, or split
+   - exact mechanical proxy or heuristic
+   - biggest false-positive risk
+   - smallest honest next step
+3. Final recommendation:
+   - implement directly
+   - implement partial + keep partial wording downgrade ready
+   - open another narrower discussion
+
+Constraints:
+- Do not redesign the whole SKILL contract.
+- Do not rely on vague semantic NLP scoring.
+- Prefer syntactic or structural checks that can be explained in code and tests.
+- If a check cannot be made trustworthy enough, say so explicitly.
+mcp startup: no servers
+codex
+I’m reading the discussion packet and the validator-related files first, then I’ll map checks 2, 4, and 5 to bounded mechanical proxies in the current validator and test layout.
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_MECHANISM_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' tests/test_validate_template.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' tmp/discussion/skill_hard_fail_mechanicalization_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Structured validator for the agent framework template."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from active_docs_audit import audit_repo as audit_active_docs
+from preference_drift_audit import audit_repo as audit_preference_drift
+
+ succeeded in 0ms:
+# Discussion Packet — skill_hard_fail_mechanicalization_v1
+
+- Generated at: 2026-04-07T13:16:20.647678+00:00
+- Owner: main-thread
+- Current round goal: Obtain enough judgment to freeze a plan
+- Round exit rule: Freeze a plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+How should the validator mechanically implement Hard-Fail checks 2, 4, and 5 from docs/SKILL_MECHANISM_V1_DRAFT.md without creating fake semantic certainty or brittle false positives?
+
+## Why This Needs Discussion
+
+- The first lower-layer proof-surface patch is complete, but the remaining gap is that the docs still promise hard-fail checks for weak triggers, runtime claims without matching degradation, and entry_instructions that collapse progressive disclosure.
+
+## Current Truth
+
+- bootstrap, validator, tests, and standard-profile example surfaces were just strengthened and validated\n- the unresolved gap is specifically validator mechanicalization for hard-fail checks 2, 4, and 5\n- we prefer lower-layer completion over shrinking upper-layer wording by default
+
+## Constraints
+ succeeded in 0ms:
+from __future__ import annotations
+
+import importlib.util
+import shutil
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO_ROOT / "scripts" / "validate_template.py"
+SPEC = importlib.util.spec_from_file_location("validate_template", MODULE_PATH)
+assert SPEC is not None
+assert SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+ValidationIssue = MODULE.ValidationIssue
+validate_repo = MODULE.validate_repo
+collect_advisories = MODULE.collect_advisories
+
+ succeeded in 0ms:
+# SKILL Mechanism V1 Draft
+
+This document defines the formal v1 design draft for the framework's `SKILL` mechanism.
+
+It exists to turn the discussion in `tmp/discussion/skill_mechanism_v1/discussion_packet.md` into a concrete framework-level contract that later template, bootstrap, validator, and adapter work can follow.
+
+This is a design draft. It freezes the canonical framework-native contract and its governance boundaries before broader implementation or packaging work.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Framework-level skill contract and governance model |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
+| Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
+| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
+
+codex
+I have the contract and the current validator surface. Next I’m reading the skill templates/examples and the skill-specific validator code paths to see what can be enforced structurally versus what still depends on interpretation.
+exec
+/bin/zsh -lc "sed -n '260,520p' docs/SKILL_MECHANISM_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+Each canonical field uses the following default matrix:
+
+| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override | Promotion tier |
+|---|---|---|---|---|
+| `purpose` | 1-2 only | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `triggers` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `human-only` |
+| `entry_instructions` | 1-3 | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+| `references` | 1-4 | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `delegated-safe` |
+| `governance` | 1-2 only | `dual-reviewer` | `dual-reviewer`; owner review required | `human-only` |
+| `degradation` | 1-3 | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
+
+Matrix rule:
+
+1. a lower-trust evidence tier may add a candidate note, but it may not directly justify a canonical field change beyond the row's allowed tier range
+2. `references` is the most flexible field because it often grows through examples or support files, but even there the reference must remain truthful and reviewable
+3. `governance` and `degradation` are not metadata-only fields; they use stricter review because they change how the skill can evolve and how it behaves under capability gaps
+4. every `guardrail` skill applies its override column even when a repository uses a looser default elsewhere
+5. detailed harvest and promotion-governance semantics live in `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, but the per-field authority table belongs directly in this canonical contract because it is part of the same field-native truth surface
+
+exec
+/bin/zsh -lc "sed -n '260,520p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
+    "## Developer Toolchain",
+    "Primary language: Python",
+    "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/RUNTIME_SURFACE_PROTECTION.md",
+    "docs/LEFTOVER_UNIT_CONTRACT.md",
+    "templates/doc_first_execution_guidelines.template.md",
+    "templates/discussion_packet.template.md",
+    "templates/execution_contract.template.md",
+    "templates/skill_invocation_receipt.template.md",
+    "templates/skill_candidate_packet.template.md",
+    "templates/skill_promotion_receipt.template.md",
+    "python3 -m pytest tests/ -q",
+    '${TMPDIR:-/tmp}/agent-framework-template-smoke',
+    "examples/demo_project/tmp/git_audit/",
+)
+
+ROOT_PROJECT_CONTEXT_FORBIDDEN_SNIPPETS = (
+exec
+/bin/zsh -lc "sed -n '260,520p' tests/test_validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    assert ValidationIssue(
+        "invalid-skill-promotion-tier",
+        "examples/skills/01_discussion_packet_workflow.md: row 'references' uses unsupported promotion tier 'mystery-tier'",
+    ) in issues
+
+
+def test_validate_repo_reports_invalid_skill_governance_promotion_tier(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+    skill_example.write_text(
+        skill_example.read_text(encoding="utf-8").replace(
+            "| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required | `human-only` |",
+            "| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+exec
+/bin/zsh -lc 'rg -n "skill|trigger|degradation|entry_instructions|references|Hard-Fail|hard-fail|weak" docs/SKILL_MECHANISM_V1_DRAFT.md scripts/validate_template.py tests/test_validate_template.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+tests/test_validate_template.py:134:        "**Next Planned Step**: Re-run focused and repository-wide validation, then decide whether the remaining hard-fail gaps need another four-CLI solution round.",
+tests/test_validate_template.py:204:def test_validate_repo_reports_missing_skill_heading(tmp_path: Path) -> None:
+tests/test_validate_template.py:208:    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+tests/test_validate_template.py:209:    skill_example.write_text(
+tests/test_validate_template.py:210:        skill_example.read_text(encoding="utf-8").replace("### Negative Triggers\n", "", 1),
+tests/test_validate_template.py:217:        "missing-skill-heading",
+tests/test_validate_template.py:218:        "examples/skills/01_discussion_packet_workflow.md: ### Negative Triggers",
+tests/test_validate_template.py:222:def test_validate_repo_reports_missing_skill_review_matrix_row(tmp_path: Path) -> None:
+tests/test_validate_template.py:226:    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+tests/test_validate_template.py:227:    skill_example.write_text(
+tests/test_validate_template.py:228:        skill_example.read_text(encoding="utf-8").replace(
+tests/test_validate_template.py:229:            "| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |\n",
+tests/test_validate_template.py:239:        "missing-skill-review-matrix-row",
+tests/test_validate_template.py:240:        "examples/skills/01_discussion_packet_workflow.md: receipt and review matrix is missing row 'degradation'",
+tests/test_validate_template.py:244:def test_validate_repo_reports_invalid_skill_promotion_tier(tmp_path: Path) -> None:
+tests/test_validate_template.py:248:    skill_example = repo_copy / "examples" / "skills" / "01_discussion_packet_workflow.md"
+tests/test_validate_template.py:249:    skill_example.write_text(
+tests/test_validate_template.py:250:        skill_example.read_text(encoding="utf-8").replace(
+tests/test_validate_template.py:251:            "| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `delegated-safe` |",
+tests/test_validate_template.py:252:            "| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness | `mystery-tier` |",
+exec
+/bin/zsh -lc "sed -n '936,1115p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+def _iter_skill_contract_paths(root: Path) -> tuple[Path, ...]:
+    paths: list[Path] = []
+    explicit_paths = (
+        root / "templates" / "skill.template.md",
+        root / "templates" / "skill_tool_wrapper.template.md",
+        root / "templates" / "skill_reviewer_gate.template.md",
+        root / "templates" / "skill_pipeline.template.md",
+        root / "templates" / "skill_artifact_generator.template.md",
+        root / "examples" / "skills" / "01_discussion_packet_workflow.md",
+        root / "examples" / "skills" / "02_no_placeholder_runtime_guardrail.md",
+        root / "examples" / "skills" / "03_developer_toolchain_wrapper.md",
+        root / "examples" / "skills" / "04_receipt_anchored_reviewer.md",
+        root / "examples" / "skills" / "05_staged_handoff_pipeline.md",
+        root / "examples" / "skills" / "06_bounded_artifact_generator.md",
+    )
+    for path in explicit_paths:
+        if path.is_file():
+            paths.append(path)
+
+    for path in root.rglob("SKILL.md"):
+ succeeded in 0ms:
+# Skill Contract Template
+
+- ID: [skill-id]
+- Type: [knowledge | workflow | verification | guardrail]
+- Owner: [team or role]
+- Review Threshold: [single-reviewer | dual-reviewer | owner-only]
+
+> This template freezes the framework-native v1 SKILL contract. Keep the entry surface small, put deep detail in references, and do not let adapter-specific behavior redefine the canonical truth.
+
+## Purpose
+
+[One sentence describing the behavior change this skill should produce.]
+
+## Triggers
+
+### Positive Triggers
+
+- [Use when this specific request, task phase, repo state, or failure mode is present.]
+
+### Negative Triggers
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_tool_wrapper.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_reviewer_gate.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Developer Toolchain Wrapper Starter
+
+- ID: developer-toolchain-wrapper-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Bind one skill invocation to one declared Developer Toolchain surface so wrapper behavior stays explicit, inspectable, and receipt-friendly.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task should call a declared toolchain surface such as Diagnostics, Health or smoke, Repro path, or Build through a repeatable skill entrypoint.
+
+### Negative Triggers
+
+- Do not use when the work is exploratory and has not yet chosen a concrete toolchain surface or when the task would need hidden runtime behavior not declared in the project adapter.
+ succeeded in 0ms:
+# Independent Reviewer Gate Starter
+
+- ID: independent-reviewer-gate-starter
+- Type: verification
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Route completed implementation through one receipt-anchored independent evaluation path before closeout so review is explicit instead of implied.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task has crossed from generation into evaluation and the repository wants one reviewer, audit pass, or owner verdict recorded against the finished scope.
+
+### Negative Triggers
+
+- Do not use when the work is still being generated, when no bounded review artifact exists yet, or when the task is a trivial local change with no declared review lane.
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_pipeline.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_artifact_generator.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Bounded Artifact Generator Starter
+
+- ID: bounded-artifact-generator-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Allow narrow artifact generation only when the output contract, path, and proof surface are explicit enough to keep generation honest.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task needs a discussion packet, audit packet, receipt, candidate artifact, or other structured file with a stable schema.
+
+### Negative Triggers
+
+- Do not use for open-ended drafting, unconstrained content authoring, or any output that lacks a declared schema, path, and validation story.
+ succeeded in 0ms:
+# Staged Handoff Pipeline Starter
+
+- ID: staged-handoff-pipeline-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Make staged execution explicit by requiring named boundaries, handoff artifacts, checkpoint proof, and an honest stop rule between stages.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task crosses multiple bounded stages such as planning, implementation, review, closeout, or any packet or receipt driven workflow.
+
+### Negative Triggers
+
+- Do not use when the work is a single local step with no meaningful stage boundary or when no artifact changes hands between stages.
+exec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/03_developer_toolchain_wrapper.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/01_discussion_packet_workflow.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet First
+
+- ID: discussion-packet-first
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Route open design questions into one durable packet before execution begins so later rounds do not rely on chat memory.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task is primarily about choosing a direction, comparing alternatives, or reviewing a plan with real tradeoffs.
+
+### Negative Triggers
+
+- Do not use when the next implementation step is already obvious and the remaining work is execution, not decision-making.
+ succeeded in 0ms:
+# Developer Toolchain Wrapper
+
+- ID: developer-toolchain-wrapper
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Bind a task to one declared Developer Toolchain surface so wrapper behavior stays truthful, auditable, and easy for adopters to reuse.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task should invoke a declared surface from `.github/instructions/project-context.instructions.md`, such as `Diagnostics`, `Health or smoke`, or `Repro path`.
+
+### Negative Triggers
+
+- Do not use when the repository has not declared the target surface yet or when the task is still deciding which runtime or module path is authoritative.
+exec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/02_no_placeholder_runtime_guardrail.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# No Placeholder Runtime Claims
+
+- ID: no-placeholder-runtime-claims
+- Type: guardrail
+- Owner: framework-maintainers
+- Review Threshold: dual-reviewer
+
+## Purpose
+
+Prevent agents from shipping placeholder runtime paths, fake smoke claims, or misleading live-surface assertions into active docs and user-facing closeout artifacts.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task edits runtime guidance, health checks, smoke paths, user-surface maps, or other docs that describe what currently works in a live or runtime-adjacent flow.
+
+### Negative Triggers
+
+- Do not use for pure discussion artifacts, historical archives, or speculative design notes that are explicitly not active runtime truth.
+exec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/04_receipt_anchored_reviewer.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Receipt-Anchored Reviewer
+
+- ID: receipt-anchored-reviewer
+- Type: verification
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Turn review into a receipt-bearing evaluation step so implementation closeout does not rely on implied approval.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task has a bounded review artifact and the repository wants an explicit PASS, CONDITIONAL, or FAIL verdict before closeout.
+
+### Negative Triggers
+
+- Do not use while the generator is still changing files or when no packet, diff, or runnable path exists for an independent evaluator to inspect.
+exec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/06_bounded_artifact_generator.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/05_staged_handoff_pipeline.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Staged Handoff Pipeline
+
+- ID: staged-handoff-pipeline
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Model multi-step execution as explicit stage transitions backed by packets, receipts, and stop rules rather than narrative workflow prose.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when work moves across planning, implementation, review, or closeout stages and needs a durable handoff surface between them.
+
+### Negative Triggers
+
+- Do not use for single-step edits that have no meaningful stage boundary or reusable handoff artifact.
+ succeeded in 0ms:
+# Bounded Artifact Generator
+
+- ID: bounded-artifact-generator
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Keep generator behavior limited to schema-backed artifact creation so generated output remains diffable, reusable, and validator-visible.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task needs a discussion packet, git audit packet, skill invocation receipt, or candidate packet generated from known inputs.
+
+### Negative Triggers
+
+- Do not use for unconstrained prose generation, broad drafting, or any output with no stable schema or repository path.
+codex
+I’ve narrowed the likely enforcement surface: check 4 is mechanically tractable if capability markers are explicit, check 5 is only tractable for structural over-inline cases, and check 2 is the weakest unless it’s reduced to anti-pattern detection rather than “good triggers.”
+exec
+/bin/zsh -lc 'rg -n "progressive disclosure|degradation|trigger conditions are too weak|runtime-specific behavior|entry_instructions" -S tmp/discussion docs tests examples templates' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.md:26:| 4. Runtime behavior claimed without matching degradation | **✗ no check** |
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.md:27:| 5. entry_instructions inlines what should stay in references | **✗ no check** |
+tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.md:30:A repo can have governance-theater triggers, undeclared runtime behavior, and fat entry_instructions — pass all tests — and the constitutional doc claims these are mechanically blocked.
+tests/test_validate_template.py:229:            "| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |\n",
+tests/test_validate_template.py:240:        "examples/skills/01_discussion_packet_workflow.md: receipt and review matrix is missing row 'degradation'",
+tests/test_validate_template.py:639:        """# Sample Skill\n\n- ID: sample-skill\n- Type: mystery\n- Owner: adopted-team\n- Review Threshold: single-reviewer\n\n## Purpose\n\nA sample skill.\n\n## Triggers\n\n### Positive Triggers\n\n- Use when the sample condition is present.\n\n### Negative Triggers\n\n- Do not use when the sample non-trigger is present.\n\n### Expected Effect\n\n- The agent changes behavior in a known way.\n\n## Entry Instructions\n\n- Follow the sample steps.\n\n## References\n\n| Name | Path | Required at invocation | Purpose |\n|---|---|---|---|\n| sample | README.md | no | Example only |\n\n## Governance\n\n### Allowed Evidence\n\n- Human-reviewed receipts.\n\n### Reviewer Gate\n\n- Maintainer review required.\n\n### Forbidden Direct Update Inputs\n\n- Raw transcripts.\n\n## Receipt And Review Matrix\n\n| Field | Proposal evidence tiers | Minimum reviewer threshold | Guardrail override |\n|---|---|---|---|\n| `purpose` | `1-2 only` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `triggers` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite |\n| `references` | `1-4` | `single-reviewer` | `single-reviewer`; must keep reference truthfulness |\n| `governance` | `1-2 only` | `dual-reviewer` | `dual-reviewer`; owner review required |\n| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required |\n\n## Degradation\n\n- Fall back to manual execution.\n""",
+templates/skill_reviewer_gate.template.md:65:| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+templates/skill_reviewer_gate.template.md:68:| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
+templates/skill_reviewer_gate.template.md:70:## Degradation
+templates/skill.template.md:47:- [Who must approve changes to purpose, triggers, entry instructions, governance, or degradation.]
+templates/skill.template.md:59:| `entry_instructions` | [for example: 1-3] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] | [delegated-safe / delegated-reviewed / human-only] |
+templates/skill.template.md:62:| `degradation` | [for example: 1-3] | [single-reviewer / dual-reviewer / owner-only] | [stricter rule for guardrail skills] | [delegated-safe / delegated-reviewed / human-only] |
+templates/skill.template.md:64:## Degradation
+templates/skill_pipeline.template.md:65:| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+templates/skill_pipeline.template.md:68:| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
+templates/skill_pipeline.template.md:70:## Degradation
+templates/skill_artifact_generator.template.md:65:| `entry_instructions` | `1-3` | `single-reviewer` | `dual-reviewer`; no auto-proposed rewrite | `delegated-reviewed` |
+templates/skill_artifact_generator.template.md:68:| `degradation` | `1-3` | `single-reviewer` | `dual-reviewer`; owner review required | `delegated-reviewed` |
+templates/skill_artifact_generator.template.md:70:## Degradation
+tests/test_skill_evolution_pipeline.py:66:            target_fields="- entry_instructions\n- references",
+codex
+I found prior discussion confirming the gap: current docs promise these checks, but only structural coverage exists today. I’m reading that prior note plus the helper functions so I can keep the recommendation aligned with the repo’s existing validator style instead of inventing a new contract.
+exec
+/bin/zsh -lc "sed -n '520,700p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/skill_five_pattern_acceptance_desync_v1/round1/claude.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+## Hostile Acceptance Review — skill_five_pattern_acceptance_desync_v1
+
+---
+
+## Verdict: `CONDITIONAL`
+
+The wave is structurally coherent and passes its own tests. It is not a FAIL. But it is not a PASS — three concrete upper/lower mismatches outrun the shipped mechanical proof surface.
+
+---
+
+## Findings (top 5, severity order)
+
+---
+
+### Finding 1 — CRITICAL
+**category:** rule-execution gap / validator blind spot  
+**files:** `docs/SKILL_MECHANISM_V1_DRAFT.md` lines ~288+ | `scripts/validate_template.py` | `tests/test_validate_template.py`
+
+SKILL_MECHANISM_V1_DRAFT declares 6 conditions the validator "should hard-fail" on. The validator enforces only 3:
+
+ succeeded in 0ms:
+def _load_bootstrap_module(root: Path):
+    import sys
+
+    module_path = root / "scripts" / "bootstrap_adoption.py"
+    spec = spec_from_file_location("bootstrap_adoption_validate", module_path)
+    assert spec is not None and spec.loader is not None
+    module = module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _max_rule_number(text: str) -> int:
+    matches = re.findall(r"^## Rule (\d+):", text, flags=re.MULTILINE)
+    return max((int(value) for value in matches), default=0)
+
+
+def _rule_number_for_title(text: str, title: str) -> int | None:
+    pattern = re.compile(r"^## Rule (\d+):\s+(.+)$", flags=re.MULTILINE)
+    for value, found_title in pattern.findall(text):
+exec
+/bin/zsh -lc 'rg -n "def _extract_markdown_subsection|def _extract_first_table_after_heading" scripts/validate_template.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+568:def _extract_markdown_subsection(text: str, heading: str) -> str | None:
+580:def _extract_first_table_after_heading(text: str, heading: str) -> list[list[str]]:
+exec
+/bin/zsh -lc "sed -n '600,760p' tests/test_validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+
+def test_collect_advisories_accepts_qualified_surface_labels(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="full-stack",
+    )
+
+    advisories = collect_advisories(tmp_path / "adopted")
+
+    assert not any("unknown base surface" in advisory.detail for advisory in advisories)
+
+
+def test_collect_advisories_passes_for_bootstrapped_adopted_repo(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path / "adopted",
+        project_name="Adopted Demo",
+        profile="standard",
+exec
+/bin/zsh -lc 'rg --files tmp/discussion/skill_hard_fail_mechanicalization_v1' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/copilot.md
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/claude.md
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/codex.err
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/gemini.md
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/codex.md
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/copilot.err
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/prompt.txt
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/gemini.err
+tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/claude.err
+tmp/discussion/skill_hard_fail_mechanicalization_v1/discussion_packet.md
+exec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/claude.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/copilot.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+ succeeded in 0ms:
+I’m pulling the packet, the validator surface, and the skill-related templates together first so I can recommend checks that are actually enforceable rather than aspirational.
+
+● Read validate_template.py
+  │ scripts/validate_template.py
+  └ 1 line read
+
+● Read test_validate_template.py
+  │ tests/test_validate_template.py
+  └ 1 line read
+
+● Read discussion_packet.md
+  │ tmp/discussion/skill_hard_fail_mechanicalization_v1/discussion_packet.md
+  └ 51 lines read
+
+● Read session_state.md
+  └ 125 lines read
+
+● Read skill.template.md
+  │ templates/skill.template.md
+  └ 72 lines read
+exec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/gemini.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+I'll start by reading the discussion packet and the SKILL mechanism draft to understand the context and the specific hard-fail checks in question.
+Now I will read the draft documentation and the current validation script to understand the checks in question and the existing enforcement mechanisms.
+exec
+/bin/zsh -lc "sed -n '1,220p' tmp/discussion/skill_hard_fail_mechanicalization_v1/round1/codex.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+codex
+**Verdict**
+
+`PARTIAL-IMPLEMENT`
+
+**Check 2: trigger conditions are too weak to be actionable**
+
+- Recommended enforcement shape: split into a very small hard-fail floor plus an advisory vagueness lint.
+- Enforcement level: split.
+- Exact mechanical proxy or heuristic: hard-fail only on obvious structural non-actionability in `### Positive Triggers` and `### Negative Triggers`:
+  `1.` no bullets
+  `2.` any bullet is placeholder-like (`[... ]`, `TBD`, `todo`, `example`, `sample`)
+  `3.` any bullet lacks a conditional marker such as `when`, `if`, or `unless`
+  `4.` positive and negative bullets normalize to the same text after lowercasing and stripping `use/do not use/not`
+  `5.` any bullet is trivially short, e.g. fewer than 5 words
+  Keep broader “too vague” detection advisory only, using a denylist like `appropriate`, `helpful`, `useful`, `relevant`, `as needed`, `best judgment`, `sometimes`.
+- Biggest false-positive risk: domain-specific but valid triggers can be concise or use unusual phrasing without `when/if/unless`.
+- Smallest honest next step: add only the placeholder/conditional/collision/short-bullet hard-fails first and phrase the rest as advisory.
+
+**Check 4: runtime-specific behavior is claimed without a matching degradation declaration**
+
+- Recommended enforcement shape: implement for an explicit capability-family list, not for all “runtime-ish” prose.
+- Enforcement level: split, with a real hard-fail subset.
+- Exact mechanical proxy or heuristic: scan all sections except `## Degradation` and `## References` for capability-family markers derived from the doc itself:
+  `hook`, `tool gating`, `subagent` / `sub-agent`, `context fork` / `context isolation`, `package install`, `update channel`, `lockfile`, `publish`.
+  If any family is claimed outside degradation, hard-fail unless `## Degradation` contains:
+  `1.` an unavailability marker such as `if`, `when unavailable`, `absent`, `missing`, `cannot`
+  `2.` an outcome marker such as `fallback`, `manual`, `advisory-only`, `refuse`, `stop`, `downgrade`, or `block`
+  `3.` ideally the same capability family token or mapped alias.
+  Missing `1` or `2` should be hard-fail. Missing `3` should be advisory unless the family vocabulary is tightly controlled.
+- Biggest false-positive risk: a skill may mention a capability only to forbid it, or may have a truthful generic degradation that does not repeat the same token family.
+- Smallest honest next step: start with the explicit portability/degradation vocabulary already named in `docs/SKILL_MECHANISM_V1_DRAFT.md` and add tests around one positive and one negative case per family.
+
+**Check 5: `entry_instructions` inlines what should remain in referenced artifacts and collapses progressive disclosure**
+
+- Recommended enforcement shape: enforce only structural collapse, not semantic “this belongs in references” judgment.
+- Enforcement level: split.
+- Exact mechanical proxy or heuristic: hard-fail `## Entry Instructions` only when it clearly stops being a minimal entry surface:
+  `1.` contains a table
+  `2.` contains fenced code
+  `3.` contains nested headings
+  `4.` exceeds a conservative size cap, e.g. more than 5 bullets or more than 220 words
+  `5.` contains numbered procedural steps across many lines, e.g. 6+ `1.` / `2.` style items
+  Keep “too much detail relative to references” advisory-only, for example when entry instructions are much larger than the references block or repeat many reference-path details.
+- Biggest false-positive risk: some honest skills may need 6 concise bullets or a slightly longer entry surface without actually collapsing disclosure.
+- Smallest honest next step: implement only the structural caps that all shipped examples already satisfy, and tune the thresholds from current examples before widening.
+
+**Final recommendation**
+
+Implement partial + keep partial wording downgrade ready.
+
+Check 4 has a trustworthy hard-fail subset now. Check 5 has a trustworthy structural hard-fail subset now. Check 2 does not support a truthful full hard-fail without pretending to understand prose quality, so it should be split and documented that way unless the contract wording is narrowed to the structural floor.
+tokens used
+124,285

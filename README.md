@@ -64,6 +64,10 @@ templates/
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
+  skill_tool_wrapper.template.md   ← starter scaffold for binding a skill to a declared toolchain surface
+  skill_reviewer_gate.template.md  ← starter scaffold for receipt-anchored independent evaluation
+  skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
+  skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
   failure_packet.template.md       ← progressive runtime failure packet
   project-context.template.md      ← blank project adapter
   root_cause_note.template.md      ← closeout note for cause-suspected vs cause-established recovery
@@ -79,6 +83,10 @@ examples/
   skills/
     01_discussion_packet_workflow.md ← workflow-style starter skill example
     02_no_placeholder_runtime_guardrail.md ← guardrail-style starter skill example
+    03_developer_toolchain_wrapper.md ← wrapper-style starter skill example
+    04_receipt_anchored_reviewer.md ← reviewer-style starter skill example
+    05_staged_handoff_pipeline.md ← pipeline-style starter skill example
+    06_bounded_artifact_generator.md ← bounded generator starter skill example
   full_stack_project/              ← richer reference repo for multi-runtime Developer Toolchain shape
   reviewer_roles/
     01_goal_acceptance_owner.md    ← first-batch strategy role
@@ -249,6 +257,10 @@ Before any long-running or multi-step task, the agent should produce an executio
 The default is: main-thread agent handles normal `git add` / `commit` / standard `push`, and only exception cases are escalated. This confirmation is meant to override that default when needed, not to force per-step micromanagement.
 
 This repository ships the execution-contract template and one filled demo example at [`examples/demo_project/docs/runbooks/execution_contract_example.md`](examples/demo_project/docs/runbooks/execution_contract_example.md). It does not automatically prove that every adopting repository instantiates an execution contract for every long task unless that repository adds its own workflow or validation checks.
+
+The template now absorbs Google's five skill patterns asymmetrically: Wrapper, Reviewer, and Pipeline ship as concrete starter scaffolds, Generator stays bounded to schema-backed artifact generation, and Inversion remains deferred until the framework can name a truthful host-runtime contract.
+
+Starter scaffold paths: `templates/skill_tool_wrapper.template.md`, `templates/skill_reviewer_gate.template.md`, `templates/skill_pipeline.template.md`, and `templates/skill_artifact_generator.template.md`.
 
 Progress and closeout preference summary:
 

@@ -1,0 +1,46 @@
+You are participating in a narrow validator-design discussion for the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_hard_fail_mechanicalization_v1/discussion_packet.md
+
+Focus files to inspect:
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- scripts/validate_template.py
+- tests/test_validate_template.py
+- templates/skill.template.md
+- templates/skill_tool_wrapper.template.md
+- templates/skill_reviewer_gate.template.md
+- templates/skill_pipeline.template.md
+- templates/skill_artifact_generator.template.md
+- examples/skills/01_discussion_packet_workflow.md
+- examples/skills/02_no_placeholder_runtime_guardrail.md
+- examples/skills/03_developer_toolchain_wrapper.md
+- examples/skills/04_receipt_anchored_reviewer.md
+- examples/skills/05_staged_handoff_pipeline.md
+- examples/skills/06_bounded_artifact_generator.md
+
+Task:
+- Recommend how to mechanically implement Hard-Fail checks 2, 4, and 5 from docs/SKILL_MECHANISM_V1_DRAFT.md inside scripts/validate_template.py.
+- Check 2: trigger conditions are too weak to be actionable.
+- Check 4: runtime-specific behavior is claimed without a matching degradation declaration.
+- Check 5: entry_instructions inlines what should remain in referenced artifacts and collapses progressive disclosure.
+- The key constraint is honesty: prefer bounded, testable enforcement over fake semantic certainty.
+
+Required output shape:
+1. Verdict: `IMPLEMENT-NOW`, `PARTIAL-IMPLEMENT`, or `DO-NOT-IMPLEMENT-YET`.
+2. For each of checks 2, 4, and 5:
+   - recommended enforcement shape
+   - whether it should be hard-fail, advisory, or split
+   - exact mechanical proxy or heuristic
+   - biggest false-positive risk
+   - smallest honest next step
+3. Final recommendation:
+   - implement directly
+   - implement partial + keep partial wording downgrade ready
+   - open another narrower discussion
+
+Constraints:
+- Do not redesign the whole SKILL contract.
+- Do not rely on vague semantic NLP scoring.
+- Prefer syntactic or structural checks that can be explained in code and tests.
+- If a check cannot be made trustworthy enough, say so explicitly.

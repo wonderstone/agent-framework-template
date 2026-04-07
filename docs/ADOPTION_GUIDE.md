@@ -82,6 +82,10 @@ templates/
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
+  skill_tool_wrapper.template.md   ← starter scaffold for binding a skill to a declared toolchain surface
+  skill_reviewer_gate.template.md  ← starter scaffold for receipt-anchored independent evaluation
+  skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
+  skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
   project-context.template.md      ← blank project adapter to fill in
   root_cause_note.template.md      ← closeout note distinguishing cause-suspected from cause-established recovery
@@ -94,7 +98,7 @@ templates/
 
 examples/
   skills/
-    *.md                           ← starter SKILL examples to adapt when your repository formalizes skills
+    *.md                           ← starter SKILL examples to adapt when your repository formalizes wrapper, reviewer, pipeline, or bounded-generator skills
   reviewer_roles/
     *.md                           ← 10 ready-to-adapt starter role profiles
 
@@ -196,7 +200,16 @@ If you want concrete starting points instead of a blank role profile, keep `docs
 
 If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, and `templates/skill.template.md` together. The mechanism draft defines canonical skill truth, the harvest draft defines promotion governance, the execution-layer draft defines runtime invocation evidence and typed evolution lineage, and the template gives you one concrete file shape to fill in.
 
-If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers one `workflow` skill and one `guardrail` skill.
+The template now also ships concrete starter surfaces for the five-pattern execution wave:
+
+1. `templates/skill_tool_wrapper.template.md`
+2. `templates/skill_reviewer_gate.template.md`
+3. `templates/skill_pipeline.template.md`
+4. `templates/skill_artifact_generator.template.md`
+
+Those files are intentionally not a new canonical pattern taxonomy. They are narrow execution scaffolds meant to keep Wrapper, Reviewer, Pipeline, and bounded Generator surfaces bootstrap-shippable and validator-visible.
+
+If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers six shipped examples across discussion workflow, runtime guardrail, tool wrapper, receipt-anchored reviewer, staged handoff pipeline, and bounded artifact generation.
 
 When you do so, keep the field-level receipt and review matrix intact. It is the mechanism that turns broad "humans approve" guidance into an actual per-field update policy.
 

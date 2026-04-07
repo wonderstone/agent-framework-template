@@ -65,8 +65,12 @@ REQUIRED_FILES = (
     "examples/demo_project/docs/ARCHITECTURE.md",
     "examples/demo_project/docs/INDEX.md",
     "examples/demo_project/docs/runbooks/demo-workflow.md",
+    "examples/demo_project/docs/runbooks/execution_contract_example.md",
     "examples/demo_project/src/task_tracker.py",
     "examples/demo_project/tests/test_task_tracker.py",
+    "examples/full_stack_project/README.md",
+    "examples/reviewer_roles/01_goal_acceptance_owner.md",
+    "examples/reviewer_roles/10_docs_spec_drift_reviewer.md",
     "scripts/active_docs_audit.py",
     "scripts/bootstrap_adoption.py",
     "scripts/closeout_truth_audit.py",
@@ -92,6 +96,14 @@ REQUIRED_FILES = (
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
+    "templates/skill_tool_wrapper.template.md",
+    "templates/skill_reviewer_gate.template.md",
+    "templates/skill_pipeline.template.md",
+    "templates/skill_artifact_generator.template.md",
+    "examples/skills/03_developer_toolchain_wrapper.md",
+    "examples/skills/04_receipt_anchored_reviewer.md",
+    "examples/skills/05_staged_handoff_pipeline.md",
+    "examples/skills/06_bounded_artifact_generator.md",
     "tests/test_active_docs_audit.py",
     "tests/test_closeout_truth_audit.py",
     "tests/test_bootstrap_adoption.py",
@@ -193,6 +205,10 @@ README_REQUIRED_REFERENCES = (
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
+    "templates/skill_tool_wrapper.template.md",
+    "templates/skill_reviewer_gate.template.md",
+    "templates/skill_pipeline.template.md",
+    "templates/skill_artifact_generator.template.md",
     "examples/skills/",
     "scripts/closeout_truth_audit.py",
     "scripts/discussion_pipeline.py",
@@ -300,6 +316,132 @@ SKILL_EVOLUTION_PIPELINE_REQUIRED_SNIPPETS = (
     "templates/skill_candidate_packet.template.md",
 )
 
+SKILL_FIVE_PATTERN_DOC_REQUIRED_SNIPPETS = {
+    "docs/SKILL_MECHANISM_V1_DRAFT.md": (
+        "The five Google skill patterns are useful as execution prompts, but they are not a second canonical SKILL taxonomy.",
+        "the canonical contract does not add a required `pattern` field",
+        "Wrapper, Reviewer, and Pipeline may ship only as execution scaffolds or starter surfaces",
+        "Generator is limited to bounded artifact generation backed by a real output contract",
+        "Inversion stays deferred until a host-runtime contract and degradation path exist",
+    ),
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md": (
+        "The execution layer is the main place where the template currently absorbs the usable parts of Google's five skill patterns.",
+        "| `Tool Wrapper` | execution scaffold that binds a skill to one declared Developer Toolchain surface |",
+        "| `Reviewer` | receipt-anchored evaluation scaffold tied to independent review, audit, or closeout evidence |",
+        "| `Pipeline` | staged execution scaffold with explicit handoff artifacts, checkpoints, and stop rules |",
+        "| `Generator` | bounded artifact generation only when output schema, path, and proof surface are explicit |",
+        "| `Inversion` | deferred until a truthful host-runtime contract and degradation story exist |",
+    ),
+}
+
+SKILL_PATTERN_STARTER_REQUIRED_SNIPPETS = {
+    "templates/skill_tool_wrapper.template.md": (
+        "- Wrapper Target Surface:",
+        "- Declared Input Boundary:",
+        "- Output Or Evidence Shape:",
+        "- Fallback Or Stop Rule:",
+        "- Invocation Receipt Linkage:",
+    ),
+    "templates/skill_reviewer_gate.template.md": (
+        "- Review Artifact:",
+        "- Verdict Contract:",
+        "- Evidence Sink:",
+        "- Escalation Or Stop Rule:",
+        "- Independence Rule:",
+    ),
+    "templates/skill_pipeline.template.md": (
+        "- Stage Boundary:",
+        "- Handoff Artifact:",
+        "- Checkpoint Rule:",
+        "- Stop Or Degrade Rule:",
+        "- Validator Surface:",
+    ),
+    "templates/skill_artifact_generator.template.md": (
+        "- Artifact Contract:",
+        "- Required Inputs:",
+        "- Output Path Rule:",
+        "- Receipt Or Diff Anchor:",
+        "- Stop Rule:",
+    ),
+    "examples/skills/03_developer_toolchain_wrapper.md": (
+        "- Wrapper Target Surface:",
+        "- Declared Input Boundary:",
+        "- Output Or Evidence Shape:",
+        "- Fallback Or Stop Rule:",
+        "- Invocation Receipt Linkage:",
+    ),
+    "examples/skills/04_receipt_anchored_reviewer.md": (
+        "- Review Artifact:",
+        "- Verdict Contract:",
+        "- Evidence Sink:",
+        "- Escalation Or Stop Rule:",
+        "- Independence Rule:",
+    ),
+    "examples/skills/05_staged_handoff_pipeline.md": (
+        "- Stage Boundary:",
+        "- Handoff Artifact:",
+        "- Checkpoint Rule:",
+        "- Stop Or Degrade Rule:",
+        "- Validator Surface:",
+    ),
+    "examples/skills/06_bounded_artifact_generator.md": (
+        "- Artifact Contract:",
+        "- Required Inputs:",
+        "- Output Path Rule:",
+        "- Receipt Or Diff Anchor:",
+        "- Stop Rule:",
+    ),
+}
+
+SKILL_WRAPPER_CONTRACT_PATHS = {
+    "templates/skill_tool_wrapper.template.md",
+    "examples/skills/03_developer_toolchain_wrapper.md",
+}
+SKILL_WRAPPER_REQUIRED_REFERENCE_PATHS = (
+    ".github/instructions/project-context.instructions.md",
+    "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+)
+SKILL_WRAPPER_ALLOWED_SURFACE_MARKERS = (
+    "Diagnostics",
+    "Health or smoke",
+    "Repro path",
+    "Build",
+    "Run",
+    "Lint",
+)
+SKILL_REVIEWER_CONTRACT_PATHS = {
+    "templates/skill_reviewer_gate.template.md",
+    "examples/skills/04_receipt_anchored_reviewer.md",
+}
+SKILL_REVIEWER_REQUIRED_REFERENCE_PATHS = (
+    "docs/runbooks/resumable-git-audit-pipeline.md",
+    "templates/git_audit_receipt.template.md",
+)
+SKILL_REVIEWER_REQUIRED_VERDICTS = ("PASS", "CONDITIONAL", "FAIL")
+SKILL_PIPELINE_CONTRACT_PATHS = {
+    "templates/skill_pipeline.template.md",
+    "examples/skills/05_staged_handoff_pipeline.md",
+}
+SKILL_PIPELINE_REQUIRED_REFERENCE_PATHS = (
+    "docs/runbooks/resumable-git-audit-pipeline.md",
+    "templates/git_audit_handoff_packet.template.md",
+)
+SKILL_PIPELINE_ARTIFACT_MARKERS = ("packet", "receipt", "handoff")
+SKILL_GENERATOR_CONTRACT_PATHS = {
+    "templates/skill_artifact_generator.template.md",
+    "examples/skills/06_bounded_artifact_generator.md",
+}
+SKILL_GENERATOR_SCRIPT_REFERENCES = (
+    "scripts/discussion_pipeline.py",
+    "scripts/git_audit_pipeline.py",
+    "scripts/skill_evolution_pipeline.py",
+)
+SKILL_GENERATOR_TEMPLATE_REFERENCES = (
+    "templates/discussion_packet.template.md",
+    "templates/git_audit_task_packet.template.md",
+    "templates/skill_candidate_packet.template.md",
+)
+
 ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
 
 
@@ -364,11 +506,26 @@ DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT = {
         "Run",
         "Health or smoke",
         "Repro path",
-        "Build",
     ],
-    "recommended_surface_kinds": ["Lint"],
+    "recommended_surface_kinds": ["Build", "Lint"],
     "allow_surface_qualifiers": True,
 }
+
+STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
+    "scripts/closeout_truth_audit.py",
+    "examples/skills/01_discussion_packet_workflow.md",
+    "examples/skills/02_no_placeholder_runtime_guardrail.md",
+    "examples/skills/03_developer_toolchain_wrapper.md",
+    "examples/skills/04_receipt_anchored_reviewer.md",
+    "examples/skills/05_staged_handoff_pipeline.md",
+    "examples/skills/06_bounded_artifact_generator.md",
+    "examples/demo_project/README.md",
+    "examples/demo_project/docs/runbooks/execution_contract_example.md",
+    "examples/full_stack_project/README.md",
+    "examples/reviewer_roles/01_goal_acceptance_owner.md",
+    "examples/reviewer_roles/10_docs_spec_drift_reviewer.md",
+)
 
 SKILL_ALLOWED_TYPES = {"knowledge", "workflow", "verification", "guardrail"}
 SKILL_REQUIRED_HEADINGS = (
@@ -403,6 +560,38 @@ SKILL_REQUIRED_MATRIX_FIELDS = (
     "governance",
     "degradation",
 )
+SKILL_RUNTIME_CLAIM_KEYWORDS = (
+    "hook",
+    "tool gating",
+    "subagent",
+    "sub-agent",
+    "context fork",
+    "context isolation",
+    "vendor-specific",
+    "auto-trigger",
+    "host-runtime",
+    "toolchain surface",
+    "target surface",
+    "wrapper target surface",
+)
+SKILL_DEGRADATION_MARKERS = (
+    "fallback",
+    "fall back",
+    "unavailable",
+    "absent",
+    "missing",
+    "block",
+    "downgrade",
+    "advisory",
+    "refuse",
+    "refusal",
+    "stop",
+    "cannot",
+    "manual",
+)
+SKILL_WEAK_TRIGGER_MIN_LENGTH = 25
+SKILL_ENTRY_INSTRUCTION_MAX_BULLETS = 5
+SKILL_ENTRY_INSTRUCTION_MAX_CHARS = 900
 
 
 def _read(path: Path) -> str:
@@ -638,6 +827,13 @@ def _validate_bootstrap(root: Path) -> list[ValidationIssue]:
     if "capabilities" not in _read(module_path):
         issues.append(ValidationIssue("bootstrap-feature-missing", "capability flags support"))
 
+    standard_paths = set(module._iter_profile_paths("standard"))
+    for relative in STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS:
+        if relative not in standard_paths:
+            issues.append(
+                ValidationIssue("bootstrap-profile-mismatch", f"standard profile missing '{relative}'")
+            )
+
     return issues
 
 
@@ -727,7 +923,7 @@ def _validate_root_session_state_freshness(root: Path) -> list[ValidationIssue]:
 
     if current_step and next_step:
         current_norm = _normalize_state_value(current_step)
-        if current_norm.startswith("no active work") and not _is_none_like_state(next_step):
+        if current_norm.startswith("no active") and not _is_none_like_state(next_step):
             issues.append(
                 ValidationIssue(
                     "stale-root-session-state",
@@ -735,7 +931,7 @@ def _validate_root_session_state_freshness(root: Path) -> list[ValidationIssue]:
                 )
             )
 
-        if current_norm.startswith("no active work") and "- [ ]" in uac_section:
+        if current_norm.startswith("no active") and "- [ ]" in uac_section:
             issues.append(
                 ValidationIssue(
                     "stale-root-session-state",
@@ -822,8 +1018,16 @@ def _iter_skill_contract_paths(root: Path) -> tuple[Path, ...]:
     paths: list[Path] = []
     explicit_paths = (
         root / "templates" / "skill.template.md",
+        root / "templates" / "skill_tool_wrapper.template.md",
+        root / "templates" / "skill_reviewer_gate.template.md",
+        root / "templates" / "skill_pipeline.template.md",
+        root / "templates" / "skill_artifact_generator.template.md",
         root / "examples" / "skills" / "01_discussion_packet_workflow.md",
         root / "examples" / "skills" / "02_no_placeholder_runtime_guardrail.md",
+        root / "examples" / "skills" / "03_developer_toolchain_wrapper.md",
+        root / "examples" / "skills" / "04_receipt_anchored_reviewer.md",
+        root / "examples" / "skills" / "05_staged_handoff_pipeline.md",
+        root / "examples" / "skills" / "06_bounded_artifact_generator.md",
     )
     for path in explicit_paths:
         if path.is_file():
@@ -840,6 +1044,225 @@ def _iter_skill_contract_paths(root: Path) -> tuple[Path, ...]:
 
 def _skill_path_label(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
+
+
+def _skill_trigger_bullets(text: str, heading: str) -> list[str]:
+    section = _extract_markdown_subsection(text, heading)
+    if section is None:
+        return []
+    bullets: list[str] = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            bullets.append(stripped[2:].strip())
+    return bullets
+
+
+def _skill_entry_instruction_metrics(text: str) -> tuple[int, int]:
+    section = _extract_markdown_section(text, "Entry Instructions") or ""
+    bullet_count = sum(1 for line in section.splitlines() if line.strip().startswith("- "))
+    return bullet_count, len(section.strip())
+
+
+def _validate_skill_runtime_claims(relative: str, text: str) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    entry_section = (_extract_markdown_section(text, "Entry Instructions") or "").lower()
+    degradation_section = (_extract_markdown_section(text, "Degradation") or "").lower()
+
+    if not any(keyword in entry_section for keyword in SKILL_RUNTIME_CLAIM_KEYWORDS):
+        return issues
+
+    if not any(marker in degradation_section for marker in SKILL_DEGRADATION_MARKERS):
+        issues.append(
+            ValidationIssue(
+                "skill-runtime-claim-without-degradation",
+                f"{relative}: runtime-capability claims in entry instructions need a matching degradation path",
+            )
+        )
+
+    return issues
+
+
+def _validate_skill_entry_instruction_structure(relative: str, text: str) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    entry_section = _extract_markdown_section(text, "Entry Instructions") or ""
+
+    if "```" in entry_section:
+        issues.append(
+            ValidationIssue(
+                "skill-entry-instructions-inline-content",
+                f"{relative}: entry instructions must not inline fenced code blocks",
+            )
+        )
+
+    if any(line.strip().startswith("|") for line in entry_section.splitlines()):
+        issues.append(
+            ValidationIssue(
+                "skill-entry-instructions-inline-content",
+                f"{relative}: entry instructions must not inline markdown tables",
+            )
+        )
+
+    if re.search(r"^### ", entry_section, flags=re.MULTILINE):
+        issues.append(
+            ValidationIssue(
+                "skill-entry-instructions-inline-content",
+                f"{relative}: entry instructions must not introduce nested subheadings",
+            )
+        )
+
+    return issues
+
+
+def _validate_skill_wrapper_contract(relative: str, text: str) -> list[ValidationIssue]:
+    if relative not in SKILL_WRAPPER_CONTRACT_PATHS:
+        return []
+
+    issues: list[ValidationIssue] = []
+    references_section = _extract_markdown_section(text, "References") or ""
+    entry_section = _extract_markdown_section(text, "Entry Instructions") or ""
+
+    for required_path in SKILL_WRAPPER_REQUIRED_REFERENCE_PATHS:
+        if required_path not in references_section:
+            issues.append(
+                ValidationIssue(
+                    "skill-wrapper-missing-reference",
+                    f"{relative}: wrapper contract must reference '{required_path}'",
+                )
+            )
+
+    if not any(marker in entry_section for marker in SKILL_WRAPPER_ALLOWED_SURFACE_MARKERS):
+        issues.append(
+            ValidationIssue(
+                "skill-wrapper-missing-surface-binding",
+                f"{relative}: wrapper entry instructions must name at least one declared Developer Toolchain surface",
+            )
+        )
+
+    if ".github/instructions/project-context.instructions.md" not in entry_section:
+        issues.append(
+            ValidationIssue(
+                "skill-wrapper-missing-adapter-binding",
+                f"{relative}: wrapper entry instructions must bind to the project-context adapter path",
+            )
+        )
+
+    return issues
+
+
+def _validate_skill_reviewer_contract(relative: str, text: str) -> list[ValidationIssue]:
+    if relative not in SKILL_REVIEWER_CONTRACT_PATHS:
+        return []
+
+    issues: list[ValidationIssue] = []
+    references_section = _extract_markdown_section(text, "References") or ""
+    entry_section = _extract_markdown_section(text, "Entry Instructions") or ""
+
+    for required_path in SKILL_REVIEWER_REQUIRED_REFERENCE_PATHS:
+        if required_path not in references_section:
+            issues.append(
+                ValidationIssue(
+                    "skill-reviewer-missing-reference",
+                    f"{relative}: reviewer contract must reference '{required_path}'",
+                )
+            )
+
+    if not all(verdict in entry_section for verdict in SKILL_REVIEWER_REQUIRED_VERDICTS):
+        issues.append(
+            ValidationIssue(
+                "skill-reviewer-missing-verdict-contract",
+                f"{relative}: reviewer entry instructions must name PASS, CONDITIONAL, and FAIL verdicts",
+            )
+        )
+
+    if "independent" not in entry_section.lower() and "evaluator" not in entry_section.lower():
+        issues.append(
+            ValidationIssue(
+                "skill-reviewer-missing-independence-rule",
+                f"{relative}: reviewer entry instructions must state an independence rule or evaluator boundary",
+            )
+        )
+
+    return issues
+
+
+def _validate_skill_pipeline_contract(relative: str, text: str) -> list[ValidationIssue]:
+    if relative not in SKILL_PIPELINE_CONTRACT_PATHS:
+        return []
+
+    issues: list[ValidationIssue] = []
+    references_section = _extract_markdown_section(text, "References") or ""
+    entry_section = (_extract_markdown_section(text, "Entry Instructions") or "").lower()
+
+    for required_path in SKILL_PIPELINE_REQUIRED_REFERENCE_PATHS:
+        if required_path not in references_section:
+            issues.append(
+                ValidationIssue(
+                    "skill-pipeline-missing-reference",
+                    f"{relative}: pipeline contract must reference '{required_path}'",
+                )
+            )
+
+    if not all(marker in entry_section for marker in SKILL_PIPELINE_ARTIFACT_MARKERS):
+        issues.append(
+            ValidationIssue(
+                "skill-pipeline-missing-artifact-boundary",
+                f"{relative}: pipeline entry instructions must mention packet, receipt, or handoff artifact boundaries explicitly",
+            )
+        )
+
+    if "stage" not in entry_section or ("blocker" not in entry_section and "validation" not in entry_section):
+        issues.append(
+            ValidationIssue(
+                "skill-pipeline-missing-checkpoint-rule",
+                f"{relative}: pipeline entry instructions must describe stage checkpoints with validation or blocker output",
+            )
+        )
+
+    return issues
+
+
+def _validate_skill_generator_contract(relative: str, text: str) -> list[ValidationIssue]:
+    if relative not in SKILL_GENERATOR_CONTRACT_PATHS:
+        return []
+
+    issues: list[ValidationIssue] = []
+    references_section = _extract_markdown_section(text, "References") or ""
+    entry_section = (_extract_markdown_section(text, "Entry Instructions") or "").lower()
+
+    if not any(path in references_section for path in SKILL_GENERATOR_SCRIPT_REFERENCES):
+        issues.append(
+            ValidationIssue(
+                "skill-generator-missing-script-reference",
+                f"{relative}: generator contract must reference at least one generator script surface",
+            )
+        )
+
+    if not any(path in references_section for path in SKILL_GENERATOR_TEMPLATE_REFERENCES):
+        issues.append(
+            ValidationIssue(
+                "skill-generator-missing-template-reference",
+                f"{relative}: generator contract must reference at least one schema-backed artifact template",
+            )
+        )
+
+    if "schema" not in entry_section and "stable schema" not in entry_section:
+        issues.append(
+            ValidationIssue(
+                "skill-generator-missing-schema-boundary",
+                f"{relative}: generator entry instructions must state a stable schema boundary",
+            )
+        )
+
+    if "path" not in entry_section or ("receipt" not in entry_section and "diff" not in entry_section):
+        issues.append(
+            ValidationIssue(
+                "skill-generator-missing-proof-boundary",
+                f"{relative}: generator entry instructions must name an output path rule and receipt or diff anchor",
+            )
+        )
+
+    return issues
 
 
 def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
@@ -981,11 +1404,44 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
                             )
                         )
 
+            issues.extend(_validate_skill_wrapper_contract(relative, text))
+            issues.extend(_validate_skill_reviewer_contract(relative, text))
+            issues.extend(_validate_skill_pipeline_contract(relative, text))
+            issues.extend(_validate_skill_generator_contract(relative, text))
+            issues.extend(_validate_skill_runtime_claims(relative, text))
+            issues.extend(_validate_skill_entry_instruction_structure(relative, text))
+
     return issues
 
 
 def _validate_skill_execution_surfaces(root: Path) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+
+    for relative_path, snippets in SKILL_FIVE_PATTERN_DOC_REQUIRED_SNIPPETS.items():
+        path = root / relative_path
+        if path.is_file():
+            text = _read(path)
+            for snippet in snippets:
+                if snippet not in text:
+                    issues.append(
+                        ValidationIssue(
+                            "missing-skill-five-pattern-doc-snippet",
+                            f"{relative_path}: {snippet}",
+                        )
+                    )
+
+    for relative_path, snippets in SKILL_PATTERN_STARTER_REQUIRED_SNIPPETS.items():
+        path = root / relative_path
+        if path.is_file():
+            text = _read(path)
+            for snippet in snippets:
+                if snippet not in text:
+                    issues.append(
+                        ValidationIssue(
+                            "missing-skill-pattern-starter-snippet",
+                            f"{relative_path}: {snippet}",
+                        )
+                    )
 
     invocation_template_path = root / "templates/skill_invocation_receipt.template.md"
     if invocation_template_path.is_file():
@@ -1181,6 +1637,33 @@ def _validate_developer_toolchain_contract(
 
 def collect_advisories(root: Path) -> list[ValidationAdvisory]:
     advisories: list[ValidationAdvisory] = []
+
+    for path in _iter_skill_contract_paths(root):
+        relative = _skill_path_label(root, path)
+        text = _read(path)
+        if relative.startswith("templates/"):
+            continue
+
+        for heading in ("Positive Triggers", "Negative Triggers"):
+            for bullet in _skill_trigger_bullets(text, heading):
+                if len(bullet) < SKILL_WEAK_TRIGGER_MIN_LENGTH:
+                    advisories.append(
+                        ValidationAdvisory(
+                            "weak-skill-trigger-bullet",
+                            f"{relative}: {heading} contains a trigger bullet shorter than {SKILL_WEAK_TRIGGER_MIN_LENGTH} characters",
+                        )
+                    )
+                    break
+
+        bullet_count, section_chars = _skill_entry_instruction_metrics(text)
+        if bullet_count > SKILL_ENTRY_INSTRUCTION_MAX_BULLETS or section_chars > SKILL_ENTRY_INSTRUCTION_MAX_CHARS:
+            advisories.append(
+                ValidationAdvisory(
+                    "skill-entry-instructions-too-dense",
+                    f"{relative}: entry instructions exceed the advisory density budget",
+                )
+            )
+
     project_context = root / ".github/instructions/project-context.instructions.md"
     if not project_context.is_file():
         return advisories

@@ -1,0 +1,851 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d677e-c995-7a00-bd58-60f149846139
+--------
+user
+You are participating in a hostile acceptance review for the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_five_pattern_acceptance_desync_v1/discussion_packet.md
+
+Focus files to inspect:
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md
+- README.md
+- docs/ADOPTION_GUIDE.md
+- scripts/bootstrap_adoption.py
+- scripts/validate_template.py
+- templates/skill_tool_wrapper.template.md
+- templates/skill_reviewer_gate.template.md
+- templates/skill_pipeline.template.md
+- templates/skill_artifact_generator.template.md
+- examples/skills/03_developer_toolchain_wrapper.md
+- examples/skills/04_receipt_anchored_reviewer.md
+- examples/skills/05_staged_handoff_pipeline.md
+- examples/skills/06_bounded_artifact_generator.md
+- tests/test_bootstrap_adoption.py
+- tests/test_validate_template.py
+
+Task:
+- Audit whether the newly shipped five-pattern scaffold wave has any upper-layer vs lower-layer desynchronization.
+- Upper layer means: constitutional docs, governance rules, adoption docs, validator claims, README framing, profile promises.
+- Lower layer means: starter templates, examples, bootstrap-distributed assets, tests, and executable proof surfaces.
+- Be adversarial: look for overclaim, blind spots, layer bleed, false confidence, profile mismatch, validator holes, wording that outruns proof, or starter surfaces that do not actually satisfy the rules above them.
+
+Required output shape:
+1. Verdict: `PASS`, `CONDITIONAL`, or `FAIL`.
+2. Findings: top 5 max, ordered by severity.
+3. For each finding include:
+   - severity: critical / high / medium / low
+   - category: rule-execution gap / validator blind spot / bootstrap mismatch / doc-overclaim / layer bleed / example drift / test gap
+   - file evidence: exact file path(s)
+   - why it matters
+   - smallest honest fix
+4. Residual risks:
+   - what could still go wrong even if no blocker is found
+5. Final recommendation:
+   - accept
+   - accept-with-fixes
+   - reroute-to-another-discussion
+
+Constraints:
+- Do not propose broad redesign unless a concrete blocker forces it.
+- Prefer concrete mismatch over theoretical purity.
+- Treat validator coverage as weaker than executable proof.
+- Treat docs as wrong if they outrun shipped bootstrap/test reality.
+- Do not reward the implementation merely because tests pass.
+mcp startup: no servers
+codex
+I’m treating this as a hostile consistency audit between the governance/docs layer and the shipped scaffold/test layer. I’ll read the packet first, then cross-check the named docs, templates, scripts, examples, and tests for concrete desynchronization and validator overclaim.
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_MECHANISM_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' README.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Mechanism V1 Draft
+
+This document defines the formal v1 design draft for the framework's `SKILL` mechanism.
+
+It exists to turn the discussion in `tmp/discussion/skill_mechanism_v1/discussion_packet.md` into a concrete framework-level contract that later template, bootstrap, validator, and adapter work can follow.
+
+This is a design draft. It freezes the canonical framework-native contract and its governance boundaries before broader implementation or packaging work.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Framework-level skill contract and governance model |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
+| Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
+| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
+
+ succeeded in 0ms:
+# Agent Framework Template
+
+A minimal, reusable GitHub Copilot agent framework. Drop it into any project to give your AI coding assistant structured decision rules, state management, and a clean operating protocol.
+
+---
+
+## Why This Exists
+
+Most agent setups fail in one of three ways:
+
+- the rules live only in chat history
+- the project-specific truth sources are never made explicit
+- multi-step work cannot survive a reviewer swap or interrupted CLI session
+
+This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
+
+---
+
+## What's Included
+
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Execution Layer V1 Draft
+
+This document defines the formal v1 design draft for the framework's SKILL execution layer.
+
+It exists to close the gap between the canonical SKILL contract and real task execution so repositories can make skills improve through use without collapsing canonical truth into runtime drift.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Runtime invocation evidence, bounded candidate triggers, lineage metadata, and execution-side artifact surfaces for SKILL evolution |
+| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, receipt-anchored closeout, and discussion-backed design decisions |
+| Already changes | template surfaces, bootstrap assets, validator expectations, and future runtime evidence packaging for SKILL use |
+| Does not yet change | autonomous canonical mutation, cloud skill sharing, telemetry-backed promotion authority, or a fully automated host executor |
+
+Normative note:
+
+exec
+/bin/zsh -lc "sed -n '1,240p' tmp/discussion/skill_five_pattern_acceptance_desync_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — skill_five_pattern_acceptance_desync_v1
+
+- Generated at: 2026-04-07T10:30:13.616652+00:00
+- Owner: main-thread
+- Current round goal: Obtain enough judgment to freeze a plan
+- Round exit rule: Freeze a plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+After the five-pattern scaffold implementation wave, where do upper-layer rules, docs, validator claims, or governance surfaces still drift away from lower-layer starter surfaces, bootstrap output, examples, or executable proof?
+
+## Why This Needs Discussion
+
+The implementation wave is complete and validated, but the user explicitly wants a hostile acceptance round focused on upper-layer versus lower-layer desynchronization before treating the wave as truly solid.
+
+## Current Truth
+
+The repository now ships five-pattern boundary text in the canonical SKILL docs, new starter scaffold templates for Wrapper/Reviewer/Pipeline/bounded Generator, new examples under examples/skills, bootstrap wiring, validator rules, focused tests, full tests, and a successful standard-profile bootstrap smoke dry-run. The risk is not obvious breakage; it is hidden desync between what upper-layer rules claim and what lower-layer executable surfaces really guarantee.
+
+## Constraints
+codex
+The design docs already contain an important caveat: several fields are described as “required in v1” even when not fully enforced today. I’m now checking whether the rest of the repo stays inside that caveat or quietly overstates what bootstrap, templates, validators, and examples actually deliver.
+exec
+/bin/zsh -lc "sed -n '1,320p' scripts/bootstrap_adoption.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,320p' docs/ADOPTION_GUIDE.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Bootstrap this template into another repository."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
+    "backend-api": {
+        "primary_language": "Python",
+        "package_manager": "pip",
+        "project_map_rows": (
+            "| `src/` | API implementation and domain services |",
+ succeeded in 0ms:
+# Adoption Guide
+
+Step-by-step guide for adopting this agent framework in a new project.
+
+---
+
+## Prerequisites
+
+- GitHub repository (new or existing)
+- A coding assistant that reads `.github/copilot-instructions.md` (GitHub Copilot, Cursor, Augment, etc.)
+- Python 3.11+ (to run the bootstrap, audit helper, and validation scripts)
+- Bash is optional — `scripts/validate-template.sh` is a thin wrapper that calls `scripts/validate_template.py`; you can run either
+
+---
+
+## Step 1 — Bootstrap Or Copy The Core Files
+
+### Recommended: bootstrap the target repository
+
+Run this from the template repository:
+exec
+/bin/zsh -lc "sed -n '1,320p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_tool_wrapper.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_reviewer_gate.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_pipeline.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Developer Toolchain Wrapper Starter
+
+- ID: developer-toolchain-wrapper-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Bind one skill invocation to one declared Developer Toolchain surface so wrapper behavior stays explicit, inspectable, and receipt-friendly.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task should call a declared toolchain surface such as Diagnostics, Health or smoke, Repro path, or Build through a repeatable skill entrypoint.
+
+### Negative Triggers
+
+- Do not use when the work is exploratory and has not yet chosen a concrete toolchain surface or when the task would need hidden runtime behavior not declared in the project adapter.
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Structured validator for the agent framework template."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from active_docs_audit import audit_repo as audit_active_docs
+from preference_drift_audit import audit_repo as audit_preference_drift
+
+ succeeded in 0ms:
+# Independent Reviewer Gate Starter
+
+- ID: independent-reviewer-gate-starter
+- Type: verification
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Route completed implementation through one receipt-anchored independent evaluation path before closeout so review is explicit instead of implied.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task has crossed from generation into evaluation and the repository wants one reviewer, audit pass, or owner verdict recorded against the finished scope.
+
+### Negative Triggers
+
+- Do not use when the work is still being generated, when no bounded review artifact exists yet, or when the task is a trivial local change with no declared review lane.
+ succeeded in 0ms:
+# Staged Handoff Pipeline Starter
+
+- ID: staged-handoff-pipeline-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Make staged execution explicit by requiring named boundaries, handoff artifacts, checkpoint proof, and an honest stop rule between stages.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task crosses multiple bounded stages such as planning, implementation, review, closeout, or any packet or receipt driven workflow.
+
+### Negative Triggers
+
+- Do not use when the work is a single local step with no meaningful stage boundary or when no artifact changes hands between stages.
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_artifact_generator.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Bounded Artifact Generator Starter
+
+- ID: bounded-artifact-generator-starter
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Allow narrow artifact generation only when the output contract, path, and proof surface are explicit enough to keep generation honest.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task needs a discussion packet, audit packet, receipt, candidate artifact, or other structured file with a stable schema.
+
+### Negative Triggers
+
+- Do not use for open-ended drafting, unconstrained content authoring, or any output that lacks a declared schema, path, and validation story.
+codex
+I’ve confirmed the four starter templates are narrow and cautious on their own. The next question is whether bootstrap, validator, examples, and tests actually preserve those narrow boundaries or quietly widen the promise.
+exec
+/bin/zsh -lc "sed -n '1,280p' tests/test_bootstrap_adoption.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/04_receipt_anchored_reviewer.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/06_bounded_artifact_generator.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/05_staged_handoff_pipeline.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' examples/skills/03_developer_toolchain_wrapper.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Receipt-Anchored Reviewer
+
+- ID: receipt-anchored-reviewer
+- Type: verification
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Turn review into a receipt-bearing evaluation step so implementation closeout does not rely on implied approval.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when a task has a bounded review artifact and the repository wants an explicit PASS, CONDITIONAL, or FAIL verdict before closeout.
+
+### Negative Triggers
+
+- Do not use while the generator is still changing files or when no packet, diff, or runnable path exists for an independent evaluator to inspect.
+ succeeded in 0ms:
+# Bounded Artifact Generator
+
+- ID: bounded-artifact-generator
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Keep generator behavior limited to schema-backed artifact creation so generated output remains diffable, reusable, and validator-visible.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task needs a discussion packet, git audit packet, skill invocation receipt, or candidate packet generated from known inputs.
+
+### Negative Triggers
+
+- Do not use for unconstrained prose generation, broad drafting, or any output with no stable schema or repository path.
+ succeeded in 0ms:
+from __future__ import annotations
+
+import importlib.util
+import json
+import subprocess
+import sys
+from contextlib import redirect_stdout
+from io import StringIO
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO_ROOT / "scripts" / "bootstrap_adoption.py"
+SPEC = importlib.util.spec_from_file_location("bootstrap_adoption", MODULE_PATH)
+assert SPEC is not None
+assert SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+bootstrap_repo = MODULE.bootstrap_repo
+ succeeded in 0ms:
+# Staged Handoff Pipeline
+
+- ID: staged-handoff-pipeline
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Model multi-step execution as explicit stage transitions backed by packets, receipts, and stop rules rather than narrative workflow prose.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when work moves across planning, implementation, review, or closeout stages and needs a durable handoff surface between them.
+
+### Negative Triggers
+
+- Do not use for single-step edits that have no meaningful stage boundary or reusable handoff artifact.
+ succeeded in 0ms:
+# Developer Toolchain Wrapper
+
+- ID: developer-toolchain-wrapper
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Bind a task to one declared Developer Toolchain surface so wrapper behavior stays truthful, auditable, and easy for adopters to reuse.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task should invoke a declared surface from `.github/instructions/project-context.instructions.md`, such as `Diagnostics`, `Health or smoke`, or `Repro path`.
+
+### Negative Triggers
+
+- Do not use when the repository has not declared the target surface yet or when the task is still deciding which runtime or module path is authoritative.
+exec
+/bin/zsh -lc "sed -n '1,320p' tests/test_validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+from __future__ import annotations
+
+import importlib.util
+import shutil
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = REPO_ROOT / "scripts" / "validate_template.py"
+SPEC = importlib.util.spec_from_file_location("validate_template", MODULE_PATH)
+assert SPEC is not None
+assert SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+ValidationIssue = MODULE.ValidationIssue
+validate_repo = MODULE.validate_repo
+collect_advisories = MODULE.collect_advisories
+
+exec
+/bin/zsh -lc 'rg -n "skill_tool_wrapper|skill_reviewer_gate|skill_pipeline|skill_artifact_generator|invocation receipt|candidate packet|promotion receipt|required in v1|required-core|five-pattern|Inversion|self-improve|self-evolution|self-improv|execution contract" scripts/bootstrap_adoption.py scripts/validate_template.py docs/ADOPTION_GUIDE.md README.md docs/SKILL_MECHANISM_V1_DRAFT.md docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md tests/test_bootstrap_adoption.py tests/test_validate_template.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+tests/test_validate_template.py:336:        "missing-skill-five-pattern-doc-snippet",
+tests/test_validate_template.py:345:    wrapper_template = repo_copy / "templates" / "skill_tool_wrapper.template.md"
+tests/test_validate_template.py:359:        "templates/skill_tool_wrapper.template.md: - Invocation Receipt Linkage:",
+docs/ADOPTION_GUIDE.md:82:  skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
+docs/ADOPTION_GUIDE.md:83:  skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
+docs/ADOPTION_GUIDE.md:85:  skill_tool_wrapper.template.md   ← starter scaffold for binding a skill to a declared toolchain surface
+docs/ADOPTION_GUIDE.md:86:  skill_reviewer_gate.template.md  ← starter scaffold for receipt-anchored independent evaluation
+docs/ADOPTION_GUIDE.md:87:  skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
+docs/ADOPTION_GUIDE.md:88:  skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
+docs/ADOPTION_GUIDE.md:112:  skill_evolution_pipeline.py      ← helper for initializing invocation receipts and candidate packets from execution evidence
+docs/ADOPTION_GUIDE.md:181:Bootstrap-generated adopters now also carry a manifest-declared `required-core` contract for Developer Toolchain.
+docs/ADOPTION_GUIDE.md:203:The template now also ships concrete starter surfaces for the five-pattern execution wave:
+docs/ADOPTION_GUIDE.md:205:1. `templates/skill_tool_wrapper.template.md`
+docs/ADOPTION_GUIDE.md:206:2. `templates/skill_reviewer_gate.template.md`
+docs/ADOPTION_GUIDE.md:207:3. `templates/skill_pipeline.template.md`
+docs/ADOPTION_GUIDE.md:208:4. `templates/skill_artifact_generator.template.md`
+docs/ADOPTION_GUIDE.md:224:5. give skill execution a real runtime evidence surface by recording invocation receipts, not just post-hoc summaries
+docs/ADOPTION_GUIDE.md:226:6. require candidate packets before proposed change and promotion receipts before canonical mutation
+docs/ADOPTION_GUIDE.md:231:1. runtime invocation receipts may prove that a skill was used and may recommend `FIX`, `DERIVED`, or `CAPTURED` evolution modes
+docs/ADOPTION_GUIDE.md:232:2. those execution-side artifacts may create candidate packets
+exec
+/bin/zsh -lc "sed -n '400,760p' scripts/bootstrap_adoption.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+        ".github/instructions/docs.instructions.md",
+        ".github/workflows/ci.yml",
+        "CHANGELOG.md",
+        "LICENSE",
+        "VERSION",
+        "docs/ADOPTION_GUIDE.md",
+        "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
+        "docs/COMPATIBILITY.md",
+        "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
+        "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+        "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+        "docs/FRAMEWORK_ARCHITECTURE.md",
+        "docs/LEFTOVER_UNIT_CONTRACT.md",
+        "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
+        "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
+        "docs/SKILL_MECHANISM_V1_DRAFT.md",
+        "docs/runbooks/multi-model-discussion-loop.md",
+        "docs/RUNTIME_SURFACE_PROTECTION.md",
+        "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
+        "docs/runbooks/resumable-git-audit-pipeline.md",
+exec
+/bin/zsh -lc "sed -n '840,1120p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+        "Status-line / closeout-summary rule understood:",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-execution-contract-snippet", snippet))
+    return issues
+
+
+def _validate_closeout_rule_guards(root: Path) -> list[ValidationIssue]:
+    text = _read(root / ".github/copilot-instructions.md")
+    issues: list[ValidationIssue] = []
+    required_snippets = (
+        "### Closeout Irreversibility Rule (🔴 Mandatory)",
+        "### Hook Repair Protocol (🔴 Mandatory)",
+        "it must not emit a second closeout action",
+        "add only the missing closeout action",
+    )
+    for snippet in required_snippets:
+        if snippet not in text:
+            issues.append(ValidationIssue("missing-closeout-guard-snippet", snippet))
+exec
+/bin/zsh -lc "sed -n '300,520p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+)
+
+SKILL_PROMOTION_TEMPLATE_REQUIRED_SNIPPETS = (
+    "- Evolution Mode:",
+    "- Invocation IDs:",
+    "- Parent Lineage:",
+)
+
+SKILL_EVOLUTION_PIPELINE_REQUIRED_SNIPPETS = (
+    "init-invocation",
+    "init-candidate",
+    "templates/skill_invocation_receipt.template.md",
+    "templates/skill_candidate_packet.template.md",
+)
+
+SKILL_FIVE_PATTERN_DOC_REQUIRED_SNIPPETS = {
+    "docs/SKILL_MECHANISM_V1_DRAFT.md": (
+        "The five Google skill patterns are useful as execution prompts, but they are not a second canonical SKILL taxonomy.",
+        "the canonical contract does not add a required `pattern` field",
+        "Wrapper, Reviewer, and Pipeline may ship only as execution scaffolds or starter surfaces",
+exec
+/bin/zsh -lc "sed -n '320,460p' tests/test_validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    mechanism_doc = repo_copy / "docs" / "SKILL_MECHANISM_V1_DRAFT.md"
+    mechanism_doc.write_text(
+        mechanism_doc.read_text(encoding="utf-8").replace(
+            "2. Wrapper, Reviewer, and Pipeline may ship only as execution scaffolds or starter surfaces\n",
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-five-pattern-doc-snippet",
+        "docs/SKILL_MECHANISM_V1_DRAFT.md: Wrapper, Reviewer, and Pipeline may ship only as execution scaffolds or starter surfaces",
+    ) in issues
+
+exec
+/bin/zsh -lc "sed -n '280,520p' tests/test_bootstrap_adoption.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+        encoding="utf-8"
+    )
+    assert "Project type: full-stack" in project_context
+    assert "| Diagnostics (frontend) |" in project_context
+    assert "| Run (backend) |" in project_context
+    assert "| Repro path (primary journey) |" in project_context
+    assert result.project_type == "full-stack"
+
+
+def test_detect_project_type_prefers_backend_for_pyproject(tmp_path: Path) -> None:
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\n", encoding="utf-8")
+
+    assert detect_project_type(tmp_path) == "backend-api"
+
+
+def test_main_prints_skill_accumulation_guidance_for_standard_profile(tmp_path: Path, monkeypatch) -> None:
+    output = StringIO()
+    monkeypatch.setattr(
+        sys,
+        "argv",
+exec
+/bin/zsh -lc 'rg -n "agent-framework-manifest|required_surface_kinds|required_top_level_fields|recommended_surface_kinds|allow_surface_qualifiers|expected_files|missing-skill-pattern-starter-snippet|missing-skill-five-pattern-doc-snippet|examples/skills/03|examples/skills/04|examples/skills/05|examples/skills/06" scripts/validate_template.py tests/test_validate_template.py scripts/bootstrap_adoption.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+tests/test_validate_template.py:336:        "missing-skill-five-pattern-doc-snippet",
+tests/test_validate_template.py:358:        "missing-skill-pattern-starter-snippet",
+scripts/bootstrap_adoption.py:452:        "examples/skills/03_developer_toolchain_wrapper.md",
+scripts/bootstrap_adoption.py:453:        "examples/skills/04_receipt_anchored_reviewer.md",
+scripts/bootstrap_adoption.py:454:        "examples/skills/05_staged_handoff_pipeline.md",
+scripts/bootstrap_adoption.py:455:        "examples/skills/06_bounded_artifact_generator.md",
+scripts/bootstrap_adoption.py:470:        "examples/full_stack_project/.github/agent-framework-manifest.json",
+scripts/bootstrap_adoption.py:519:MANIFEST_PATH = ".github/agent-framework-manifest.json"
+scripts/bootstrap_adoption.py:616:    expected_files: tuple[str, ...],
+scripts/bootstrap_adoption.py:626:        "expected_files": list(expected_files),
+scripts/bootstrap_adoption.py:630:            "required_top_level_fields": ["Primary language", "Package manager"],
+scripts/bootstrap_adoption.py:631:            "required_surface_kinds": [
+scripts/bootstrap_adoption.py:638:            "recommended_surface_kinds": ["Lint"],
+scripts/bootstrap_adoption.py:639:            "allow_surface_qualifiers": True,
+scripts/bootstrap_adoption.py:742:        expected_files=tuple(
+scripts/validate_template.py:99:    "examples/skills/03_developer_toolchain_wrapper.md",
+scripts/validate_template.py:100:    "examples/skills/04_receipt_anchored_reviewer.md",
+scripts/validate_template.py:101:    "examples/skills/05_staged_handoff_pipeline.md",
+scripts/validate_template.py:102:    "examples/skills/06_bounded_artifact_generator.md",
+scripts/validate_template.py:364:ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
+exec
+/bin/zsh -lc "sed -n '520,840p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+def _extract_markdown_subsection(text: str, heading: str) -> str | None:
+    heading_match = re.search(rf"^### {re.escape(heading)}\s*$", text, flags=re.MULTILINE)
+    if heading_match is None:
+        return None
+
+    start = heading_match.end()
+    next_heading = re.search(r"^(## |### )", text[start:], flags=re.MULTILINE)
+    if next_heading is None:
+        return text[start:]
+    return text[start : start + next_heading.start()]
+
+
+def _extract_first_table_after_heading(text: str, heading: str) -> list[list[str]]:
+    section = _extract_markdown_section(text, heading)
+    if section is None:
+        return []
+
+    rows: list[list[str]] = []
+    collecting = False
+codex
+I’m in the validator now. So far it proves file presence and a few required snippets well enough, but I’m checking whether it actually validates the hard claims the docs make about the new scaffold wave, especially around execution lineage and starter integrity.
+exec
+/bin/zsh -lc "sed -n '1120,1235p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+    pipeline_path = root / "scripts/skill_evolution_pipeline.py"
+    if pipeline_path.is_file():
+        pipeline_text = _read(pipeline_path)
+        for snippet in SKILL_EVOLUTION_PIPELINE_REQUIRED_SNIPPETS:
+            if snippet not in pipeline_text:
+                issues.append(
+                    ValidationIssue(
+                        "missing-skill-evolution-pipeline-snippet",
+                        f"scripts/skill_evolution_pipeline.py: {snippet}",
+                    )
+                )
+
+    return issues
+
+
+def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
+    return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
+
+
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_candidate_packet.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Candidate Packet
+
+- Candidate ID: [candidate-id]
+- Source Skill: [skill-id]
+- Harvest Source: [closeout receipt / root-cause note / invocation receipt]
+- Proposed By: [harvester role or executor]
+- Confidence Tier: [low / medium / high]
+- Evolution Mode: [FIX | DERIVED | CAPTURED]
+- Candidate Trigger: [explicit-request | repeated-invocation-failure | repeated-manual-correction | repeated-successful-reuse | operator-forced]
+- Invocation IDs: [invocation-id or comma-separated ids]
+- Parent Lineage: [none / skill-id / candidate-id / promotion-receipt-id]
+
+## Target Fields
+
+- [List the canonical SKILL fields this candidate wants to affect.]
+
+## Proposed Delta
+
+- [Describe the smallest candidate change in field-scoped terms, not free-form transcript summary.]
+
+exec
+/bin/zsh -lc "sed -n '1,280p' scripts/skill_evolution_pipeline.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_promotion_receipt.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1235,1315p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Promotion Receipt
+
+- Receipt ID: [promotion-receipt-id]
+- Candidate ID: [candidate-id]
+- Source Skill: [skill-id]
+- Evolution Mode: [FIX | DERIVED | CAPTURED]
+- Invocation IDs: [invocation-id or comma-separated ids]
+- Parent Lineage: [none / skill-id / candidate-id / promotion-receipt-id]
+- Decision: [approve / reject / defer / escalate]
+- Reviewer Role: [role name]
+- Review Executor: [cli / subagent / owner / human]
+
+## Affected Fields
+
+| Field | Promotion Tier | Evidence Used | Escalation Required |
+|---|---|---|---|
+| [canonical-field] | [delegated-safe / delegated-reviewed / human-only] | [receipt ids] | [yes / no] |
+
+## Decision Rationale
+
+ succeeded in 0ms:
+                ValidationIssue(
+                    "invalid-developer-toolchain-none",
+                    f".github/instructions/project-context.instructions.md: surface '{entry.surface}' is marked not-applicable but does not use explicit 'none'",
+                )
+            )
+
+    return issues
+
+
+def _validate_developer_toolchain_contract(
+    project_context_path: Path,
+    *,
+    project_type: str | None,
+    contract: dict[str, object],
+) -> list[ValidationIssue]:
+    if not project_context_path.is_file():
+        return [
+            ValidationIssue(
+                "missing-developer-toolchain-context",
+                ".github/instructions/project-context.instructions.md: missing project context file for Developer Toolchain validation",
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Generate SKILL execution-layer artifacts from runtime evidence."""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _read_template(relative_path: str) -> str:
+    return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def _normalize_block(value: str) -> str:
+    text = value.strip()
+    return text or "- none"
+exec
+/bin/zsh -lc "rg -n \"def validate_repo|is_adopted_repo|ADOPTER_MANIFEST_PATH|_validate_adopted_repo|_validate_skill_contract_files|_validate_skill_execution_surfaces\" scripts/validate_template.py && sed -n '1315,1395p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+364:ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
+705:def _validate_adopted_repo(root: Path) -> list[ValidationIssue]:
+706:    manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+914:def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
+1056:def _validate_skill_execution_surfaces(root: Path) -> list[ValidationIssue]:
+1411:def validate_repo(root: Path) -> list[ValidationIssue]:
+1412:    if (root / ADOPTER_MANIFEST_PATH).is_file():
+1413:        issues = _validate_adopted_repo(root)
+1414:        manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+1426:        issues.extend(_validate_skill_contract_files(root))
+1427:        issues.extend(_validate_skill_execution_surfaces(root))
+1447:        _validate_skill_contract_files,
+1448:        _validate_skill_execution_surfaces,
+                ".github/instructions/project-context.instructions.md: add a Developer Toolchain table with structured surfaces rather than keeping the section empty",
+            )
+        )
+        return advisories
+
+    grouped = _group_developer_toolchain_entries(entries)
+
+exec
+/bin/zsh -lc "sed -n '1395,1465p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+                    ".github/instructions/project-context.instructions.md: live-runtime project types should prefer a concrete Repro path when one is stable; keep 'none' only when that is the honest current state",
+                )
+            )
+
+        run_entries = grouped.get("Run", [])
+        if run_entries and all(entry.command_or_source.lower() == "none" for entry in run_entries):
+            advisories.append(
+                ValidationAdvisory(
+                    "developer-toolchain-reminder",
+                    ".github/instructions/project-context.instructions.md: live-runtime project types should normally declare a concrete Run entrypoint rather than 'none'",
+                )
+            )
+
+    return advisories
+
+
+def validate_repo(root: Path) -> list[ValidationIssue]:
+    if (root / ADOPTER_MANIFEST_PATH).is_file():
+        issues = _validate_adopted_repo(root)
+        manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
+codex
+There’s a more concrete profile-level problem now: the standard bootstrap ships `README.md` and `docs/ADOPTION_GUIDE.md`, but those docs still contain markdown links into example assets that only the `full` profile copies. I’m verifying that exact profile/doc mismatch and then I’ll finalize the judgment.
+exec
+/bin/zsh -lc "python3 -c 'from pathlib import Path; import importlib.util, sys, tempfile; root=Path(\"/Users/mac/Desktop/agent-framework-template\"); spec=importlib.util.spec_from_file_location(\"bootstrap\", root/\"scripts\"/\"bootstrap_adoption.py\"); mod=importlib.util.module_from_spec(spec); sys.modules[spec.name]=mod; spec.loader.exec_module(mod); td=tempfile.TemporaryDirectory(); target=Path(td.name)/\"adopted\"; mod.bootstrap_repo(target_dir=target, project_name=\"Demo\", profile=\"standard\", project_type=\"cli-tool\");
+for rel in [\"README.md\",\"docs/ADOPTION_GUIDE.md\"]:
+ text=(target/rel).read_text(encoding=\"utf-8\"); print(f\"FILE:{rel}\");
+ for line in text.splitlines():
+  if \"](\" in line and (\"examples/\" in line or \"docs/\" in line or \"templates/\" in line): print(line)
+'" in /Users/mac/Desktop/agent-framework-template exited 1 in 0ms:
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 871, in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 374, in mkdtemp
+    prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 127, in _sanitize_params
+    dir = gettempdir()
+          ^^^^^^^^^^^^
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 316, in gettempdir
+    return _os.fsdecode(_gettempdir())
+                        ^^^^^^^^^^^^^
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 309, in _gettempdir
+    tempdir = _get_default_tempdir()
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mac/.pyenv/versions/3.11.9/lib/python3.11/tempfile.py", line 224, in _get_default_tempdir
+    raise FileNotFoundError(_errno.ENOENT,
+FileNotFoundError: [Errno 2] No usable temporary directory found in ['/var/folders/_j/lwz4tx1x5bs8rg99tcmb2mpr0000gn/T/', '/tmp', '/var/tmp', '/usr/tmp', '/Users/mac/Desktop/agent-framework-template']
+exec
+/bin/zsh -lc 'rg -n "execution_contract_example|examples/full_stack_project|examples/skills/|current starter set covers one `workflow` skill and one `guardrail` skill|If the relevant runtime path depends on a build step, also declare `Build`|required_surface_kinds|Build" README.md docs/ADOPTION_GUIDE.md scripts/bootstrap_adoption.py scripts/validate_template.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+zsh:1: command not found: workflow
+zsh:1: command not found: guardrail
+zsh:1: command not found: Build
+README.md:171:   - starter examples under `examples/skills/`
+README.md:259:This repository ships the execution-contract template and one filled demo example at [`examples/demo_project/docs/runbooks/execution_contract_example.md`](examples/demo_project/docs/runbooks/execution_contract_example.md). It does not automatically prove that every adopting repository instantiates an execution contract for every long task unless that repository adds its own workflow or validation checks.
+README.md:275:If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), [`docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`](docs/SKILL_HARVEST_LOOP_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
+README.md:293:5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path
+README.md:401:| Build/test commands | `.github/instructions/project-context.instructions.md` → Build and Test Commands |
+scripts/validate_template.py:61:    "examples/skills/01_discussion_packet_workflow.md",
+scripts/validate_template.py:62:    "examples/skills/02_no_placeholder_runtime_guardrail.md",
+scripts/validate_template.py:99:    "examples/skills/03_developer_toolchain_wrapper.md",
+scripts/validate_template.py:100:    "examples/skills/04_receipt_anchored_reviewer.md",
+scripts/validate_template.py:101:    "examples/skills/05_staged_handoff_pipeline.md",
+scripts/validate_template.py:102:    "examples/skills/06_bounded_artifact_generator.md",
+scripts/validate_template.py:208:    "examples/skills/",
+scripts/validate_template.py:402:    "Build",
+scripts/validate_template.py:415:    "Build",
+scripts/validate_template.py:423:    "required_surface_kinds": [
+scripts/validate_template.py:428:        "Build",
+scripts/validate_template.py:1162:    required_surface_kinds = set(contract.get("required_surface_kinds", []))
+codex
+1. Verdict: `CONDITIONAL`
+
+2. Findings
+
+1. Severity: `high`; category: `bootstrap mismatch`. File evidence: [README.md](/Users/mac/Desktop/agent-framework-template/README.md), [docs/ADOPTION_GUIDE.md](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md), [scripts/bootstrap_adoption.py](/Users/mac/Desktop/agent-framework-template/scripts/bootstrap_adoption.py), [scripts/validate_template.py](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py). Why it matters: the recommended `standard` profile ships `README.md` and `docs/ADOPTION_GUIDE.md`, but those docs still link or point users to `examples/demo_project/...`, [`examples/skills/`](/Users/mac/Desktop/agent-framework-template/examples/skills), and [`examples/full_stack_project/`](/Users/mac/Desktop/agent-framework-template/examples/full_stack_project), which `bootstrap_adoption.py` only copies in `full`. Adopted-repo validation then skips doc-link checks, so a standard-profile repo can validate green while carrying broken profile-local guidance. Smallest honest fix: mark those references as `full`-profile-only in the docs or move the referenced assets into `standard`; also run profile-local doc-link validation for adopted repos.
+
+2. Severity: `high`; category: `rule-execution gap`. File evidence: [docs/ADOPTION_GUIDE.md](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md), [scripts/bootstrap_adoption.py](/Users/mac/Desktop/agent-framework-template/scripts/bootstrap_adoption.py), [scripts/validate_template.py](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py). Why it matters: the guide says “If the relevant runtime path depends on a build step, also declare `Build`,” but the shipped manifest/validator contract hard-requires a `Build` surface in `required_surface_kinds` for adopted repos. An adopter can follow the guide literally and still fail the validator. Smallest honest fix: change the docs and template wording to “always include a `Build` row; use `none` when truly not applicable,” which matches the actual validator contract.
+
+3. Severity: `medium`; category: `validator blind spot`. File evidence: [docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md](/Users/mac/Desktop/agent-framework-template/docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md), [docs/ADOPTION_GUIDE.md](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md), [scripts/validate_template.py](/Users/mac/Desktop/agent-framework-template/scripts/validate_template.py), [templates/skill_tool_wrapper.template.md](/Users/mac/Desktop/agent-framework-template/templates/skill_tool_wrapper.template.md), [templates/skill_reviewer_gate.template.md](/Users/mac/Desktop/agent-framework-template/templates/skill_reviewer_gate.template.md), [templates/skill_pipeline.template.md](/Users/mac/Desktop/agent-framework-template/templates/skill_pipeline.template.md), [templates/skill_artifact_generator.template.md](/Users/mac/Desktop/agent-framework-template/templates/skill_artifact_generator.template.md). Why it matters: upper-layer docs describe these starters as validator-visible, structurally truthful execution scaffolds, but the validator only checks for a few literal bullet snippets plus generic SKILL headings. It does not verify the actual pattern-specific promises: wrapper bound to a declared toolchain surface, reviewer tied to a real verdict sink, pipeline tied to a real handoff artifact, generator tied to a schema-backed artifact family. Smallest honest fix: add a small set of pattern-specific assertions against the starter references already shipped.
+
+4. Severity: `medium`; category: `example drift`. File evidence: [docs/ADOPTION_GUIDE.md](/Users/mac/Desktop/agent-framework-template/docs/ADOPTION_GUIDE.md), [examples/skills/03_developer_toolchain_wrapper.md](/Users/mac/Desktop/agent-framework-template/examples/skills/03_developer_toolchain_wrapper.md), [examples/skills/04_receipt_anchored_reviewer.md](/Users/mac/Desktop/agent-framework-template/examples/skills/04_receipt_anchored_reviewer.md), [examples/skills/05_staged_handoff_pipeline.md](/Users/mac/Desktop/agent-framework-template/examples/skills/05_staged_handoff_pipeline.md), [examples/skills/06_bounded_artifact_generator.md](/Users/mac/Desktop/agent-framework-template/examples/skills/06_bounded_artifact_generator.md). Why it matters: the guide still says the “current starter set covers one `workflow` skill and one `guardrail` skill,” which is no longer true after the five-pattern wave. That understates the shipped lower layer and makes the new examples look unofficial or absent. Smallest honest fix: update that sentence to enumerate the six shipped examples and note that 03-06 are the new scaffold wave.
+
+5. Severity: `low`; category: `test gap`. File evidence: [tests/test_bootstrap_adoption.py](/Users/mac/Desktop/agent-framework-template/tests/test_bootstrap_adoption.py), [tests/test_validate_template.py](/Users/mac/Desktop/agent-framework-template/tests/test_validate_template.py). Why it matters: tests prove bootstrap and validation pass, but they do not assert profile-aware doc integrity or the docs-to-manifest `Build` contract. That is why the mismatches above can survive green CI. Smallest honest fix: add one standard-profile smoke test for markdown-link resolution inside the adopted repo and one assertion that adoption-doc wording matches the manifest-required `Build` surface.
+
+3. Residual risks
+
+- Even after these fixes, validator coverage remains structural, not semantic. A repository can still ship low-quality skills that satisfy headings and tables.
+- The execution-layer proof is strongest for invocation/candidate artifact generation, not for real host-runtime invocation quality. Repeated-use evolution can still be overstated by adopters if they treat templates as operational automation.
+- Profile-specific docs can drift again unless link checks and profile-aware content checks run on adopted repos, not just on the template root.
+
+4. Final recommendation: `accept-with-fixes`
+tokens used
+70,923

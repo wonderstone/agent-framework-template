@@ -1,0 +1,51 @@
+You are participating in a hostile acceptance review for the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_five_pattern_acceptance_desync_v1/discussion_packet.md
+
+Focus files to inspect:
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md
+- README.md
+- docs/ADOPTION_GUIDE.md
+- scripts/bootstrap_adoption.py
+- scripts/validate_template.py
+- templates/skill_tool_wrapper.template.md
+- templates/skill_reviewer_gate.template.md
+- templates/skill_pipeline.template.md
+- templates/skill_artifact_generator.template.md
+- examples/skills/03_developer_toolchain_wrapper.md
+- examples/skills/04_receipt_anchored_reviewer.md
+- examples/skills/05_staged_handoff_pipeline.md
+- examples/skills/06_bounded_artifact_generator.md
+- tests/test_bootstrap_adoption.py
+- tests/test_validate_template.py
+
+Task:
+- Audit whether the newly shipped five-pattern scaffold wave has any upper-layer vs lower-layer desynchronization.
+- Upper layer means: constitutional docs, governance rules, adoption docs, validator claims, README framing, profile promises.
+- Lower layer means: starter templates, examples, bootstrap-distributed assets, tests, and executable proof surfaces.
+- Be adversarial: look for overclaim, blind spots, layer bleed, false confidence, profile mismatch, validator holes, wording that outruns proof, or starter surfaces that do not actually satisfy the rules above them.
+
+Required output shape:
+1. Verdict: `PASS`, `CONDITIONAL`, or `FAIL`.
+2. Findings: top 5 max, ordered by severity.
+3. For each finding include:
+   - severity: critical / high / medium / low
+   - category: rule-execution gap / validator blind spot / bootstrap mismatch / doc-overclaim / layer bleed / example drift / test gap
+   - file evidence: exact file path(s)
+   - why it matters
+   - smallest honest fix
+4. Residual risks:
+   - what could still go wrong even if no blocker is found
+5. Final recommendation:
+   - accept
+   - accept-with-fixes
+   - reroute-to-another-discussion
+
+Constraints:
+- Do not propose broad redesign unless a concrete blocker forces it.
+- Prefer concrete mismatch over theoretical purity.
+- Treat validator coverage as weaker than executable proof.
+- Treat docs as wrong if they outrun shipped bootstrap/test reality.
+- Do not reward the implementation merely because tests pass.

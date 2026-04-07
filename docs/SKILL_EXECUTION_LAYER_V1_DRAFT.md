@@ -80,6 +80,26 @@ the execution layer complements the canonical SKILL contract.
 
 it does not replace it.
 
+## Five-Pattern Execution Scaffold Mapping
+
+The execution layer is the main place where the template currently absorbs the usable parts of Google's five skill patterns.
+
+The mapping is intentionally asymmetric:
+
+| Pattern | Execution-layer stance |
+|---|---|
+| `Tool Wrapper` | execution scaffold that binds a skill to one declared Developer Toolchain surface |
+| `Reviewer` | receipt-anchored evaluation scaffold tied to independent review, audit, or closeout evidence |
+| `Pipeline` | staged execution scaffold with explicit handoff artifacts, checkpoints, and stop rules |
+| `Generator` | bounded artifact generation only when output schema, path, and proof surface are explicit |
+| `Inversion` | deferred until a truthful host-runtime contract and degradation story exist |
+
+Design rule:
+
+the execution layer does not turn these patterns into new constitutional skill fields.
+
+It turns selected patterns into concrete scaffolds that repositories can ship, validate, and reuse without overclaiming runtime power.
+
 ---
 
 ## Canonical Execution-Layer Artifacts
