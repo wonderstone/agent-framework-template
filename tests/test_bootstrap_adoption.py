@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from contextlib import redirect_stdout
 from io import StringIO
@@ -57,17 +58,127 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
     assert (tmp_path / "docs" / "RUNTIME_SURFACE_PROTECTION.md").exists()
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
+    assert (tmp_path / "docs" / "SKILL_EXECUTION_LAYER_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "SKILL_HARVEST_LOOP_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "SKILL_MECHANISM_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "runbooks" / "multi-model-discussion-loop.md").exists()
     assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
     assert (tmp_path / "templates" / "discussion_packet.template.md").exists()
     assert (tmp_path / "templates" / "execution_contract.template.md").exists()
+    assert (tmp_path / "templates" / "skill_invocation_receipt.template.md").exists()
     assert (tmp_path / "templates" / "skill_candidate_packet.template.md").exists()
     assert (tmp_path / "templates" / "skill_promotion_receipt.template.md").exists()
     assert (tmp_path / "templates" / "skill.template.md").exists()
     assert (tmp_path / "scripts" / "discussion_pipeline.py").exists()
+    assert (tmp_path / "scripts" / "skill_evolution_pipeline.py").exists()
     assert (tmp_path / "scripts" / "validate-template.sh").exists()
+
+
+def test_bootstrap_standard_ships_runnable_skill_execution_round_trip(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    invocation_output = adopted_root / "tmp" / "skill_execution" / "invocation.md"
+    candidate_output = adopted_root / "tmp" / "skill_execution" / "candidate.md"
+    script_path = adopted_root / "scripts" / "skill_evolution_pipeline.py"
+
+    invocation = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            "init-invocation",
+            "--receipt-id",
+            "receipt-1",
+            "--invocation-id",
+            "invoke-1",
+            "--skill-id",
+            "discussion-packet-first",
+            "--trigger-class",
+            "explicit-request",
+            "--execution-mode",
+            "host-runtime",
+            "--outcome",
+            "success",
+            "--candidate-recommendation",
+            "CAPTURED",
+            "--trigger-reason",
+            "- The host requested the discussion workflow.",
+            "--references-loaded",
+            "| discussion runbook | docs/runbooks/multi-model-discussion-loop.md | yes | Needed for the canonical round flow |",
+            "--outcome-summary",
+            "- The invocation produced a durable discussion packet.",
+            "--evidence-links",
+            "| packet-1 | task artifact | Links runtime execution back to the packet artifact |",
+            "--follow-up-recommendation",
+            "- Capture this as reusable runtime evidence.",
+            "--output",
+            str(invocation_output),
+        ],
+        cwd=adopted_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    candidate = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            "init-candidate",
+            "--candidate-id",
+            "candidate-1",
+            "--source-skill",
+            "discussion-packet-first",
+            "--harvest-source",
+            "invocation receipt",
+            "--proposed-by",
+            "skill-harvester",
+            "--confidence-tier",
+            "high",
+            "--evolution-mode",
+            "DERIVED",
+            "--candidate-trigger",
+            "repeated-successful-reuse",
+            "--invocation-ids",
+            "invoke-1",
+            "--parent-lineage",
+            "discussion-packet-first",
+            "--target-fields",
+            "- references\n- entry_instructions",
+            "--proposed-delta",
+            "- Strengthen the runtime packet append workflow.",
+            "--evidence-bundle",
+            "| receipt-1 | invocation | Shows the runtime path completed successfully |",
+            "--escalation-triggers",
+            "- Escalate if canonical trigger scope needs widening.",
+            "--notes",
+            "- Keep canonical mutation behind promotion review.",
+            "--output",
+            str(candidate_output),
+        ],
+        cwd=adopted_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert invocation.stdout.strip() == str(invocation_output)
+    assert candidate.stdout.strip() == str(candidate_output)
+
+    invocation_text = invocation_output.read_text(encoding="utf-8")
+    candidate_text = candidate_output.read_text(encoding="utf-8")
+
+    assert "- Execution Mode: host-runtime" in invocation_text
+    assert "discussion runbook" in invocation_text
+    assert "packet-1" in invocation_text
+    assert "- Evolution Mode: DERIVED" in candidate_text
+    assert "- Invocation IDs: invoke-1" in candidate_text
+    assert "receipt-1" in candidate_text
 
 
 def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:

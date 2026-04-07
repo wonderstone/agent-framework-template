@@ -51,6 +51,7 @@ REQUIRED_FILES = (
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
     "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/STRATEGY_MECHANISM_LAYERING.md",
@@ -74,6 +75,7 @@ REQUIRED_FILES = (
     "scripts/install_git_hooks.sh",
     "scripts/preference_drift_audit.py",
     "scripts/runtime_surface_guardrails.py",
+    "scripts/skill_evolution_pipeline.py",
     "scripts/validate-template.sh",
     "scripts/validate_template.py",
     "templates/discussion_packet.template.md",
@@ -86,6 +88,7 @@ REQUIRED_FILES = (
     "templates/roadmap.template.md",
     "templates/runtime_surface_registry.template.py",
     "templates/session_state.template.md",
+    "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
@@ -96,6 +99,7 @@ REQUIRED_FILES = (
     "tests/test_git_audit_pipeline.py",
     "tests/test_hook_scaffolding.py",
     "tests/test_runtime_surface_guardrails.py",
+    "tests/test_skill_evolution_pipeline.py",
     "tests/test_validate_template.py",
 )
 
@@ -142,6 +146,13 @@ REQUIRED_SECTIONS = {
         "## Validator Contract",
         "## Portability And Honest Degradation",
     ),
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md": (
+        "## Core Decision",
+        "## Canonical Execution-Layer Artifacts",
+        "## Invocation Receipt Contract",
+        "## Evolution Modes",
+        "## Validator Contract",
+    ),
     "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md": (
         "## Core Decision",
         "## Promotion Authority Model",
@@ -168,6 +179,7 @@ README_REQUIRED_REFERENCES = (
     "docs/COMPATIBILITY.md",
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
@@ -177,6 +189,7 @@ README_REQUIRED_REFERENCES = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
     "templates/skill.template.md",
@@ -184,6 +197,7 @@ README_REQUIRED_REFERENCES = (
     "scripts/closeout_truth_audit.py",
     "scripts/discussion_pipeline.py",
     "scripts/runtime_surface_guardrails.py",
+    "scripts/skill_evolution_pipeline.py",
 )
 
 DOC_LINK_PATHS = {
@@ -203,6 +217,7 @@ INDEX_REQUIRED_ROWS = (
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/COMPATIBILITY.md",
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
     "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md",
@@ -224,6 +239,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
+    "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
@@ -236,6 +252,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
     "templates/execution_contract.template.md",
+    "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
     "python3 -m pytest tests/ -q",
@@ -249,6 +266,38 @@ ROOT_PROJECT_CONTEXT_FORBIDDEN_SNIPPETS = (
     "Add project-specific entries here as the project evolves",
     "npm run build",
     "./scripts/start.sh",
+)
+
+SKILL_INVOCATION_TEMPLATE_REQUIRED_SNIPPETS = (
+    "- Receipt ID:",
+    "- Invocation ID:",
+    "- Skill ID:",
+    "- Trigger Class:",
+    "- Execution Mode:",
+    "- Outcome:",
+    "- Candidate Recommendation:",
+    "## References Loaded",
+    "## Evidence Links",
+)
+
+SKILL_CANDIDATE_TEMPLATE_REQUIRED_SNIPPETS = (
+    "- Evolution Mode:",
+    "- Candidate Trigger:",
+    "- Invocation IDs:",
+    "- Parent Lineage:",
+)
+
+SKILL_PROMOTION_TEMPLATE_REQUIRED_SNIPPETS = (
+    "- Evolution Mode:",
+    "- Invocation IDs:",
+    "- Parent Lineage:",
+)
+
+SKILL_EVOLUTION_PIPELINE_REQUIRED_SNIPPETS = (
+    "init-invocation",
+    "init-candidate",
+    "templates/skill_invocation_receipt.template.md",
+    "templates/skill_candidate_packet.template.md",
 )
 
 ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
@@ -935,6 +984,60 @@ def _validate_skill_contract_files(root: Path) -> list[ValidationIssue]:
     return issues
 
 
+def _validate_skill_execution_surfaces(root: Path) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+
+    invocation_template_path = root / "templates/skill_invocation_receipt.template.md"
+    if invocation_template_path.is_file():
+        invocation_template = _read(invocation_template_path)
+        for snippet in SKILL_INVOCATION_TEMPLATE_REQUIRED_SNIPPETS:
+            if snippet not in invocation_template:
+                issues.append(
+                    ValidationIssue(
+                        "missing-skill-invocation-template-snippet",
+                        f"templates/skill_invocation_receipt.template.md: {snippet}",
+                    )
+                )
+
+    candidate_template_path = root / "templates/skill_candidate_packet.template.md"
+    if candidate_template_path.is_file():
+        candidate_template = _read(candidate_template_path)
+        for snippet in SKILL_CANDIDATE_TEMPLATE_REQUIRED_SNIPPETS:
+            if snippet not in candidate_template:
+                issues.append(
+                    ValidationIssue(
+                        "missing-skill-candidate-template-snippet",
+                        f"templates/skill_candidate_packet.template.md: {snippet}",
+                    )
+                )
+
+    promotion_template_path = root / "templates/skill_promotion_receipt.template.md"
+    if promotion_template_path.is_file():
+        promotion_template = _read(promotion_template_path)
+        for snippet in SKILL_PROMOTION_TEMPLATE_REQUIRED_SNIPPETS:
+            if snippet not in promotion_template:
+                issues.append(
+                    ValidationIssue(
+                        "missing-skill-promotion-template-snippet",
+                        f"templates/skill_promotion_receipt.template.md: {snippet}",
+                    )
+                )
+
+    pipeline_path = root / "scripts/skill_evolution_pipeline.py"
+    if pipeline_path.is_file():
+        pipeline_text = _read(pipeline_path)
+        for snippet in SKILL_EVOLUTION_PIPELINE_REQUIRED_SNIPPETS:
+            if snippet not in pipeline_text:
+                issues.append(
+                    ValidationIssue(
+                        "missing-skill-evolution-pipeline-snippet",
+                        f"scripts/skill_evolution_pipeline.py: {snippet}",
+                    )
+                )
+
+    return issues
+
+
 def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
     return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
 
@@ -1226,6 +1329,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         issues.extend(_validate_preference_drift(root))
         issues.extend(_validate_active_docs(root))
         issues.extend(_validate_skill_contract_files(root))
+        issues.extend(_validate_skill_execution_surfaces(root))
         return issues
 
     checks = (
@@ -1246,6 +1350,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_active_docs,
         _validate_receipt_closeout_references,
         _validate_skill_contract_files,
+        _validate_skill_execution_surfaces,
     )
     issues: list[ValidationIssue] = []
     for check in checks:

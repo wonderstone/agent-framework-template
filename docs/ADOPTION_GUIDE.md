@@ -59,6 +59,7 @@ docs/
   ADOPTION_GUIDE.md                ← this file (optional, keep for ref)
   COMPATIBILITY.md                 ← verified surfaces and known limits
   SKILL_HARVEST_LOOP_V1_DRAFT.md   ← formal v1 design draft for post-task SKILL harvest and promotion governance
+  SKILL_EXECUTION_LAYER_V1_DRAFT.md ← formal v1 design draft for runtime invocation evidence and typed skill evolution lineage
   SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design draft for the framework-native SKILL contract
   DEVELOPER_TOOLCHAIN_DESIGN.md    ← formal v1 design draft for the Developer Toolchain surface
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and alternative viewpoints for that surface
@@ -77,6 +78,7 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill_invocation_receipt.template.md ← runtime receipt template for real skill invocation evidence
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
@@ -103,6 +105,7 @@ scripts/
   discussion_pipeline.py           ← generator for discussion packet creation and append-only feedback/synthesis
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
   install_git_hooks.sh             ← activates optional `.githooks/` in the adopter repo
+  skill_evolution_pipeline.py      ← helper for initializing invocation receipts and candidate packets from execution evidence
   runtime_surface_guardrails.py    ← registry-driven runtime guard runner
   validate_template.py             ← structured validator used locally and in CI
 
@@ -191,13 +194,13 @@ When doing so, define the role by judgment boundary first, not by tool name. For
 
 If you want concrete starting points instead of a blank role profile, keep `docs/ROLE_STRATEGY_EXAMPLES.md` and adapt the examples that fit your repository.
 
-If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `templates/skill.template.md` together. The first draft defines the canonical framework-native contract, the harvest draft defines post-task promotion governance, and the template gives you one concrete file shape to fill in.
+If your repository wants formal SKILL surfaces, keep `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, and `templates/skill.template.md` together. The mechanism draft defines canonical skill truth, the harvest draft defines promotion governance, the execution-layer draft defines runtime invocation evidence and typed evolution lineage, and the template gives you one concrete file shape to fill in.
 
 If you want examples before inventing your own skill files, adapt the starter files under `examples/skills/`. The current starter set covers one `workflow` skill and one `guardrail` skill.
 
 When you do so, keep the field-level receipt and review matrix intact. It is the mechanism that turns broad "humans approve" guidance into an actual per-field update policy.
 
-If your repository also wants receipt-bearing harvest artifacts rather than inventing them later, keep `templates/skill_candidate_packet.template.md` and `templates/skill_promotion_receipt.template.md` too.
+If your repository also wants receipt-bearing harvest artifacts rather than inventing them later, keep `templates/skill_invocation_receipt.template.md`, `templates/skill_candidate_packet.template.md`, `templates/skill_promotion_receipt.template.md`, and `scripts/skill_evolution_pipeline.py` too.
 
 Recommended starting posture if you want the repository to actually improve with repeated use rather than merely carry the files:
 
@@ -205,9 +208,16 @@ Recommended starting posture if you want the repository to actually improve with
 2. prefer a `workflow` skill for a repeated execution pattern or a `guardrail` skill for a repeated failure mode
 3. keep the `promotion_tier` matrix intact so field authority stays explicit
 4. treat closeout receipts, root-cause notes, and repeated failure patterns as candidate evidence
+5. give skill execution a real runtime evidence surface by recording invocation receipts, not just post-hoc summaries
 5. do not let raw transcripts mutate canonical skills directly
 6. require candidate packets before proposed change and promotion receipts before canonical mutation
 7. review trigger overlap aggressively so skill accumulation does not collapse progressive disclosure
+
+Execution-side rule:
+
+1. runtime invocation receipts may prove that a skill was used and may recommend `FIX`, `DERIVED`, or `CAPTURED` evolution modes
+2. those execution-side artifacts may create candidate packets
+3. they still do not directly rewrite canonical SKILL fields without the declared promotion path
 
 This is the key difference between “the repo has SKILL files” and “the repo actually gets better with use”. The framework supports the latter, but only if repositories keep the evidence and promotion boundary explicit.
 

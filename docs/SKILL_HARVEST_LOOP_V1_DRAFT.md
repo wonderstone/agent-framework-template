@@ -12,7 +12,7 @@ It exists to turn the discussion in `tmp/discussion/skill_harvest_loop_v1/discus
 |---|---|
 | Status | Draft v1 |
 | Scope | Post-task candidate extraction, delegated review boundaries, and canonical promotion authority for SKILL files |
-| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, discussion packets, receipt-anchored closeout, and validator surfaces |
+| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, discussion packets, receipt-anchored closeout, and validator surfaces |
 | Already changes | field-authority expectations for skill templates, examples, validators, and future promotion receipts |
 | Does not yet change | packaged distribution format, installer behavior, lockfile semantics, or a fully implemented promotion-state registry |
 
@@ -26,7 +26,7 @@ when this document says a field authority is `human-only`, `delegated-reviewed`,
 
 The framework already has a canonical SKILL contract and a field-level receipt and review matrix.
 
-What it still needs is a trustworthy mechanism for turning finished-task evidence into candidate skill improvements without collapsing into direct transcript-to-skill mutation.
+What it still needs is a trustworthy mechanism for turning finished-task and execution-side evidence into candidate skill improvements without collapsing into direct transcript-to-skill mutation.
 
 This design defines that mechanism.
 

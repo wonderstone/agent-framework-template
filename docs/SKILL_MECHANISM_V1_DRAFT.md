@@ -14,7 +14,7 @@ This is a design draft. It freezes the canonical framework-native contract and i
 |---|---|
 | Status | Draft v1 |
 | Scope | Framework-level skill contract and governance model |
-| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, and `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
 | Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
 | Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
 
@@ -42,6 +42,8 @@ Its purpose is to give repositories a durable, reviewable mechanism for:
 2. separating minimal entry instructions from deeper supporting context
 3. recording what evidence may improve the skill over time
 4. preserving portability while being honest about runtime-specific limitations
+
+The canonical contract in this document is intentionally complemented by `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, which defines how runtime invocation evidence and bounded execution-side evolution inputs reach the harvest loop without overriding canonical authority.
 
 This surface is complementary to role strategy, discussion loops, and developer-toolchain design. It is not a replacement for those surfaces.
 

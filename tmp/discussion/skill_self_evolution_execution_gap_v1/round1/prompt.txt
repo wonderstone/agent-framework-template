@@ -1,0 +1,31 @@
+You are participating in a design discussion about the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md
+
+Task:
+- Evaluate how this template should absorb OpenSpace-style SKILL self-evolution ideas.
+- Focus especially on the current weakness that this framework's SKILL layer is governance-rich but execution-thin.
+- Distinguish clearly between what OpenSpace gets directionally right and what should not be copied wholesale.
+- Assume the user strongly wants skills to become smarter through use, but still expects honest governance and mutation boundaries.
+
+Required output shape:
+1. Verdict: what should the template absorb next?
+2. Top 3 findings only, ordered by severity.
+3. For each finding include:
+   - category: execution gap / governance strength / over-automation risk / missing runtime surface / migration concern
+   - why it matters
+   - smallest honest next step
+4. One OpenSpace idea that is high-value for this template.
+5. One OpenSpace idea that this template should resist or heavily constrain.
+6. Final recommendation:
+   - freeze-plan
+   - continue-discussion
+   - stop
+
+Constraints:
+- Be critical, not promotional.
+- Do not assume OpenSpace should be copied as-is.
+- Prefer incremental implementation paths over total redesign.
+- Preserve truthful promotion boundaries; do not recommend raw transcript to canonical skill mutation.
+- Treat FIX/DERIVED/CAPTURED, metric-driven triggers, host integration, lineage tracking, and execution-layer weakness as especially relevant.

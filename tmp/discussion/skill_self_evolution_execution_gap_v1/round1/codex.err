@@ -1,0 +1,360 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d6611-a33e-7ae3-85c0-53b215b408ff
+--------
+user
+You are participating in a design discussion about the repository at the current working directory.
+
+Read this packet first:
+- tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md
+
+Task:
+- Evaluate how this template should absorb OpenSpace-style SKILL self-evolution ideas.
+- Focus especially on the current weakness that this framework's SKILL layer is governance-rich but execution-thin.
+- Distinguish clearly between what OpenSpace gets directionally right and what should not be copied wholesale.
+- Assume the user strongly wants skills to become smarter through use, but still expects honest governance and mutation boundaries.
+
+Required output shape:
+1. Verdict: what should the template absorb next?
+2. Top 3 findings only, ordered by severity.
+3. For each finding include:
+   - category: execution gap / governance strength / over-automation risk / missing runtime surface / migration concern
+   - why it matters
+   - smallest honest next step
+4. One OpenSpace idea that is high-value for this template.
+5. One OpenSpace idea that this template should resist or heavily constrain.
+6. Final recommendation:
+   - freeze-plan
+   - continue-discussion
+   - stop
+
+Constraints:
+- Be critical, not promotional.
+- Do not assume OpenSpace should be copied as-is.
+- Prefer incremental implementation paths over total redesign.
+- Preserve truthful promotion boundaries; do not recommend raw transcript to canonical skill mutation.
+- Treat FIX/DERIVED/CAPTURED, metric-driven triggers, host integration, lineage tracking, and execution-layer weakness as especially relevant.
+mcp startup: no servers
+codex
+I’m reading the discussion packet first and will anchor the answer in the repository’s actual framing, with attention on the execution-layer weakness versus the existing governance machinery.
+exec
+/bin/zsh -lc "sed -n '1,260p' tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — skill_self_evolution_execution_gap_v1
+
+- Generated at: 2026-04-07T03:48:03.140710+00:00
+- Owner: main-thread
+- Current round goal: Decide what the template should absorb from OpenSpace next, especially around execution-layer strengthening for SKILL self-evolution.
+- Round exit rule: Freeze a plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+How should the template absorb OpenSpace-style SKILL self-evolution while fixing its weak execution layer without losing governance truthfulness?
+
+## Why This Needs Discussion
+
+OpenSpace provides a concrete self-evolving-skill model, the user strongly agrees with that direction, and recent feedback says this template's SKILL execution layer is too weak and detached from actual task loops.
+
+## Current Truth
+
+The template already has a canonical SKILL contract, a harvest-loop governance model, candidate and promotion artifacts, validators, examples, and adoption guidance. It is stronger on governance than execution. OpenSpace explicitly adds FIX/DERIVED/CAPTURED evolution, metric-driven triggers, host-skill integration, lineage tracking, and a shared skill community. The user wants a four-CLI discussion specifically about absorbing the right OpenSpace ideas and closing the execution gap in this template.
+
+## Constraints
+exec
+/bin/zsh -lc 'rg -n "FIX|DERIVED|CAPTURED|lineage|skill|host integration|metric|trigger|mutation|execution" -S .' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:5:The template's governance layer is honest and structurally sound. The execution layer is the actual problem — skills are designed to be reviewable, not to improve through use. The freeze-plan recommendation is Direction B, constrained to four incremental moves that close the execution gap without pretending unsupported automation exists:
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:7:1. Add `evolution_mode: FIX | DERIVED | CAPTURED` to the candidate packet template (highest-value OpenSpace import, schema-only)
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:8:2. Define a trigger-eval I/O interface contract (no engine, just declared schema + stub)
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:9:3. Add `invocation_id` linkage to closeout receipts (schema-only lineage anchor)
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:10:4. Write `harvest_candidates.py` — read-only, evidence-tier filtered, no canonical mutation
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/claude.md:12:The one OpenSpace idea to resist is metric-driven autonomous promotion triggers — they presuppose a telemetry infrastructure this template doesn't have, and wiring them to constitutional fields (purpose, triggers, governance) would create a false authority chain before any metric source is verified.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:16:- tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:20:- Focus especially on the current weakness that this framework's SKILL layer is governance-rich but execution-thin.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:22:- Assume the user strongly wants skills to become smarter through use, but still expects honest governance and mutation boundaries.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:28:   - category: execution gap / governance strength / over-automation risk / missing runtime surface / migration concern
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:42:- Preserve truthful promotion boundaries; do not recommend raw transcript to canonical skill mutation.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:43:- Treat FIX/DERIVED/CAPTURED, metric-driven triggers, host integration, lineage tracking, and execution-layer weakness as especially relevant.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/codex.err:46:I’m reading the discussion packet first and will anchor the answer in the repository’s actual framing, with attention on the execution-layer weakness versus the existing governance machinery.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:4:- tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:8:- Focus especially on the current weakness that this framework's SKILL layer is governance-rich but execution-thin.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:10:- Assume the user strongly wants skills to become smarter through use, but still expects honest governance and mutation boundaries.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:16:   - category: execution gap / governance strength / over-automation risk / missing runtime surface / migration concern
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:30:- Preserve truthful promotion boundaries; do not recommend raw transcript to canonical skill mutation.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/round1/prompt.txt:31:- Treat FIX/DERIVED/CAPTURED, metric-driven triggers, host integration, lineage tracking, and execution-layer weakness as especially relevant.
+./tmp/discussion/skill_self_evolution_execution_gap_v1/discussion_packet.md:1:# Discussion Packet — skill_self_evolution_execution_gap_v1
+codex
+The packet confirms the core issue: the repo already has strong contract and promotion surfaces, but little that binds skills to actual invocation, evidence capture, and reuse. I’m pulling the current SKILL and harvest-loop docs next to separate what is already strong from what is still missing at runtime.
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_MECHANISM_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' templates/skill_promotion_receipt.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' templates/skill_candidate_packet.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_HARVEST_LOOP_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Promotion Receipt
+
+- Receipt ID: [promotion-receipt-id]
+- Candidate ID: [candidate-id]
+- Source Skill: [skill-id]
+- Decision: [approve / reject / defer / escalate]
+- Reviewer Role: [role name]
+- Review Executor: [cli / subagent / owner / human]
+
+## Affected Fields
+
+| Field | Promotion Tier | Evidence Used | Escalation Required |
+|---|---|---|---|
+| [canonical-field] | [delegated-safe / delegated-reviewed / human-only] | [receipt ids] | [yes / no] |
+
+## Decision Rationale
+
+- [Why the change was accepted, rejected, deferred, or escalated.]
+
+## Canonical Result
+ succeeded in 0ms:
+# SKILL Candidate Packet
+
+- Candidate ID: [candidate-id]
+- Source Skill: [skill-id]
+- Harvest Source: [closeout receipt / root-cause note / invocation receipt]
+- Proposed By: [harvester role or executor]
+- Confidence Tier: [low / medium / high]
+
+## Target Fields
+
+- [List the canonical SKILL fields this candidate wants to affect.]
+
+## Proposed Delta
+
+- [Describe the smallest candidate change in field-scoped terms, not free-form transcript summary.]
+
+## Evidence Bundle
+
+| Evidence ID | Type | Why It Matters |
+|---|---|---|
+ succeeded in 0ms:
+# SKILL Mechanism V1 Draft
+
+This document defines the formal v1 design draft for the framework's `SKILL` mechanism.
+
+It exists to turn the discussion in `tmp/discussion/skill_mechanism_v1/discussion_packet.md` into a concrete framework-level contract that later template, bootstrap, validator, and adapter work can follow.
+
+This is a design draft. It freezes the canonical framework-native contract and its governance boundaries before broader implementation or packaging work.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Framework-level skill contract and governance model |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, and `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` |
+| Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
+| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
+
+ succeeded in 0ms:
+# SKILL Harvest Loop V1 Draft
+
+This document defines the formal v1 design draft for the framework's post-task SKILL harvest and promotion-governance loop.
+
+It exists to turn the discussion in `tmp/discussion/skill_harvest_loop_v1/discussion_packet.md` into a concrete contract that templates, validators, and future promotion receipts can implement without reopening the whole workflow question each time.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Post-task candidate extraction, delegated review boundaries, and canonical promotion authority for SKILL files |
+| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, discussion packets, receipt-anchored closeout, and validator surfaces |
+| Already changes | field-authority expectations for skill templates, examples, validators, and future promotion receipts |
+| Does not yet change | packaged distribution format, installer behavior, lockfile semantics, or a fully implemented promotion-state registry |
+
+Normative note:
+
+codex
+The docs confirm the pattern: field authority and promotion boundaries are already explicit, but the candidate packet still hangs off artifacts that barely exist as live execution surfaces. I’m checking whether the repo has a concrete invocation/evolution runtime at all, or mostly schemas and examples.
+exec
+/bin/zsh -lc "sed -n '1,220p' examples/skills/01_discussion_packet_workflow.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' examples/skills/02_no_placeholder_runtime_guardrail.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# No Placeholder Runtime Claims
+
+- ID: no-placeholder-runtime-claims
+- Type: guardrail
+- Owner: framework-maintainers
+- Review Threshold: dual-reviewer
+
+## Purpose
+
+Prevent agents from shipping placeholder runtime paths, fake smoke claims, or misleading live-surface assertions into active docs and user-facing closeout artifacts.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task edits runtime guidance, health checks, smoke paths, user-surface maps, or other docs that describe what currently works in a live or runtime-adjacent flow.
+
+### Negative Triggers
+
+- Do not use for pure discussion artifacts, historical archives, or speculative design notes that are explicitly not active runtime truth.
+ succeeded in 0ms:
+# Discussion Packet First
+
+- ID: discussion-packet-first
+- Type: workflow
+- Owner: framework-maintainers
+- Review Threshold: single-reviewer
+
+## Purpose
+
+Route open design questions into one durable packet before execution begins so later rounds do not rely on chat memory.
+
+## Triggers
+
+### Positive Triggers
+
+- Use when the task is primarily about choosing a direction, comparing alternatives, or reviewing a plan with real tradeoffs.
+
+### Negative Triggers
+
+- Do not use when the next implementation step is already obvious and the remaining work is execution, not decision-making.
+exec
+/bin/zsh -lc 'rg -n "invocation receipt|invocation_id|harvest_candidates|trigger-eval|skill invocation|skill runtime|evolution_mode|FIX|DERIVED|CAPTURED|lineage_parent|promotion-state registry|host-skill|host integration" -S docs templates scripts examples tests' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+docs/COMPATIBILITY.md:49:- The repository now ships candidate and promotion receipt templates for SKILL harvest, but it does not yet ship a full end-to-end promotion pipeline or promotion-state registry.
+templates/skill_candidate_packet.template.md:5:- Harvest Source: [closeout receipt / root-cause note / invocation receipt]
+docs/SKILL_HARVEST_LOOP_V1_DRAFT.md:17:| Does not yet change | packaged distribution format, installer behavior, lockfile semantics, or a fully implemented promotion-state registry |
+docs/SKILL_HARVEST_LOOP_V1_DRAFT.md:127:4. whether a repository wants an external promotion-state registry rather than a purely receipt-driven history
+docs/SKILL_MECHANISM_V1_DRAFT.md:19:| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
+docs/SKILL_MECHANISM_V1_DRAFT.md:185:| 3 | Structured invocation receipts and failure-pattern aggregates | Medium |
+docs/SKILL_MECHANISM_V1_DRAFT.md:197:3. structured invocation receipts with explicit provenance
+exec
+/bin/zsh -lc "sed -n '1,140p' docs/COMPATIBILITY.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' CHANGELOG.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Compatibility
+
+This document explains what has been verified in this repository and where adopters should still do project-specific validation.
+
+---
+
+## Verified In This Repository
+
+The following are exercised directly in this template repository:
+
+| Surface | Verification |
+|---|---|
+| Bootstrap CLI | Unit tests plus `--dry-run` smoke commands in CI |
+| Template validator | Unit tests plus CI execution |
+| Active docs portability and stale-assertion audit | Standalone audit script plus validator integration for live docs and instruction surfaces |
+| Preference drift audit | Standalone audit script plus validator integration for progress/closeout contract drift |
+| SKILL contract template and starter examples | Structured validator checks canonical sections, review-matrix completeness, and referenced-path integrity |
+| SKILL harvest loop design and artifact templates | TYPE-A draft plus shipped candidate/receipt templates exercised by bootstrap and repository validation |
+| Git audit generator | Unit tests |
+| Core docs and file references | Structured validator |
+ succeeded in 0ms:
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on Keep a Changelog and this repository uses Semantic Versioning.
+
+## [Unreleased]
+
+### Added
+- Stable closeout and progress formatting docs at `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` and `docs/PROGRESS_UPDATE_TEMPLATE.md`.
+- While-loop closeout state fields in `templates/session_state.template.md` for progress unit, true closeout boundary, and host closeout action.
+- Optional fast-start execution block in `templates/execution_contract.template.md` to freeze planning surfaces, execution boundary, UAC, decomposition, and long-loop closeout rules at task start.
+- Rule 8 closeout guardrails for irreversible host closeout and hook-only repair paths.
+- Developer Toolchain discussion and formal design docs at `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` and `docs/DEVELOPER_TOOLCHAIN_DESIGN.md`.
+- Active-doc portability and stale-assertion auditing via `scripts/active_docs_audit.py`, including validator and bootstrap integration.
+
+### Changed
+- Root project metadata is now self-hosted: the repository ships a real project adapter and roadmap instead of template placeholders.
+- Generated Python caches are now ignored and can be cleaned without polluting the working tree.
+- Rule 8 now separates in-progress status lines from final closeout behavior and treats host closeout actions such as `task_complete` as the machine-facing completion signal.
+codex
+1. **Verdict: what the template should absorb next?**
+
+Absorb a thin execution layer next, not a full OpenSpace-style self-evolution engine. Concretely: keep the current canonical SKILL contract and promotion governance, then add a non-canonical runtime path for `trigger -> invocation -> receipt -> candidate -> review`, with typed evolution modes and lineage attached to the non-canonical artifacts.
+
+2. **Top 3 findings only, ordered by severity**
+
+1. **Finding:** The framework has no real skill-invocation evidence loop yet.  
+   - category: `execution gap`
+   - why it matters: The repo can govern skill mutation, but it cannot yet show that a skill was invoked, whether its trigger matched correctly, what happened, or why a later candidate exists. That means skills cannot honestly become smarter through use; they can only become more documented.
+   - smallest honest next step: Add a minimal `skill invocation receipt` surface with `invocation_id`, `skill_id`, trigger reason, required references loaded, outcome, and evidence links; make candidate packets point to that receipt instead of loosely to “invocation receipt” as an implied future artifact.
+
+2. **Finding:** Skills are still weakly attached to the host task loop, so triggerability and metrics remain mostly theoretical.  
+   - category: `missing runtime surface`
+   - why it matters: OpenSpace is directionally right that skills need host integration and trigger surfaces. Without a declared runtime contract for “how a host asks whether a skill applies” and “how usage is recorded,” metric-driven triggers and self-evolution become governance theater.
+   - smallest honest next step: Define one host-facing contract only: `trigger-eval` input/output plus invocation logging fields. Ship it as schema and one stubbed adapter path, not as claimed autonomous behavior.
+
+3. **Finding:** The current governance model is the part to preserve, not replace.  
+   - category: `governance strength`
+   - why it matters: The repo already has the right truth boundary: canonical skill content is distinct from candidate evidence, and field-level promotion authority is explicit. Copying OpenSpace wholesale would risk collapsing that boundary and letting runtime convenience rewrite canonical truth.
+   - smallest honest next step: Freeze the existing six-field authority model as constitutional, and add new evolution metadata only to candidate packets and promotion receipts, not to direct canonical mutation paths.
+
+3. **One OpenSpace idea that is high-value for this template**
+
+Adopt `FIX / DERIVED / CAPTURED` as a typed evolution mode on candidate packets and promotion receipts, with lineage fields. That is high-value because it separates “repair a known mistake,” “derive a reusable improvement,” and “capture a situational pattern” without pretending all three deserve the same mutation authority.
+
+4. **One OpenSpace idea that this template should resist or heavily constrain**
+
+Resist metric-driven autonomous promotion, especially anything that lets runtime frequency, transcript summaries, or aggregate success signals directly rewrite canonical `triggers`, `entry_instructions`, or `governance`. Metrics may propose candidates; they should not authorize canonical mutation.
+
+5. **Final recommendation**
+
+`freeze-plan`
+
+The next plan should be incremental:
+
+1. Add invocation receipts and `invocation_id` lineage.
+2. Add `evolution_mode: FIX | DERIVED | CAPTURED` to candidate and promotion artifacts.
+3. Define one host `trigger-eval` / invocation logging contract.
+4. Keep canonical mutation human-bounded exactly as it is now.
+tokens used
+23,616
+1. **Verdict: what the template should absorb next?**
+
+Absorb a thin execution layer next, not a full OpenSpace-style self-evolution engine. Concretely: keep the current canonical SKILL contract and promotion governance, then add a non-canonical runtime path for `trigger -> invocation -> receipt -> candidate -> review`, with typed evolution modes and lineage attached to the non-canonical artifacts.
+
+2. **Top 3 findings only, ordered by severity**
+
+1. **Finding:** The framework has no real skill-invocation evidence loop yet.  
+   - category: `execution gap`
+   - why it matters: The repo can govern skill mutation, but it cannot yet show that a skill was invoked, whether its trigger matched correctly, what happened, or why a later candidate exists. That means skills cannot honestly become smarter through use; they can only become more documented.
+   - smallest honest next step: Add a minimal `skill invocation receipt` surface with `invocation_id`, `skill_id`, trigger reason, required references loaded, outcome, and evidence links; make candidate packets point to that receipt instead of loosely to “invocation receipt” as an implied future artifact.
+
+2. **Finding:** Skills are still weakly attached to the host task loop, so triggerability and metrics remain mostly theoretical.  
+   - category: `missing runtime surface`
+   - why it matters: OpenSpace is directionally right that skills need host integration and trigger surfaces. Without a declared runtime contract for “how a host asks whether a skill applies” and “how usage is recorded,” metric-driven triggers and self-evolution become governance theater.
+   - smallest honest next step: Define one host-facing contract only: `trigger-eval` input/output plus invocation logging fields. Ship it as schema and one stubbed adapter path, not as claimed autonomous behavior.
+
+3. **Finding:** The current governance model is the part to preserve, not replace.  
+   - category: `governance strength`
+   - why it matters: The repo already has the right truth boundary: canonical skill content is distinct from candidate evidence, and field-level promotion authority is explicit. Copying OpenSpace wholesale would risk collapsing that boundary and letting runtime convenience rewrite canonical truth.
+   - smallest honest next step: Freeze the existing six-field authority model as constitutional, and add new evolution metadata only to candidate packets and promotion receipts, not to direct canonical mutation paths.
+
+3. **One OpenSpace idea that is high-value for this template**
+
+Adopt `FIX / DERIVED / CAPTURED` as a typed evolution mode on candidate packets and promotion receipts, with lineage fields. That is high-value because it separates “repair a known mistake,” “derive a reusable improvement,” and “capture a situational pattern” without pretending all three deserve the same mutation authority.
+
+4. **One OpenSpace idea that this template should resist or heavily constrain**
+
+Resist metric-driven autonomous promotion, especially anything that lets runtime frequency, transcript summaries, or aggregate success signals directly rewrite canonical `triggers`, `entry_instructions`, or `governance`. Metrics may propose candidates; they should not authorize canonical mutation.
+
+5. **Final recommendation**
+
+`freeze-plan`
+
+The next plan should be incremental:
+
+1. Add invocation receipts and `invocation_id` lineage.
+2. Add `evolution_mode: FIX | DERIVED | CAPTURED` to candidate and promotion artifacts.
+3. Define one host `trigger-eval` / invocation logging contract.
+4. Keep canonical mutation human-bounded exactly as it is now.

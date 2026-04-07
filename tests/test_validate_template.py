@@ -126,8 +126,8 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_next
     session_state = repo_copy / "session_state.md"
     session_state.write_text(
         session_state.read_text(encoding="utf-8").replace(
-            "**Current Step**: Implement the root `session_state.md` stale-state audit and its tests.\n\n**Next Planned Step**: Re-run validation, then commit and push the drift-audit changes.",
-            "**Current Step**: No active work.\n\n**Next Planned Step**: Independent review, then git closeout.",
+            "**Next Planned Step**: None until the next SKILL runtime automation task is opened.",
+            "**Next Planned Step**: Independent review, then git closeout.",
             1,
         ),
         encoding="utf-8",
@@ -148,13 +148,8 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_unch
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "**Current Step**: Implement the root `session_state.md` stale-state audit and its tests.",
-        "**Current Step**: No active work.",
-        1,
-    )
-    updated = updated.replace(
-        "- [ ] Validation for touched surfaces passes after the stale-state audit is added.",
-        "- [ ] Validation for touched surfaces passes after the stale-state audit is added.",
+        "- [x] Validation passes after the execution-layer implementation wave.",
+        "- [ ] Validation passes after the execution-layer implementation wave.",
         1,
     )
     session_state.write_text(updated, encoding="utf-8")
@@ -300,6 +295,42 @@ def test_validate_repo_reports_missing_skill_reference_path(tmp_path: Path) -> N
     assert ValidationIssue(
         "missing-skill-reference-path",
         "examples/skills/02_no_placeholder_runtime_guardrail.md: reference path 'docs/MISSING_RUNTIME_SURFACE_PROTECTION.md' does not exist",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_skill_invocation_template_snippet(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    invocation_template = repo_copy / "templates" / "skill_invocation_receipt.template.md"
+    invocation_template.write_text(
+        invocation_template.read_text(encoding="utf-8").replace("- Invocation ID: [invocation-id]\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-invocation-template-snippet",
+        "templates/skill_invocation_receipt.template.md: - Invocation ID:",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_skill_candidate_template_lineage_snippet(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    candidate_template = repo_copy / "templates" / "skill_candidate_packet.template.md"
+    candidate_template.write_text(
+        candidate_template.read_text(encoding="utf-8").replace("- Evolution Mode: [FIX | DERIVED | CAPTURED]\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-skill-candidate-template-snippet",
+        "templates/skill_candidate_packet.template.md: - Evolution Mode:",
     ) in issues
 
 

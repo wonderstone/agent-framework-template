@@ -5,6 +5,10 @@
 - Harvest Source: [closeout receipt / root-cause note / invocation receipt]
 - Proposed By: [harvester role or executor]
 - Confidence Tier: [low / medium / high]
+- Evolution Mode: [FIX | DERIVED | CAPTURED]
+- Candidate Trigger: [explicit-request | repeated-invocation-failure | repeated-manual-correction | repeated-successful-reuse | operator-forced]
+- Invocation IDs: [invocation-id or comma-separated ids]
+- Parent Lineage: [none / skill-id / candidate-id / promotion-receipt-id]
 
 ## Target Fields
 
@@ -28,3 +32,4 @@
 
 - Candidate packets are not canonical truth.
 - Do not paste raw transcripts here.
+- Invocation receipts may justify a candidate, but they still do not authorize canonical mutation by themselves.

@@ -38,6 +38,7 @@ docs/
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
   SKILL_HARVEST_LOOP_V1_DRAFT.md   ← formal v1 design for post-task SKILL harvest and promotion governance
+  SKILL_EXECUTION_LAYER_V1_DRAFT.md ← formal v1 design for invocation receipts, bounded candidate triggers, and typed evolution lineage
   SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design for the framework-native SKILL contract
   TRACEABILITY_AND_RECOVERY_V1_DRAFT.md ← formal v1 design for traceability and recovery layout
   AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md ← discussion history behind that design
@@ -59,6 +60,7 @@ templates/
   discussion_packet.template.md   ← append-only discussion packet for design debates
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
+  skill_invocation_receipt.template.md ← runtime invocation evidence surface for skill use
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
   skill.template.md                ← framework-native SKILL contract template
@@ -97,6 +99,7 @@ scripts/
   discussion_pipeline.py          ← generates and extends discussion packets for multi-model debate
   preference_drift_audit.py       ← detects agent preference drift against declared project-context rules
   install_git_hooks.sh            ← activates the shipped .githooks path in an adopting repo
+  skill_evolution_pipeline.py     ← initializes invocation receipts and candidate packets for execution-side skill evolution
   runtime_surface_guardrails.py   ← registry-driven runner for runtime surface staged/live checks
   validate-template.sh             ← checks template integrity (run after setup)
   validate_template.py             ← structured validator used by CI and local checks
@@ -152,7 +155,9 @@ Required steps:
 7. If this repository should improve with repeated use, keep these SKILL and harvest-governance surfaces together:
    - `docs/SKILL_MECHANISM_V1_DRAFT.md`
    - `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`
+  - `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`
    - `templates/skill.template.md`
+  - `templates/skill_invocation_receipt.template.md`
    - `templates/skill_candidate_packet.template.md`
    - `templates/skill_promotion_receipt.template.md`
    - starter examples under `examples/skills/`
@@ -162,6 +167,7 @@ Required steps:
    - do not convert raw transcripts directly into canonical SKILL edits
    - harvest reusable observations into candidate packets first
    - use promotion receipts for canonical approved mutations
+  - treat invocation receipts and runtime signals as candidate evidence, not as canonical truth by themselves
 10. If this repository is not ready for SKILL-based accumulation yet, say so explicitly and keep only the future upgrade path that still makes sense.
 11. Leave unrelated application code untouched.
 12. Run validation from the target repo:
@@ -173,6 +179,7 @@ Required steps:
   - what placeholders still need manual project-specific values
   - what validation was run and whether it passed
   - whether the repo kept the SKILL and harvest surfaces, and if so which first skill was initialized
+  - whether the repo also kept the execution-layer surfaces for invocation receipts and typed evolution lineage
   - which template features were intentionally kept, downgraded, or skipped based on project fit
   - which surfaces remain design-only or workflow-driven rather than mechanically enforced
 
@@ -181,6 +188,7 @@ Constraints:
 - prefer the standard profile unless I ask for a lighter or fuller setup
 - if doc-first execution should be the default for this repo, also wire `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`
 - do not claim the repo will automatically self-improve unless you also wire the SKILL and harvest-governance surfaces honestly
+- do not claim that runtime skill usage rewrites canonical truth automatically; runtime receipts and triggers may propose candidates, but canonical mutation still needs the declared promotion path
 - do not invent fake runtime paths, fake E2E, or fake enforcement just to match the template more closely
 ```
 
@@ -255,6 +263,8 @@ If a repository wants open design questions to go through a durable multi-model 
 If a repository wants formal SKILL surfaces instead of ad hoc prompt snippets, it can also ship [`docs/SKILL_MECHANISM_V1_DRAFT.md`](docs/SKILL_MECHANISM_V1_DRAFT.md), [`docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`](docs/SKILL_HARVEST_LOOP_V1_DRAFT.md), keep [`templates/skill.template.md`](templates/skill.template.md), and adapt the starter examples under [`examples/skills/`](examples/skills/).
 
 The current SKILL contract now also includes a field-level receipt and review matrix, so repositories can say which evidence tiers may propose changes to `purpose`, `triggers`, `entry_instructions`, `references`, `governance`, and `degradation`, and how `guardrail` skills become stricter.
+
+If a repository wants skills to improve through repeated execution rather than only through after-the-fact review, it can also ship [`docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`](docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md), keep [`templates/skill_invocation_receipt.template.md`](templates/skill_invocation_receipt.template.md), and use [`scripts/skill_evolution_pipeline.py`](scripts/skill_evolution_pipeline.py) to initialize invocation receipts and candidate packets from real runtime evidence.
 
 If a repository wants to make the harvest loop executable instead of leaving it as design-only guidance, it can also keep [`templates/skill_candidate_packet.template.md`](templates/skill_candidate_packet.template.md) and [`templates/skill_promotion_receipt.template.md`](templates/skill_promotion_receipt.template.md) as the default candidate/proof artifacts.
 

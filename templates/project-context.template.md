@@ -25,6 +25,7 @@ description: >
 |---|---|
 | `README.md` | Project entry point |
 | `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` | [Formal v1 design draft for post-task SKILL harvest and per-field promotion governance — keep if useful] |
+| `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` | [Formal v1 design draft for runtime invocation evidence, bounded candidate triggers, and typed skill evolution lineage — keep if useful] |
 | `docs/SKILL_MECHANISM_V1_DRAFT.md` | [Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation — keep if useful] |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | [Formal v1 design draft for the agent-facing Developer Toolchain surface — keep if useful] |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | [Discussion history and alternative viewpoints for Developer Toolchain — keep if useful] |
@@ -38,6 +39,7 @@ description: >
 | `docs/COMPATIBILITY.md` | [Verified tooling surface and known limits — create if useful] |
 | `templates/execution_contract.template.md` | [Pre-execution confirmation contract for long tasks] |
 | `templates/discussion_packet.template.md` | [Append-only packet template for multi-model discussion loops — keep if useful] |
+| `templates/skill_invocation_receipt.template.md` | [Invocation receipt template for runtime skill evidence and typed evolution lineage — keep if useful] |
 | `templates/skill_candidate_packet.template.md` | [Candidate packet template for post-task SKILL harvest — keep if useful] |
 | `templates/skill_promotion_receipt.template.md` | [Promotion receipt template for canonical SKILL mutation decisions — keep if useful] |
 | `templates/skill.template.md` | [Framework-native SKILL contract template — keep if your repository wants formal skill surfaces] |
@@ -66,6 +68,7 @@ description: >
 | `architecture\|design\|service boundary` | `ARCHITECTURE.md` |
 | `skill\|skills\|skill design\|skill mechanism\|triggerability\|progressive disclosure\|guardrail skill` | `docs/SKILL_MECHANISM_V1_DRAFT.md` |
 | `skill harvest\|promotion tier\|promotion authority\|candidate packet\|promotion receipt` | `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` |
+| `skill execution\|invocation receipt\|evolution mode\|fix\|derived\|captured` | `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
 | `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
 | `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
 | `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |
