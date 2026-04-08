@@ -1,0 +1,322 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d6a0b-9539-7ea2-89cc-4d77493feb5b
+--------
+user
+Read this packet first:
+
+tmp/discussion/copilot_instructions_format_review_v1/discussion_packet.md
+
+You are participating in a design review for the agent-framework-template repository.
+
+Review target:
+- `.github/copilot-instructions.md`
+
+Please evaluate the current file as it exists now.
+
+Required focus areas:
+1. Are there any remaining file-format or markdown-structure problems?
+2. Does the writing feel规范, internally consistent, and easy to follow?
+3. Are any rules redundant, conflicting, awkwardly split, or good candidates for merging?
+4. Are there places where the file is technically correct but still hard to navigate or maintain?
+5. What are the highest-value improvements, ordered from most important to least important?
+
+Important constraints:
+- Distinguish formatting issues from policy/content issues.
+- Do not answer only with vague style advice; prefer concrete edits or restructuring suggestions.
+- Do not shorten the file by removing important governance without justification.
+- Base your answer on the current file, not on older broken states.
+
+Required output shape:
+1. Verdict: choose one of `freeze-as-is`, `minor-cleanup`, `targeted-refactor`, or `needs-restructure`
+2. Findings table with columns:
+   - priority
+   - category (`format`, `writing`, `overlap`, `conflict`, `maintainability`, `other`)
+   - issue
+   - why it matters
+   - recommended fix
+3. Merge opportunities:
+   - list any rules or subsections that could be merged, de-duplicated, or cross-referenced instead of repeated
+4. Keep-as-is:
+   - list parts that are already strong and should not be changed casually
+5. Final recommendation in 3-5 sentences
+
+Return plain text only.
+mcp startup: no servers
+codex
+I’m reading the review packet and the current `.github/copilot-instructions.md` first, then I’ll assess structure, consistency, and consolidation opportunities against the file as it exists now.
+exec
+/bin/zsh -lc "sed -n '1,260p' tmp/discussion/copilot_instructions_format_review_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — copilot_instructions_format_review_v1
+
+- Generated at: 2026-04-07T22:22:50.936754+00:00
+- Owner: main-thread
+- Current round goal: Obtain an implementation-ready review of .github/copilot-instructions.md itself
+- Round exit rule: Freeze a plan, narrow to a sharper second round, or stop on missing truth
+
+## Decision Question
+
+How should this repository improve .github/copilot-instructions.md with respect to file-format correctness, writing quality, rule overlap or conflict, and overall maintainability?
+
+## Why This Needs Discussion
+
+The Rule 4-7 region in .github/copilot-instructions.md was recently repaired after a structural corruption. Before making further edits, we want a fresh 4-CLI review of the file as it exists now: whether the markdown format is still problematic, whether the writing is规范 and internally consistent, whether some rules conflict or can be merged, and what concrete improvements would raise clarity and maintainability.
+
+## Current Truth
+
+- The file now has continuous Rule headings from Rule 0 through Rule 27.
+- The previously corrupted Rule 4-7 region was repaired: Rule 6 was restored, malformed tables were fixed, and list structure is valid again.
+- The file is intentionally long and now includes anti-drift additions such as progress receipts, drift packets, and state-sync rules.
+exec
+/bin/zsh -lc "sed -n '1,320p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Agent Operating Rules
+
+> Behavior rules only. Project-specific facts live in `.github/instructions/project-context.instructions.md`.
+>
+> **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
+
+---
+
+## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
+
+User memory, judgment, or technical descriptions may be wrong. When a user statement conflicts with docs, code, or confirmed facts in this session:
+
+**DO**: `"Your statement X conflicts with [source] because [reason]. The actual situation is Z."`
+
+**DON'T**: Accept incorrect claims silently or proceed as if they were true.
+
+For potentially outdated information (paths, versions, ports): state the conflict, then ask which is current.
+
+Pre-action verification (read → verify → execute → report) is formalized in **Rule 12**.
+
+codex
+I’ve got the packet and the first half of the rules. I’m pulling the remainder now so the review is based on the full current file rather than the repaired section alone.
+exec
+/bin/zsh -lc "sed -n '321,640p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+State the action you are about to take and why, in one sentence.
+
+### Step 2 — SELF-CHECK
+Answer each question. If any answer is NO or UNKNOWN, resolve it before proceeding.
+
+| Question | Failure action |
+|---|---|
+| Have I read every file I plan to change? | **STOP** — read missing files first |
+| Are any target paths listed under Protected Paths? | **STOP** — request explicit user confirmation |
+| Have I loaded `.github/instructions/project-context.instructions.md`? | **STOP** — load it now |
+| Do all sources (docs, code, config) agree on this change? | **STOP** — escalate the conflict; do not guess |
+| Is the scope of this change fully understood? | **STOP** — ask for clarification |
+
+### Step 3 — ACT
+Only proceed if every self-check question was answered YES. If any check failed, the gate is not satisfied — state what is blocking and wait.
+
+**STOP language to use**:
+- Unread file: `"I need to read [file] before I can proceed safely."`
+- Protected path: `"[path] is a protected path. Explicit confirmation required before I continue."`
+- Unloaded adapter: `"I have not yet loaded the project adapter. Loading it now before I act."`
+exec
+/bin/zsh -lc 'wc -l .github/copilot-instructions.md' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    1235 .github/copilot-instructions.md
+codex
+The file is much longer than the first read window; it’s 1,235 lines. I’m reading the rest in chunks so I can separate structural problems from policy overlap cleanly.
+exec
+/bin/zsh -lc "sed -n '641,960p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+| Artifact | Purpose | Minimum timing |
+|---|---|---|
+| **Task packet** | Freeze goal, truth sources, allowed files, do-not-touch list, validation, acceptance boundary | Before fan-out or external execution starts |
+| **Audit receipt** | Record what an executor/reviewer changed, validated, and what risks remain | After each scoped execution or audit pass |
+| **Handoff packet** | Capture resume point, blocker, and next executor when a session stops or is replaced | Before switching executors or stopping mid-task |
+
+### Mandatory Use Cases
+
+Create these assets when any of the following is true:
+
+1. The task is split across 2+ executors or sessions
+2. An external CLI / Codex reviewer is asked to audit or implement part of the work
+3. Git closeout depends on a semantic audit that might need to be retried or handed off
+4. The task is important enough that losing chat history would materially block recovery
+
+### Hard Rules
+
+1. Do not treat chat history as the only source of task state.
+2. Do not ask a replacement executor to reconstruct context from memory if a handoff packet could be written first.
+exec
+/bin/zsh -lc "sed -n '961,1235p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+| Project type | Unit | Integration | End-to-end |
+|---|---|---|---|
+| Web frontend | Jest / Vitest | React Testing Library / Vue Test Utils | Playwright / Cypress |
+| Backend API | pytest / Jest | httpx / supertest (real HTTP) | Postman+Newman / curl script |
+| CLI tool | pytest / Jest | subprocess invocation | Full command invocation + output assertion |
+| Library / SDK | pytest / Jest | Example usage tests | Consumer integration test |
+| Full-stack | Per layer | API contract test | Browser + API combined |
+
+Select from this table or document an equivalent. Do not leave the E2E tier empty for any project where a user-facing interaction path exists.
+
+### Pre-Task Toolchain Check
+
+Before writing UAC for any task, answer:
+
+| Question | If NO |
+|---|---|
+| Is there an E2E tool installed and runnable for this project? | Declare a toolchain setup subtask — this runs before implementation |
+| Can each UAC item be executed by an existing tool? | Set up the missing tool, or rewrite the UAC item to be executable |
+| Are integration tests using real dependencies on user-facing paths? | Replace the mocks before proceeding |
+
+codex
+I’ve finished reading the full file. Next I’m checking the exact rule layout and a few repeated phrases so the recommendations can point to concrete merge points instead of generic “simplify this” advice.
+exec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '1,260p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+     1	# Agent Operating Rules
+     2	
+     3	> Behavior rules only. Project-specific facts live in `.github/instructions/project-context.instructions.md`.
+     4	>
+     5	> **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
+     6	
+     7	---
+     8	
+     9	## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
+    10	
+    11	User memory, judgment, or technical descriptions may be wrong. When a user statement conflicts with docs, code, or confirmed facts in this session:
+    12	
+    13	**DO**: `"Your statement X conflicts with [source] because [reason]. The actual situation is Z."`
+    14	
+    15	**DON'T**: Accept incorrect claims silently or proceed as if they were true.
+    16	
+    17	For potentially outdated information (paths, versions, ports): state the conflict, then ask which is current.
+    18	
+    19	Pre-action verification (read → verify → execute → report) is formalized in **Rule 12**.
+    20	
+exec
+/bin/zsh -lc "rg -n '"'^## Rule|''^### |''^---$|''^'"\\| ' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+7:---
+9:## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
+21:---
+23:## Rule 1: Dangerous Operations (🔴 Mandatory)
+31:---
+33:## Rule 2: Read Before Act
+39:---
+41:## Rule 3: Critical Topic Triggers (🔴 Mandatory)
+52:---
+54:## Rule 4: Validation After Every Change (🔴 Mandatory)
+56:| Change scope | Minimum validation | Toolchain tier (Rule 23) |
+58:| Single file | Check diagnostics / lint for that file | Unit |
+59:| Single module | Run focused test suite for that module | Unit + Integration |
+60:| Cross-module or public contract | Run workspace-level static check | Integration + E2E |
+61:| Before commit | Static check clean, or known issues documented | All tiers |
+74:---
+76:## Rule 5: Dispatch Decision Disclosure (🔴 Mandatory)
+87:---
+89:## Rule 6: Document Organization (🔴 Mandatory)
+91:| Type | Definition | Location |
+exec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '621,980p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '981,1235p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+   981	If any answer is NO, the toolchain setup subtask must complete before implementation begins. Do not treat toolchain setup as optional or deferred.
+   982	
+   983	### Documentation Requirement
+   984	
+   985	Record the validated toolchain in `.github/instructions/project-context.instructions.md` under **Validation Toolchain**. This makes it part of the project adapter (Layer 2) — available to all agents on every task without re-eliciting.
+   986	
+   987	Add `e2e|toolchain|acceptance` to the Critical Topic Triggers table in the project adapter, pointing to the Validation Toolchain section.
+   988	
+   989	If adopting a new project, `scripts/bootstrap_adoption.py` generates a first-pass project adapter (including a Validation Toolchain section pre-populated for the chosen profile). Treat the generated values as starting points and confirm them before running any task.
+   990	
+   991	### Interaction with Other Rules
+   992	
+   993	| Rule | Interaction |
+   994	|---|---|
+   995	| Rule 22 (UAC Gate) | Toolchain is the prerequisite; UAC cannot be executed without it |
+   996	| Rule 4 (Validation After Change) | Validation commands must reference the declared toolchain tiers |
+   997	| Rule 16 (Planning) | When toolchain is missing, tool setup appears as the first step in the plan — before any feature step |
+   998	| Rule 21 (Dispatch Stability) | Task packets must include the toolchain commands for their validation tier |
+   999	
+  1000	---
+ succeeded in 0ms:
+   621	
+   622	### Constraints
+   623	
+   624	- Do not run a full re-analysis — answer the three questions in 1–3 sentences of evidence
+   625	- Do not manufacture evidence to force `confirmed` — `uncertain` is a valid and safe result
+   626	- A reality check is not a checkpoint review — it is a fast alignment pulse, not a deep audit
+   627	
+   628	---
+   629	
+   630	*Project facts: `.github/instructions/project-context.instructions.md`*
+   631	*Canonical doc index: `docs/INDEX.md`*
+   632	*Cross-session state: `session_state.md`*
+   633	
+   634	---
+   635	
+   636	## Rule 18: Resumable Audit Assets (🔴 Mandatory)
+   637	
+   638	When a task uses external Codex, multiple CLI sessions, internal subagents, or any reviewer workflow that may be interrupted, the agent must externalize progress into repository artifacts instead of relying on chat history.
+   639	
+   640	### Required Artifacts
+exec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '261,620p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+   261	
+   262	### Git Closeout (mandatory before next major task)
+   263	
+   264	Default policy: the main thread owns normal `git add`, `git commit`, and standard `git push`. Do not ask the user for routine authorization on those operations when the closeout boundary is coherent and no exception condition is active.
+   265	
+   266	1. `git status --short` — confirm scope and exclude unrelated dirty files
+   267	2. Produce recommended commit message + file scope
+   268	3. The main thread may execute normal `git add + git commit` once validation is clean and the closeout boundary is coherent
+   269	4. The main thread may execute a normal `git push` after commit when hard gates pass and no exception condition is active
+   270	5. Escalate to the user instead of proceeding when any exception condition is active:
+   271	   - history-rewriting or destructive Git actions are required (`push --force`, branch deletion, reset, rebase with published history)
+   272	   - the target remote or target branch is ambiguous or differs from the expected closeout path
+   273	   - unrelated dirty files or an incoherent commit boundary remain in the working tree
+   274	   - required hard gates failed or validation evidence does not match the diff
+   275	   - protected paths or release-sensitive operations are involved
+   276	
+   277	---
+   278	
+   279	## Rule 10: Phase Graduation Protocol
+   280	
+codex
+Verdict: targeted-refactor
+
+Findings table
+
+| priority | category | issue | why it matters | recommended fix |
+|---|---|---|---|---|
+| high | conflict | Rule 8 and Rule 14 define overlapping reply-ending requirements without a single precedence rule. Rule 8 says every in-progress substantive reply ends with a status line, while Rule 14 says every substantial reply must end with a `## Next Actions` block, with partially overlapping exceptions. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L174) and [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L375). | Agents can comply with both, but the file does not say whether both are always required, in what order, or which one wins when space is tight. That creates avoidable drift in implementations. | Create one “response-shape contract” section. Make Rule 8 define the required visible footer/status pattern, and have Rule 14 only govern decision logic plus a short cross-reference. If both are required, state the exact order explicitly. |
+| high | overlap | Checkpointed-task obligations are repeated across Rules 3, 4, 5, 7, 18, 20, and 21. Examples include `Active Task ID` fields, progress receipts, drift packets, handoff packets, allowed-files limits, and closeout boundaries. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L41), [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L54), [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L113), and [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L636). | This is the main maintainability risk. Any future change to checkpoint semantics now requires editing many rules, and partial updates will create contradictions again. | Extract a single authoritative “Checkpointed Task Contract” subsection or appendix, then replace repeated lists with short references to that section. Keep local rule-specific exceptions only where they truly differ. |
+| high | maintainability | Rule 7 is carrying too many responsibilities: session-state hygiene, rollover, context reset, checkpoint receipts, drift handling, handoff behavior, hard gates, and owner review. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L113). | Even though the markdown is valid, the section is hard to scan and harder to modify safely because operational state policy and execution-artifact policy are interleaved. | Split Rule 7 into “Cross-Session State”, “Rollover and Reset”, and “Checkpoint Sync” or move reset/checkpoint mechanics into Rule 18 with Rule 7 focused on `session_state.md` only. |
+| medium | conflict | Terminology is inconsistent around execution metadata. Rule 20 defines an `Execution Boundary`, but Rule 27 audits `Rule 9 + EC §1` and says Git policy is “declared in Execution Contract before task starts.” See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L740) and [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L1187). | `EC §1` / “Execution Contract” is not clearly defined in the file, so the audit section points to a concept name the reader cannot reliably map back to Rule 20. | Standardize on one term. Either rename Rule 20’s block to `Execution Contract` and define sections, or change Rule 27 to say `Execution Boundary` everywhere. |
+| medium | format | Rule 21 says “verify all five conditions,” but the readiness table contains four conditions. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L797). | This is a small but concrete correctness issue in the document itself. It weakens confidence in a section that is supposed to be procedural and exact. | Fix the count or add the missing fifth condition. |
+| medium | overlap | Rules 22, 23, 25, and 26 form one acceptance/evidence/evaluation pipeline, but the lifecycle is split across four distant rules with repeated concepts such as UAC evidence, receipts, and completion claims. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L860), [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L941), [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L1057), and [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L1112). | The policy is mostly coherent, but the reader has to reconstruct the sequence manually: define UAC, ensure toolchain, gather evidence, anchor claims, then get independent evaluation. | Group these as an “Acceptance and Closeout” cluster, or add a short lifecycle summary at the start of Rule 22 that points to the exact order of Rules 23, 25, and 26. |
+| low | format | The standalone italicized reference lines between Rules 17 and 18 read like floating metadata rather than part of a rule section. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L630). | Not broken markdown, but it interrupts flow and looks like an orphaned footer/header fragment. | Move these references to the top intro block, or label them as a small “Core Truth Surfaces” subsection. |
+| low | maintainability | Rule 6’s taxonomy table mixes document classes (`TYPE-A/B/C`) with process artifacts (`Progress receipt`, `Drift packet`) under a single `Type` column. See [.github/copilot-instructions.md](/Users/mac/Desktop/agent-framework-template/.github/copilot-instructions.md#L89). | The section is technically readable, but the conceptual model is muddier than it needs to be. Readers cannot tell whether receipts are document types or execution artifacts. | Split into two tables: “Document Classes” and “Execution Artifacts.” Keep the artifact layout example beneath the second table. |
+
+Merge opportunities
+
+- Merge Rule 5 into Rule 15. Rule 5 is mostly a forwarder plus two checkpoint notes.
+- Merge the checkpoint-specific repeated lists from Rules 3, 4, 5, and 7 into one canonical checkpoint contract, then cross-reference it from Rules 18, 20, and 21.
+- Merge Rule 8 and Rule 14’s output-shape requirements into one reply-format contract.
+- Merge Rule 22 and Rule 23 into a tighter acceptance flow, or keep them separate but add a short ordered checklist at the start of Rule 22.
+- Cross-reference Rule 25 from Rule 9 and Rule 22 instead of restating receipt/evidence expectations in multiple places.
+- Consider moving Rule 26 next to Rules 22-25 so the acceptance pipeline reads in execution order.
+- In Rule 6, separate long-lived doc taxonomy from runtime audit artifacts instead of keeping them in one table.
+
+Keep-as-is
+
+- The file no longer appears structurally broken. Headings are continuous from Rule 0 to Rule 27, tables are valid, and code fences are closed.
+- Rule 20 is strong and should remain the main posture-setting section. Its execution-boundary block is concrete and actionable.
+- Rule 22’s insistence on user-observable acceptance criteria is valuable and should not be weakened.
+- Rule 25’s receipt-anchor concept is strong governance and worth preserving.
+- Rule 27 is useful as an operational audit lens; it should stay, but its terminology should be aligned with the rest of the file.
+
+Final recommendation
+
+This file is no longer in a broken markdown state, so this is not a formatting-repair job. The highest-value work now is structural consolidation: unify response-shape rules, centralize the checkpointed-task contract, and standardize execution-boundary terminology. After that, split Rule 7 and clean up small correctness issues like the Rule 21 count mismatch. The goal should be to preserve the current governance depth while reducing the number of places a future edit has to touch.
+tokens used
+44,574

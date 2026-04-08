@@ -1,0 +1,39 @@
+Read this packet first:
+
+tmp/discussion/copilot_instructions_format_review_v1/discussion_packet.md
+
+You are participating in a design review for the agent-framework-template repository.
+
+Review target:
+- `.github/copilot-instructions.md`
+
+Please evaluate the current file as it exists now.
+
+Required focus areas:
+1. Are there any remaining file-format or markdown-structure problems?
+2. Does the writing feel规范, internally consistent, and easy to follow?
+3. Are any rules redundant, conflicting, awkwardly split, or good candidates for merging?
+4. Are there places where the file is technically correct but still hard to navigate or maintain?
+5. What are the highest-value improvements, ordered from most important to least important?
+
+Important constraints:
+- Distinguish formatting issues from policy/content issues.
+- Do not answer only with vague style advice; prefer concrete edits or restructuring suggestions.
+- Do not shorten the file by removing important governance without justification.
+- Base your answer on the current file, not on older broken states.
+
+Required output shape:
+1. Verdict: choose one of `freeze-as-is`, `minor-cleanup`, `targeted-refactor`, or `needs-restructure`
+2. Findings table with columns:
+   - priority
+   - category (`format`, `writing`, `overlap`, `conflict`, `maintainability`, `other`)
+   - issue
+   - why it matters
+   - recommended fix
+3. Merge opportunities:
+   - list any rules or subsections that could be merged, de-duplicated, or cross-referenced instead of repeated
+4. Keep-as-is:
+   - list parts that are already strong and should not be changed casually
+5. Final recommendation in 3-5 sentences
+
+Return plain text only.

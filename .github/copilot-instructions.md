@@ -4,6 +4,16 @@
 >
 > **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
 
+## Quick Navigation
+
+| Cluster | Rules | Focus |
+|---|---|---|
+| Intake and safety | [Rule 0](#rule-0-challenge-incorrect-statements--mandatory) · [Rule 1](#rule-1-dangerous-operations--mandatory) · [Rule 2](#rule-2-read-before-act) · [Rule 3](#rule-3-critical-topic-triggers--mandatory) · [Rule 4](#rule-4-validation-after-every-change--mandatory) | Challenge posture, protected operations, read-before-act, topic-triggered doc loading, validation floor |
+| State and reporting | [Rule 5](#rule-5-dispatch-decision-disclosure--mandatory) · [Rule 6](#rule-6-document-organization--mandatory) · [Rule 7](#rule-7-cross-session-state--mandatory) · [Rule 8](#rule-8-progress-status-line-and-closeout-boundary--mandatory) · [Rule 9](#rule-9-subtask-completion-checkpoint--mandatory) · [Rule 10](#rule-10-phase-graduation-protocol) | Dispatch disclosure, doc placement, session state, progress lines, checkpoint closeout, phase graduation |
+| Reasoning and planning | [Rule 11](#rule-11-cognitive-reasoning-loop--mandatory) · [Rule 12](#rule-12-pre-action-self-check-gate--mandatory) · [Rule 13](#rule-13-failure-recovery--mandatory) · [Rule 14](#rule-14-task-progression-loop--mandatory) · [Rule 15](#rule-15-decomposition-and-dispatch-decision--mandatory) · [Rule 16](#rule-16-planning-and-path-selection--mandatory) · [Rule 17](#rule-17-reality-check-and-goal-alignment--mandatory) | Hypothesis discipline, pre-action gate, recovery path, progression loop, decomposition, planning, alignment checks |
+| Execution and acceptance | [Rule 18](#rule-18-resumable-audit-assets--mandatory) · [Rule 19](#rule-19-executor-selection-order--mandatory) · [Rule 20](#rule-20-long-task-autonomous-execution--primary-mode) · [Rule 21](#rule-21-dispatch-stability-protocol--mandatory) · [Rule 22](#rule-22-user-acceptance-gate--mandatory) · [Rule 23](#rule-23-validation-toolchain-prerequisite--mandatory) | Task packets, executor choice, autonomy boundary, dispatch runtime rules, UAC, toolchain prerequisites |
+| Closeout and audit | [Rule 24](#rule-24-scope-entry-classification-and-leftover-contract--mandatory) · [Rule 25](#rule-25-receipt-anchored-closeout--mandatory) · [Rule 26](#rule-26-independent-evaluation--mandatory) · [Rule 27](#rule-27-policy-audit-trigger--on-demand) | Leftovers, receipt-anchored claims, independent evaluation, on-demand policy audit |
+
 ---
 
 ## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
@@ -18,6 +28,8 @@ For potentially outdated information (paths, versions, ports): state the conflic
 
 Pre-action verification (read → verify → execute → report) is formalized in **Rule 12**.
 
+Rule 0 defines the challenge posture. Rule 12 defines the mechanical pre-action gate.
+
 ---
 
 ## Rule 1: Dangerous Operations (🔴 Mandatory)
@@ -28,6 +40,8 @@ Before deleting, clearing, overwriting, or replacing any file:
 2. Confirm the target is not listed under **Protected Paths**
 3. If protected: require explicit user confirmation before proceeding
 
+This rule defines a specific dangerous-operation stop condition. The reusable step-by-step gate lives in Rule 12.
+
 ---
 
 ## Rule 2: Read Before Act
@@ -35,6 +49,8 @@ Before deleting, clearing, overwriting, or replacing any file:
 - Project map = navigation aid only; it does not substitute for reading actual files
 - Before editing any file: read it first and verify your assumption
 - Never assume the file still matches what it looked like last session
+
+These are standing read-before-act requirements. Rule 12 applies them at decision time before high-impact actions.
 
 ---
 
@@ -47,73 +63,86 @@ When a keyword appears in the user's message:
 1. Load the project adapter
 2. Follow the `keyword → canonical doc` mapping
 3. If the topic involves default values, ports, or feature flags: check runtime config locations before changing any defaults
-- For checkpointed long tasks, `Active Work` must also carry: `Active Task ID`, `Progress Unit`, `Checkpoint Rule`, `Truth Surfaces`, and `State Sync Schedule`
+4. For checkpointed long tasks, apply the Checkpointed Task Contract in Rule 18 before dispatching work or crossing a checkpoint
 
 ---
 
 ## Rule 4: Validation After Every Change (🔴 Mandatory)
 
 | Change scope | Minimum validation | Toolchain tier (Rule 23) |
-4. `tmp/git_audit/<task_slug>/task_packet.md` — scope plus checkpoint contract (if task is in progress)
-5. `tmp/git_audit/<task_slug>/handoff_packet.md` or `tmp/git_audit/<task_slug>/drift_packet.md` — resume point, blocker, or reconciliation status (if present)
-6. Only the files listed in the task packet's allowed-files — no speculative reading
+|---|---|---|
+| Single file | Check diagnostics / lint for that file | Unit |
 | Single module | Run focused test suite for that module | Unit + Integration |
 | Cross-module or public contract | Run workspace-level static check | Integration + E2E |
 | Before commit | Static check clean, or known issues documented | All tiers |
 
-2. emit a progress receipt at the declared checkpoint boundary when the checkpoint contract says one is required
-3. do not trigger host closeout actions at internal batch boundaries
-4. reserve final closeout for the declared true boundary, a real blocker, or an explicit user-requested checkpoint
+**Forbidden**: making a code change and immediately starting the next change without any validation.
+
+For checkpointed long tasks, follow the Rule 18 checkpoint contract before continuing. That contract owns packet validation, allowed-file limits, progress receipts, and closeout boundaries.
+
 ---
 
 ## Rule 5: Dispatch Decision Disclosure (🔴 Mandatory)
 
 When a task can be split into 2+ independent scopes, evaluate dispatch before proceeding serially. The disclosure is user-visible — not just in the status line.
 
-4. if the task has a checkpoint contract, emit the matching progress receipt or reconcile drift before moving on
-5. Status line / closeout summary: update `Next` or the final closeout summary appropriately
+This rule covers the user-visible disclosure only. The full dispatch pipeline lives across **Rule 15** (strategy and decomposition), **Rule 18** (task packet and checkpoint contract), **Rule 19** (executor selection), **Rule 21** (runtime dispatch stability), and **Rule 26** (independent evaluation).
+
+If the task has a checkpoint contract, satisfy the Rule 18 checkpoint requirements before moving on.
 
 ---
 
-5. UPDATE       → Write Current Step + Next Planned Step in session_state.md and emit the declared checkpoint artifact when one boundary was crossed
+## Rule 6: Document Organization (🔴 Mandatory)
+
+### Document Classes
 
 | Type | Definition | Location |
 |---|---|---|
 | **TYPE-A** | Long-lived: architecture, runbooks, API specs, guides | `docs/` or module root |
-| **Progress receipt** | Record one checkpoint-bearing execution event and its expected truth-surface effect | At each declared checkpoint, blocker, or meaningful batch boundary |
 | **TYPE-B** | Module-local, evolves with code | module directory |
 | **TYPE-C** | Phase reports, one-time analyses, summaries | `docs/archive/` |
+ 
+### Execution Artifacts
+
+| Artifact | Definition | Location |
+|---|---|---|
+| **Progress receipt** | Record one checkpoint-bearing execution event and its expected truth-surface effect | `tmp/git_audit/<task_slug>/progress_receipts/` |
 | **Drift packet** | Record contradictions between execution artifacts and truth surfaces plus the reconciliation path | When sync audit detects unresolved drift |
+
+Default checkpoint artifact layout:
+
+```text
+tmp/git_audit/<task_slug>/
+   progress_receipts/
+      0001_<status>.md
+   drift_packet.md
+```
 
 - **Forbidden**: process/phase docs in `docs/` root or module root
 - **Required**: update `docs/INDEX.md` when any TYPE-A doc is added or removed
 
 ---
 
-   progress_receipts/
-      0001_<status>.md
 ## Rule 7: Cross-Session State (🔴 Mandatory)
 
-   drift_packet.md
+### Core Obligations
+
 - Before any multi-step or cross-day task: read `session_state.md`
 - Update `session_state.md` when: sub-phase completes · major decision made · task interrupted · current goal diverges from actual state
 - **Technical Insights** section: permanent — never auto-delete; supersede explicitly
 - If `session_state.md` exceeds ~100 lines: archive old phase content to `docs/archive/`
-3. Emit a progress receipt at each declared checkpoint or blocker boundary
-4. Record an audit receipt with touched files, validation, and risks
-5. If interrupted, create a handoff packet before switching executor
-6. If the sync audit finds contradiction, open or update a drift packet before dispatch or closeout continues
-7. Run hard gates
-8. Return to main-thread owner review and Git closeout
+- For checkpointed long tasks, `Active Work` must mirror the fields required by the Rule 18 checkpoint contract
+
+### Rollover and Reset
+
+### Rollover Triggers (perform at the next checkpoint — do not interrupt mid-task)
+
+Rollover is required when **any one** of these conditions is true:
 
 1. `session_state.md` exceeds ~100 lines or is visibly beyond two readable screens
 2. The "Active Work" section has multiple date-appended blocks stacking up
-- Task ID:            [stable task slug]
 3. The recent receipt window holds more than 3 entries and older entries no longer affect current decisions
 4. A phase has completed but its full receipt log is still in `session_state.md`
-- Checkpoint rule:   [what makes one progress unit reflected]
-- Truth surfaces:    [session_state.md / ROADMAP.md / task packet / receipts / leftovers / other]
-- State sync schedule:[checkpoint / handoff / blocker / closeout]
 5. The file contains content from a phase that has been marked ✅ in ROADMAP
 
 These are governance thresholds, not hard interrupts. Complete the current bounded step first, then roll over at the next natural checkpoint.
@@ -122,9 +151,9 @@ These are governance thresholds, not hard interrupts. Complete the current bound
 
 1. Copy old phase narrative and excess receipts to a new TYPE-C archive doc (`docs/archive/Phase_N_<Name>_YYYY-MM-DD.md`)
 2. Write the date and scope at the top of the archive doc
-- Writing declared progress receipts and drift packets in `tmp/git_audit/`
-3. Keep only in `session_state.md`: current goal, working hypothesis, active work, recent receipt window (≤ 3), decisions, insights
-4. If the archive becomes a long-term reference, add a link back from the corresponding TYPE-A doc or from the summary section of `session_state.md`
+3. Keep writing declared progress receipts and drift packets in `tmp/git_audit/`
+4. Keep only in `session_state.md`: current goal, working hypothesis, active work, recent receipt window (≤ 3), decisions, insights
+5. If the archive becomes a long-term reference, add a link back from the corresponding TYPE-A doc or from the summary section of `session_state.md`
 
 ### Context Reset Protocol
 
@@ -132,28 +161,37 @@ These are governance thresholds, not hard interrupts. Complete the current bound
 
 Trigger a context reset when any of the following is true:
 
-| Checkpoint contract | Task packet names `Progress Unit`, `Checkpoint Rule`, `Truth Surfaces`, and `State Sync Schedule` when the task is checkpointed | Add the missing checkpoint contract before dispatching |
 - The session is approaching context limits and the task is not yet complete
 - A new executor (CLI or subagent) is picking up from a handoff packet (Rule 18/19)
-- **Required**: if the stop condition is caused by contradiction between truth surfaces, open or update a drift packet before converting the stop into a leftover
 - A phase boundary is crossed and the next phase has different canonical docs
 
+If the stop condition is caused by contradiction between truth surfaces, open or update a drift packet per Rule 18 before converting the stop into a leftover.
 
-Closeout is also blocked when `scripts/state_sync_audit.py` reports unresolved drift or when `tmp/git_audit/<task_slug>/drift_packet.md` remains open or in progress.
 **Reset entry sequence** — the new session reads these in order, nothing else:
 
 1. `.github/copilot-instructions.md` — operating rules (always loaded)
-- Any checkpoint-bearing progress receipts and any drift packet for the task
-2. `.github/instructions/project-context.instructions.md` — project adapter
-3. `session_state.md` — current goal, hypothesis, plan, and active work
-4. `tmp/git_audit/<task_slug>/handoff_packet.md` — resume point and blocker (if task is in progress)
-5. Only the files listed in the task packet's allowed-files — no speculative reading
+2. Any checkpoint-bearing progress receipts and any drift packet for the task
+3. `.github/instructions/project-context.instructions.md` — project adapter
+4. `session_state.md` — current goal, hypothesis, plan, and active work
+5. `tmp/git_audit/<task_slug>/handoff_packet.md` — resume point and blocker (if task is in progress)
+6. Only the files listed in the task packet's allowed-files — no speculative reading
 
 Do not re-read earlier conversation history. Do not summarize prior turns. Artifacts are the source of truth; chat history is not.
 
 ---
 
 ## Rule 8: Progress Status Line And Closeout Boundary (🔴 Mandatory)
+
+### Output and Closeout Reading Map
+
+| If you need to know... | Primary rule | Supporting rules |
+|---|---|---|
+| How an in-progress reply should end | Rule 8 | Rule 14 |
+| What to update when a subtask finishes | Rule 9 | Rule 22 |
+| How to choose the next move after a subtask | Rule 14 | Rule 17 |
+| What user-observable acceptance evidence is required | Rule 22 | Rule 23 |
+| What makes a completion claim auditable in truth surfaces | Rule 25 | Rule 22, Rule 26 |
+| Who must independently evaluate completion | Rule 26 | Rule 22, Rule 25 |
 
 Every in-progress substantive reply ends with a status line.
 
@@ -170,6 +208,8 @@ Use the longer focus-bearing variant only when needed:
 **Idle**: `• 空闲 Idle | 无 active task`
 
 The focus field is optional for routine updates and should be added only when it prevents ambiguity.
+
+When Rule 14 requires a `## Next Actions` block, place that block immediately before the status line. The status line remains the final line of the in-progress reply.
 
 ### Final Closeout Binding (🔴 Mandatory)
 
@@ -239,7 +279,7 @@ When a subtask is confirmed done — **before discussing the next one**:
 1. ROADMAP row: `○`/`🔄` → `✅ YYYY-MM-DD`
 2. Acceptance criteria: `[ ]` → `[x]` — at least one UAC item must be verified per Rule 22 before marking complete
 3. `session_state.md`: move item from "Active Work" → "Completed This Phase"
-4. Status line / closeout summary: update `Next` or the final closeout summary appropriately
+4. visible progress reporting and any closeout summary must follow Rule 8 and Rule 14
 
 ### Git Closeout (mandatory before next major task)
 
@@ -287,9 +327,9 @@ Before committing to an approach for any task involving code changes, multi-file
 | **Medium** | Hypothesis is consistent with available evidence but not fully verified |
 | **Low** | Hypothesis is a best guess — flag for user review before proceeding |
 
-**Low-confidence rule**: do not act on a Low-confidence hypothesis without surfacing the uncertainty to the user first.
+**Low-confidence rule**: outside a declared execution boundary, do not act on a Low-confidence hypothesis without surfacing the uncertainty to the user first.
 
-**Inside a declared execution boundary (Rule 20)**: Low-confidence on a reversible step → proceed with `Alignment: uncertain` flagged, do not stop. Low-confidence on an irreversible or high-blast-radius decision → hard stop regardless of boundary.
+**Inside a declared execution boundary (Rule 20)**: Low-confidence on a reversible step → proceed with `Alignment: uncertain` flagged and surface it at the next progress boundary; Low-confidence on an irreversible or high-blast-radius decision → hard stop regardless of boundary.
 
 Track the current hypothesis and confidence in `session_state.md` under **Working Hypothesis**. This rule runs alongside — not instead of — the Pre-Action Self-Check Gate in Rule 12.
 
@@ -356,6 +396,8 @@ Stopping is always preferred over continuing with Low confidence. A partial STOP
 
 ## Rule 14: Task Progression Loop (🔴 Mandatory)
 
+This rule governs the post-subtask decision loop. It does not replace Rule 8's reply-shape requirements or Rule 22 / Rule 25 / Rule 26 acceptance-closeout gates.
+
 After every completed subtask — before composing the reply — run this progression loop. Do not skip it.
 
 ```
@@ -364,7 +406,7 @@ After every completed subtask — before composing the reply — run this progre
 3. IDENTIFY     → What is the next actionable step toward the goal?
 4. DECIDE       → Choose one: continue · decompose · stop and ask
 5. UPDATE       → Write Current Step + Next Planned Step in session_state.md
-6. REPORT       → End every substantial reply with a ## Next Actions section
+6. REPORT       → Include a `## Next Actions` block when the reply needs explicit decision-state disclosure, then end with the Rule 8 status line
 ```
 
 > **Inside a declared execution boundary (Rule 20):** `stop and ask` is the last resort — not a peer option with `continue` and `decompose`. Prefer decomposing or continuing with `Alignment: uncertain` before stopping.
@@ -380,7 +422,7 @@ After every completed subtask — before composing the reply — run this progre
 
 ### Next Actions Contract
 
-Every substantial reply must end with:
+Every substantial reply that declares a continuing, blocked, or complete decision beyond a simple progress update must include:
 
 ```markdown
 ## Next Actions
@@ -403,7 +445,7 @@ Every substantial reply must end with:
 **Exceptions** (the only valid reasons to omit Next Actions):
 - The goal is fully complete
 - A blocking condition exists and has been declared to the user
-- The reply is purely informational (no active task)
+- The reply is a simple progress update and still ends with the Rule 8 status line
 
 This loop makes explicit the difference between "I finished a step" and "I am making progress toward the goal." It prevents stalling after individual safe actions.
 
@@ -471,6 +513,16 @@ Proceeding serially — [criterion that failed: no independent owner files / no 
 - Strong sequential dependency (output of step N is input to step N+1)
 - High-risk or destructive operation (safer to validate each step before proceeding)
 - Still in the locating/reading phase (scope not yet established)
+
+### Dispatch Pipeline
+
+Read these rules in this order when the task moves from planning into execution:
+
+1. **Rule 15** — decide whether the work should fan out or stay serial, and disclose that choice.
+2. **Rule 18** — freeze the task packet and, if checkpointed, apply the checkpoint contract before execution crosses a boundary.
+3. **Rule 19** — choose the executor and fallback path.
+4. **Rule 21** — enforce readiness gates, task sizing, terminal states, and progress signals during execution.
+5. **Rule 26** — run independent evaluation before final closeout when the task qualifies.
 
 ---
 
@@ -609,13 +661,24 @@ Every `## Next Actions` block must include:
 
 ---
 
-*Project facts: `.github/instructions/project-context.instructions.md`*
-*Canonical doc index: `docs/INDEX.md`*
-*Cross-session state: `session_state.md`*
+### Core Truth Surfaces
+
+- Project facts: `.github/instructions/project-context.instructions.md`
+- Canonical doc index: `docs/INDEX.md`
+- Cross-session state: `session_state.md`
 
 ---
 
 ## Rule 18: Resumable Audit Assets (🔴 Mandatory)
+
+### Execution State Reading Map
+
+| If you need to know... | Primary rule | Supporting rules |
+|---|---|---|
+| Which artifacts preserve resumability across sessions | Rule 18 | Rule 19 |
+| How a dispatched task must behave while running | Rule 21 | Rule 15, Rule 18 |
+| How to classify unfinished or deferred scope honestly | Rule 24 | Rule 22, Rule 25 |
+| What must happen before a completion claim is accepted | Rule 25 | Rule 22, Rule 26 |
 
 When a task uses external Codex, multiple CLI sessions, internal subagents, or any reviewer workflow that may be interrupted, the agent must externalize progress into repository artifacts instead of relying on chat history.
 
@@ -642,6 +705,27 @@ Create these assets when any of the following is true:
 2. Do not ask a replacement executor to reconstruct context from memory if a handoff packet could be written first.
 3. Hard gates (tests, type checks, sync checks, schema validators, hooks) must stay outside the semantic auditor when possible.
 4. The main thread retains final owner review and Git closeout authority.
+
+### Checkpointed Task Contract
+
+When a task is explicitly checkpointed, the active task packet and `session_state.md` must stay aligned on these fields:
+
+1. `Active Task ID`
+2. `Progress Unit`
+3. `Checkpoint Rule`
+4. `Truth Surfaces`
+5. `State Sync Schedule`
+
+Operational requirements for checkpointed tasks:
+
+1. validate `tmp/git_audit/<task_slug>/task_packet.md` before continuing if the task is active
+2. validate `tmp/git_audit/<task_slug>/handoff_packet.md` or `tmp/git_audit/<task_slug>/drift_packet.md` when those artifacts exist
+3. only touch files listed in the task packet's allowed-files while the packet is active
+4. emit a progress receipt at each declared checkpoint or blocker boundary when the checkpoint contract requires one
+5. if interrupted, create a handoff packet before switching executor
+6. if the sync audit finds contradiction, open or update a drift packet before dispatch or closeout continues
+7. do not trigger host closeout actions at internal batch boundaries; reserve final closeout for the true boundary, a real blocker, or an explicit user-requested checkpoint
+8. closeout is blocked when `scripts/state_sync_audit.py` reports unresolved drift or when `tmp/git_audit/<task_slug>/drift_packet.md` remains open or in progress
 
 ### Canonical Locations
 
@@ -776,9 +860,11 @@ Collect and surface at the next natural pause point, not immediately:
 
 Every dispatched task must be sent with a verified task packet and must terminate in an explicit state. Silent stopping is not a valid outcome. This rule applies to all CLI and subagent executors dispatched under Rule 15 and Rule 19.
 
+This rule is the runtime-execution layer of the dispatch pipeline. Read Rule 15 for strategy, Rule 18 for artifacts, and Rule 26 for post-execution evaluation.
+
 ### Pre-Dispatch Readiness Gate
 
-Before freezing the task packet and dispatching any executor, verify all five conditions. Do not dispatch if any condition fails.
+Before freezing the task packet and dispatching any executor, verify all four conditions. Do not dispatch if any condition fails.
 
 | Condition | Check | If it fails |
 |---|---|---|
@@ -841,9 +927,21 @@ Then writes a handoff packet (Rule 18) and stops. The main thread routes to the 
 
 ## Rule 22: User Acceptance Gate (🔴 Mandatory)
 
+This rule governs user-observable acceptance proof. It does not define reply formatting (Rule 8) or truth-surface receipt anchoring (Rule 25).
+
 Technical validation confirms the code is correct. User acceptance confirms the work satisfies the user's intent. These are not the same check. Passing lint and tests is necessary but not sufficient — it does not constitute task completion.
 
 No task is declared `Status: complete` until User Acceptance Criteria (UAC) have been declared upfront, validated end-to-end, and each item has evidence — not assumption.
+
+### Acceptance And Closeout Flow
+
+Read these rules in this order when work is approaching completion:
+
+1. **Rule 22** — declare user-observable acceptance criteria and an end-to-end scenario.
+2. **Rule 23** — confirm the toolchain can execute those criteria honestly.
+3. **Rule 22** — gather UAC evidence and run the gap check.
+4. **Rule 25** — anchor any completion claim to a receipt in the same diff.
+5. **Rule 26** — require independent evaluation when the task qualifies.
 
 ### UAC Declaration (before implementation starts)
 
@@ -877,7 +975,7 @@ UAC must be written in user-observable language, not technical language:
 
 For doc / config tasks with no runnable test: the agent must read the finished artifact against its stated intent and explicitly confirm the match in the UAC Evidence block. "Looks right" is not evidence — quote the specific line or section that satisfies each criterion.
 
-If the user has not specified success conditions: ask before proceeding. Do not proceed on a multi-step task without at least one UAC item.
+If the user has not specified success conditions: derive provisional UAC from the request, state the assumptions explicitly, and ask only when the missing condition is material, user-preference-dependent, or irreversible. Do not proceed on a multi-step task when even provisional UAC cannot be stated honestly.
 
 ### End-to-End Validation Requirement
 
@@ -983,6 +1081,8 @@ If adopting a new project, `scripts/bootstrap_adoption.py` generates a first-pas
 
 ## Rule 24: Scope Entry Classification and Leftover Contract (🔴 Mandatory)
 
+This rule governs scope-state classification and leftover recording. It does not replace Rule 18 runtime artifacts, Rule 22 acceptance proof, or Rule 25 receipt-anchored closeout.
+
 Work that is partially done but not formally recorded is invisible debt. This rule makes stopping partway an explicit, auditable state — not a failure to be hidden.
 
 ### Before Entering Any New Scope
@@ -1037,6 +1137,8 @@ Full concept documentation: `docs/LEFTOVER_UNIT_CONTRACT.md`
 ---
 
 ## Rule 25: Receipt-Anchored Closeout (🔴 Mandatory)
+
+This rule governs evidence anchors for completion claims written into truth surfaces. It does not replace Rule 22's UAC evidence or Rule 8's final closeout formatting.
 
 Writing "completed", "accepted", or "status=passed" in a truth source is a **claim** — not a fact. A claim without a receipt anchor is indistinguishable from a placeholder.
 
@@ -1096,6 +1198,8 @@ Projects that adopt the full framework should wire this check into their pre-com
 An agent that implements work and then evaluates its own output is not an evaluator — it is a self-reviewer. Self-review is structurally biased: agents consistently and confidently assess their own work as satisfactory, even when the output is mediocre or incorrect.
 
 For any task that produces user-facing output, a final evaluation pass must be performed by an agent or executor that did **not** produce the work.
+
+This rule closes the acceptance pipeline after Rules 22, 23, and 25. It adds an independent PASS / CONDITIONAL / FAIL verdict; it does not replace the need for UAC evidence or receipt-anchored claims.
 
 ### When Independent Evaluation Is Required
 
@@ -1168,44 +1272,23 @@ When triggered, produce the audit table below against the **current task's actua
 
 ### Audit Output Format
 
-```
+```markdown
 ## Framework Policy Audit — YYYY-MM-DD
+```
 
-| # | Dimension            | Rule         | Status | Evidence                                              |
-|---|----------------------|--------------|--------|-------------------------------------------------------|
-| 1 | Git automation       | Rule 9 + EC §1  | ✅/⚠️/❌ | [EC §1 declared / not declared for this task]       |
-| 2 | CLI fan-out+fallback | Rule 15/19/21   | ✅/⚠️/❌ | [Fan-out plan with fallback declared / absent]      |
-| 3 | Long-task autonomous | Rule 20         | ✅/⚠️/❌ | [Execution Boundary declared / not declared]        |
-| 4 | E2E acceptance gate  | Rule 22/23      | ✅/⚠️/❌ | [UAC declared + toolchain verified / not done]      |
-| 5 | Context budget       | Rule 19/21      | ✅/⚠️/❌ | [Subtask sizing ≤5 files verified / not checked]    |
-| 6 | Phase notification   | Rule 8/14       | ✅/⚠️/❌ | [Status line or closeout summary at last phase boundary / missing] |
-| 7 | Parallel ceiling     | Rule 21/27      | ✅/⚠️/❌ | [Concurrent executors ≤ ceiling / count unbounded]  |
-| 8 | Non-code completion  | Rule 22/24      | ✅/⚠️/❌ | [Observable criterion declared / absent]            |
+| # | Dimension | Rule | Status | Evidence | ✅ Condition | ⚠️ Condition | ❌ Condition |
+|---|---|---|---|---|---|---|---|
+| 1 | Git automation | Rule 9 + Rule 20 | ✅/⚠️/❌ | [Git ownership declared in Execution Boundary / not declared for this task] | Execution Boundary explicitly declares who owns `git add / commit / push` for this task | Task active but no Git policy declared | Force push or destructive op proceeded without escalation |
+| 2 | CLI fan-out+fallback | Rule 15/19/21 | ✅/⚠️/❌ | [Fan-out plan with fallback declared / absent] | Fan-out plan names executor type and fallback path per Rule 19 | Task involves fan-out but fallback not declared | Both CLI and subagent failed without escalation to user |
+| 3 | Long-task autonomous | Rule 20 | ✅/⚠️/❌ | [Execution Boundary declared / not declared] | Execution Boundary block written before first action | Multi-step task running without boundary declaration | Agent interrupted user mid-task for routine non-blocker steps |
+| 4 | E2E acceptance gate | Rule 22/23 | ✅/⚠️/❌ | [UAC declared + toolchain verified / not done] | UAC declared, includes ≥1 end-to-end scenario, toolchain verified runnable | Implementation started without UAC | Task declared complete without UAC evidence |
+| 5 | Context budget | Rule 19/21 | ✅/⚠️/❌ | [Subtask sizing ≤5 files verified / not checked] | Each dispatched subtask ≤5 files; no executor reported context exhaustion | Dispatch planned but subtask file counts not verified | Subtask dispatched with >5 files or executor hit context limit mid-task |
+| 6 | Phase notification | Rule 8/14 | ✅/⚠️/❌ | [Status line or closeout summary at last phase boundary / missing] | Status line or closeout summary emitted at each phase boundary during autonomous run | Phase boundary reached; update deferred past next natural pause | No status line in last 3+ substantive replies during an active task |
+| 7 | Parallel ceiling | Rule 21/27 | ✅/⚠️/❌ | [Concurrent executors ≤ ceiling / count unbounded] | Concurrent executors at or below the declared ceiling (default 5) | Fan-out planned but concurrent count not explicitly bounded | More than ceiling executors running simultaneously |
+| 8 | Non-code completion | Rule 22/24 | ✅/⚠️/❌ | [Observable criterion declared / absent] | All doc / config deliverables have an observable completion criterion (e.g., "file exists and content matches spec") | Task has doc or config outputs with no stated completion criteria | Doc or config change declared done with no observable criterion |
 
 ⚠️ items: state the gap and the immediate corrective action inline.
 ❌ items: fix before continuing — do not proceed without resolving the gap.
-```
-
-### Status Definitions
-
-| Symbol | Meaning |
-|---|---|
-| ✅ | Rule exists AND has been activated / satisfied for this task with evidence |
-| ⚠️ | Rule exists but has not been declared / activated for this task yet |
-| ❌ | Rule does not exist, or is clearly violated in the current task state |
-
-### Dimension Evaluation Guide
-
-| # | ✅ Condition | ⚠️ Condition | ❌ Condition |
-|---|---|---|---|
-| 1 Git policy | EC §1 explicitly declares who owns `git add / commit / push` for this task | Task active but no Git policy declared | Force push or destructive op proceeded without escalation |
-| 2 CLI fallback | Fan-out plan names executor type and fallback path per Rule 19 | Task involves fan-out but fallback not declared | Both CLI and subagent failed without escalation to user |
-| 3 Autonomous mode | Execution Boundary block written before first action | Multi-step task running without boundary declaration | Agent interrupted user mid-task for routine non-blocker steps |
-| 4 E2E gate | UAC declared, includes ≥1 end-to-end scenario, toolchain verified runnable | Implementation started without UAC | Task declared complete without UAC evidence |
-| 5 Context budget | Each dispatched subtask ≤5 files; no executor reported context exhaustion | Dispatch planned but subtask file counts not verified | Subtask dispatched with >5 files or executor hit context limit mid-task |
-| 6 Phase notification | Status line or closeout summary emitted at each phase boundary during autonomous run | Phase boundary reached; update deferred past next natural pause | No status line in last 3+ substantive replies during an active task |
-| 7 Parallel ceiling | Concurrent executors at or below the declared ceiling (default 5) | Fan-out planned but concurrent count not explicitly bounded | More than ceiling executors running simultaneously |
-| 8 Non-code completion | All doc / config deliverables have an observable completion criterion (e.g., "file exists and content matches spec") | Task has doc or config outputs with no stated completion criteria | Doc or config change declared done with no observable criterion |
 
 ### Interaction with Other Rules
 
@@ -1214,4 +1297,4 @@ When triggered, produce the audit table below against the **current task's actua
 | Rule 20 (Long-Task Autonomous) | Execution Boundary declaration is the source of truth for dimensions 3 and 7 |
 | Rule 21 (Dispatch Stability) | Pre-Dispatch Readiness Gate feeds dimensions 2 and 5 |
 | Rule 22 (UAC Gate) | UAC declaration and evidence feed dimension 4 and 8 |
-| Rule 9 (Git Closeout) | Git Closeout policy feeds dimension 1; declared in Execution Contract before task starts |
+| Rule 9 (Git Closeout) | Git Closeout policy feeds dimension 1; declared in the Execution Boundary before task starts |
