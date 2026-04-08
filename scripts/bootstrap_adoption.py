@@ -410,11 +410,14 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
         "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
         "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+        "docs/EXECUTION_PROOF_WAVE_1_PLAN.md",
+        "docs/EXECUTION_PROOF_WAVE_2_PLAN.md",
         "docs/FRAMEWORK_ARCHITECTURE.md",
         "docs/LEFTOVER_UNIT_CONTRACT.md",
         "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
         "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
         "docs/SKILL_MECHANISM_V1_DRAFT.md",
+        "docs/STRICT_ADOPTION_AND_VERIFICATION.md",
         "docs/runbooks/multi-model-discussion-loop.md",
         "docs/RUNTIME_SURFACE_PROTECTION.md",
         "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
@@ -422,16 +425,26 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "docs/runbooks/state-reconciliation.md",
         "scripts/active_docs_audit.py",
         "scripts/closeout_truth_audit.py",
+        "scripts/developer_toolchain_probe.py",
+        "scripts/developer_toolchain_runner.py",
         "scripts/discussion_pipeline.py",
+        "scripts/evaluation_pipeline.py",
         "scripts/git_audit_pipeline.py",
         "scripts/preference_drift_audit.py",
+        "scripts/review_dispatch.py",
         "scripts/state_sync_audit.py",
+        "scripts/strict_adoption_audit.py",
         "scripts/state_sync_pipeline.py",
         "scripts/skill_evolution_pipeline.py",
         "scripts/validate-template.sh",
         "scripts/validate_template.py",
+        "templates/adoption_verification_packet.template.md",
+        "templates/developer_toolchain_probe_receipt.template.md",
+        "templates/developer_toolchain_run_receipt.template.md",
         "templates/discussion_packet.template.md",
         "templates/drift_reconciliation_packet.template.md",
+        "templates/evaluation_report.template.md",
+        "templates/evaluation_request.template.md",
         "templates/execution_progress_receipt.template.md",
         "templates/git_audit_handoff_packet.template.md",
         "templates/git_audit_receipt.template.md",
@@ -439,7 +452,9 @@ PROFILE_COPY_PATHS: dict[str, tuple[str, ...]] = {
         "templates/doc_first_execution_guidelines.template.md",
         "templates/execution_contract.template.md",
         "templates/failure_packet.template.md",
+        "templates/local_executor_registry.template.json",
         "templates/project-context.template.md",
+        "templates/review_dispatch_packet.template.md",
         "templates/root_cause_note.template.md",
         "templates/roadmap.template.md",
         "templates/session_state.template.md",
@@ -559,6 +574,10 @@ RENDERED_FILES: dict[str, str] = {
     "ROADMAP.md": "templates/roadmap.template.md",
 }
 
+STANDARD_PLUS_RENDERED_FILES: dict[str, str] = {
+    ".github/local_executor_registry.json": "templates/local_executor_registry.template.json",
+}
+
 CAPABILITY_RENDERED_FILES: dict[str, dict[str, str]] = {
     "runtime-guards": {
         ".github/runtime_surface_registry.py": "templates/runtime_surface_registry.template.py",
@@ -587,6 +606,15 @@ def _iter_capability_paths(capabilities: tuple[str, ...]) -> tuple[str, ...]:
 
 def _dedupe_paths(paths: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(paths))
+
+
+def _iter_rendered_files(profile: str, capabilities: tuple[str, ...]) -> dict[str, str]:
+    rendered = dict(RENDERED_FILES)
+    if profile in {"standard", "full"}:
+        rendered.update(STANDARD_PLUS_RENDERED_FILES)
+    for capability in capabilities:
+        rendered.update(CAPABILITY_RENDERED_FILES.get(capability, {}))
+    return rendered
 
 
 def detect_project_type(target_dir: Path) -> str:
@@ -667,7 +695,7 @@ def _write_manifest(
     dry_run: bool,
 ) -> bool:
     payload = {
-        "schema_version": 2,
+        "schema_version": 4,
         "project_name": project_name,
         "profile": profile,
         "project_type": project_type,
@@ -687,6 +715,64 @@ def _write_manifest(
             "allow_surface_qualifiers": True,
         },
     }
+
+    if profile in {"standard", "full"}:
+        payload["strict_adoption_contract"] = {
+            "version": "v1",
+            "status_values": [
+                "fully-adopted",
+                "partially-adopted",
+                "design-only-upgrade-path-kept",
+            ],
+            "required_mechanism_ids": [
+                "project-context-adapter",
+                "execution-contract-surface",
+                "developer-toolchain-contract",
+                "developer-toolchain-probe",
+                "developer-toolchain-runner",
+                "closeout-truth-audit",
+                "state-sync-stack",
+                "git-audit-pipeline",
+                "discussion-packet-workflow",
+                "independent-evaluation-pipeline",
+                "local-executor-review-loop",
+            ],
+            "verification_packet_path": "tmp/adoption_verification/adoption_verification_packet.md",
+            "require_independent_review_for": ["fully-adopted"],
+        }
+        payload["developer_toolchain_probe_contract"] = {
+            "version": "v1",
+            "receipt_output_dir": "tmp/toolchain_probe_receipts",
+            "allowed_surface_kinds": [
+                "Diagnostics",
+                "Run",
+                "Health or smoke",
+                "Repro path",
+                "Build",
+                "Lint",
+                "Format",
+                "Logs or inspection",
+                "Debug",
+            ],
+            "record_freshness": True,
+        }
+        payload["developer_toolchain_runner_contract"] = {
+            "version": "v1",
+            "receipt_output_dir": "tmp/toolchain_run_receipts",
+            "allow_known_broken_override": True,
+        }
+        payload["independent_evaluation_contract"] = {
+            "version": "v1",
+            "request_template": "templates/evaluation_request.template.md",
+            "report_template": "templates/evaluation_report.template.md",
+            "allowed_verdicts": ["PASS", "CONDITIONAL", "FAIL"],
+        }
+        payload["executor_review_contract"] = {
+            "version": "v1",
+            "registry_path": ".github/local_executor_registry.json",
+            "packet_output_dir": "tmp/executor_reviews",
+            "require_raw_outputs": True,
+        }
     return _write_text(
         destination,
         json.dumps(payload, indent=2) + "\n",
@@ -743,6 +829,7 @@ def bootstrap_repo(
     planned_paths = _dedupe_paths(
         (*_iter_profile_paths(profile), *_iter_capability_paths(selected_capabilities))
     )
+    rendered_files = _iter_rendered_files(profile, selected_capabilities)
 
     for relative_path in planned_paths:
         source = REPO_ROOT / relative_path
@@ -755,7 +842,7 @@ def bootstrap_repo(
             if destination.exists():
                 conflicts.append(destination)
 
-    for destination_rel, source_rel in RENDERED_FILES.items():
+    for destination_rel, source_rel in rendered_files.items():
         source = REPO_ROOT / source_rel
         destination = target_dir / destination_rel
         contents = _render_template(source, project_name, chosen_project_type)
@@ -766,19 +853,6 @@ def bootstrap_repo(
             skipped.append(destination)
             if destination.exists():
                 conflicts.append(destination)
-
-    for capability in selected_capabilities:
-        for destination_rel, source_rel in CAPABILITY_RENDERED_FILES.get(capability, {}).items():
-            source = REPO_ROOT / source_rel
-            destination = target_dir / destination_rel
-            contents = _render_template(source, project_name, chosen_project_type)
-            rendered = _write_text(destination, contents, force=force, dry_run=dry_run)
-            if rendered:
-                created.append(destination)
-            else:
-                skipped.append(destination)
-                if destination.exists():
-                    conflicts.append(destination)
 
     manifest_destination = target_dir / MANIFEST_PATH
     manifest_written = _write_manifest(
@@ -791,12 +865,7 @@ def bootstrap_repo(
             dict.fromkeys(
                 [
                     *planned_paths,
-                    *RENDERED_FILES.keys(),
-                    *[
-                        destination_rel
-                        for capability in selected_capabilities
-                        for destination_rel in CAPABILITY_RENDERED_FILES.get(capability, {}).keys()
-                    ],
+                    *rendered_files.keys(),
                     MANIFEST_PATH,
                 ]
             )

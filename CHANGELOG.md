@@ -15,6 +15,8 @@ The format is based on Keep a Changelog and this repository uses Semantic Versio
 - Active-doc portability and stale-assertion auditing via `scripts/active_docs_audit.py`, including validator and bootstrap integration.
 - SKILL execution-layer design at `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, plus shipped invocation-receipt and lineage-aware evolution artifacts.
 - `scripts/skill_evolution_pipeline.py` for generating invocation receipts and lineage-aware candidate packets from runtime evidence.
+- `docs/EXECUTION_PROOF_WAVE_2_PLAN.md`, `scripts/developer_toolchain_runner.py`, `scripts/evaluation_pipeline.py`, and `scripts/review_dispatch.py` so adopters can run the next execution-proof surfaces instead of inheriting policy-only guidance.
+- Wave 2 receipt and packet templates for toolchain runs, evaluation requests and reports, and local executor review dispatch.
 
 ### Changed
 - Root project metadata is now self-hosted: the repository ships a real project adapter and roadmap instead of template placeholders.
@@ -29,9 +31,11 @@ The format is based on Keep a Changelog and this repository uses Semantic Versio
 - `scripts/validate_template.py` now parses Developer Toolchain sections structurally and emits reminder-level advisories for missing core surfaces, invalid statuses or scopes, and weak live-runtime repro declarations.
 - Bootstrapped adopters now receive a manifest-declared Developer Toolchain `required-core` contract, and the copied validator hard-fails missing or malformed core Developer Toolchain fields against that manifest.
 - Developer Toolchain surface labels now support runtime qualifiers such as `Run (frontend)` or `Run (backend)` so multi-runtime repositories can stay explicit without collapsing into one fake command.
-- The repository now ships `examples/full_stack_project/` as a richer reference for multi-runtime Developer Toolchain structure and repro-path modeling.
+- The repository now ships `examples/full_stack_project/` as a minimal-profile reference for multi-runtime Developer Toolchain structure and repro-path modeling.
 - Bootstrap, validator, and template docs now ship a governance-safe SKILL execution plane with invocation receipts, bounded candidate triggers, and FIX or DERIVED or CAPTURED lineage.
 - Focused tests now include an adopter round-trip proving a standard-bootstrapped repository can run the copied execution helper and generate receipt-to-candidate artifacts locally.
+- Standard and full bootstraps now ship manifest schema 4 with explicit contracts for the toolchain runner, independent evaluation, and local executor review loop, plus a rendered `.github/local_executor_registry.json`.
+- `scripts/validate_template.py` and `scripts/strict_adoption_audit.py` now enforce and understand the new Wave 2 execution-proof surfaces, and the regression suite covers their round trips directly.
 
 ### Migration Notes
 - Repositories adopting this update should re-render or manually update `templates/execution_contract.template.md`, `templates/session_state.template.md`, and any local Rule 8 customization to match the new status-line versus closeout-summary model.

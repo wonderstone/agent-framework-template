@@ -1,14 +1,18 @@
 {
-  "schema_version": 2,
+  "schema_version": 4,
   "project_name": "Full Stack Reference Project",
-  "profile": "full",
+  "profile": "minimal",
   "project_type": "full-stack",
   "capabilities": [],
   "expected_files": [
     ".github/agent-framework-manifest.json",
+    ".github/copilot-instructions.md",
     ".github/instructions/project-context.instructions.md",
+    "session_state.md",
+    "ROADMAP.md",
     "README.md",
     "docs/INDEX.md",
+    "docs/archive/.gitkeep",
     "docs/runbooks/full-stack-workflow.md",
     "frontend/src/.gitkeep",
     "backend/app/.gitkeep",
@@ -25,10 +29,10 @@
       "Diagnostics",
       "Run",
       "Health or smoke",
-      "Repro path",
-      "Build"
+      "Repro path"
     ],
     "recommended_surface_kinds": [
+      "Build",
       "Lint"
     ],
     "allow_surface_qualifiers": true

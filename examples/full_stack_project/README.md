@@ -1,6 +1,6 @@
 # Full Stack Reference Project
 
-This example is a richer reference repo for repositories that need a multi-runtime `Developer Toolchain` shape.
+This example is a minimal-profile reference repo for repositories that need a multi-runtime `Developer Toolchain` shape without claiming full-profile framework adoption.
 
 It is intentionally lightweight:
 

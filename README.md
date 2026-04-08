@@ -37,6 +37,7 @@ docs/
   FRAMEWORK_ARCHITECTURE.md        ← how the layer system works
   ADOPTION_GUIDE.md                ← step-by-step setup for a new project
   COMPATIBILITY.md                 ← verified surfaces, intended integrations, known limits
+  STRICT_ADOPTION_AND_VERIFICATION.md ← strict adoption baseline, enforcement matrix, and local CLI verification flow
   SKILL_HARVEST_LOOP_V1_DRAFT.md   ← formal v1 design for post-task SKILL harvest and promotion governance
   SKILL_EXECUTION_LAYER_V1_DRAFT.md ← formal v1 design for invocation receipts, bounded candidate triggers, and typed evolution lineage
   SKILL_MECHANISM_V1_DRAFT.md      ← formal v1 design for the framework-native SKILL contract
@@ -91,7 +92,7 @@ examples/
     04_receipt_anchored_reviewer.md ← reviewer-style starter skill example
     05_staged_handoff_pipeline.md ← pipeline-style starter skill example
     06_bounded_artifact_generator.md ← bounded generator starter skill example
-  full_stack_project/              ← richer reference repo for multi-runtime Developer Toolchain shape
+  full_stack_project/              ← minimal-profile full-stack reference repo for multi-runtime Developer Toolchain shape
   reviewer_roles/
     01_goal_acceptance_owner.md    ← first-batch strategy role
     02_plan_checkpoint_owner.md    ← first-batch strategy role
@@ -130,7 +131,7 @@ scripts/
 
 ### Copy-Paste Adoption Prompt
 
-If you want another agent to absorb this framework into its own project in one pass, paste the prompt below and replace the placeholders first.
+If you want another agent to absorb this framework into its own project in one pass, paste the prompt below and replace the placeholders first. This version is intentionally strict: it is meant to stop downstream repositories from copying only the wording while skipping the mechanisms that make the framework real.
 
 ```text
 You are working in my application repository at <TARGET_REPO_PATH>.
@@ -142,17 +143,32 @@ Do not assume the template already exists on the same machine.
 If needed, first clone or otherwise fetch the template repository so you can read its real files before making changes.
 
 Goal:
-- absorb the high-value mechanisms from the template repo into this application repo
+- absorb the framework in strict mode into this application repo
 - use project name <PROJECT_NAME>
 - use profile <minimal|standard|full>
 - use project type <backend-api|web-frontend|cli-tool|library|full-stack>
 - add optional capabilities only if requested: <closeout-audit runtime-guards git-hooks>
 - if long-term skill accumulation matters in this repo, keep the SKILL and harvest-governance surfaces rather than dropping them during setup
-- do not mechanically copy every template surface; adapt them to the current repository's real runtime, validation, and risk boundaries
+- do not mechanically copy every template surface, but also do not silently weaken the mechanism stack and then blame the template for the resulting gap
+
+Strict baseline to keep unless honestly inapplicable:
+- truthful project-context adapter
+- execution contract for long-running work
+- checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
+- receipt-anchored closeout enforcement
+- user-acceptance plus validation-toolchain honesty
+- independent evaluation path for non-trivial or user-facing work
+- resumable packet and handoff flow when multi-executor work is possible
+- discussion-packet workflow when design ambiguity exists
+
+Adoption status rule:
+- only report `fully adopted` if all applicable strict-baseline mechanisms are present and locally verified
+- if one baseline mechanism is downgraded or skipped, report `partially adopted` or `design-only upgrade path kept`
+- do not overclaim policy-guided surfaces as if they were mechanically enforced
 
 Required steps:
 1. Fetch or clone the template repository from the public source-of-truth URL if you do not already have a readable copy.
-2. Inspect the current application repository first and determine which template mechanisms are actually appropriate for this project.
+2. Inspect the current application repository first and map every strict-baseline mechanism to a concrete target-repo file, script, runbook, or local equivalent.
 3. If bootstrap is the right path, run the template bootstrap script from your fetched template copy targeting <TARGET_REPO_PATH>.
 4. Keep the generated framework files in their template paths unless you have a project-specific reason to change them.
 5. Fill in the generated `.github/instructions/project-context.instructions.md` placeholders:
@@ -166,6 +182,8 @@ Required steps:
    - runtime or failure traceability surfaces
    - resumable receipt or handoff surfaces for longer reviews or audits
    - closeout truthfulness surfaces
+  - discussion-packet workflow for open design choice
+  - independent evaluation path for non-trivial or user-facing work
 7. If this repository should improve with repeated use, keep these SKILL and harvest-governance surfaces together:
    - `docs/SKILL_MECHANISM_V1_DRAFT.md`
    - `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`
@@ -188,10 +206,18 @@ Required steps:
   - `python3 scripts/validate_template.py`
   - `python3 scripts/active_docs_audit.py` — checks for nonportable paths and stale framework assertions in shipped docs
   - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
-13. Report:
+13. Run independent local CLI verification after the implementation pass:
+  - use the same verification question against all locally available CLI executors, such as Claude, Codex, Gemini, and Copilot
+  - keep each CLI pass read-only
+  - require each CLI to answer whether the strict baseline mechanisms were truly kept, whether anything was silently downgraded, and whether any adoption claim overstates enforcement
+  - if the repo keeps the discussion workflow, record these reviews in one durable discussion or verification packet
+  - resolve critical or major gaps, then re-run target-repo validation
+14. Report:
   - what files were added or changed
   - what placeholders still need manual project-specific values
   - what validation was run and whether it passed
+  - which local CLI executors were used for independent verification and what unresolved gaps remained
+  - whether the repo is `fully adopted`, `partially adopted`, or `design-only upgrade path kept`
   - whether the repo kept the SKILL and harvest surfaces, and if so which first skill was initialized
   - whether the repo also kept the execution-layer surfaces for invocation receipts and typed evolution lineage
   - which template features were intentionally kept, downgraded, or skipped based on project fit
@@ -204,7 +230,10 @@ Constraints:
 - do not claim the repo will automatically self-improve unless you also wire the SKILL and harvest-governance surfaces honestly
 - do not claim that runtime skill usage rewrites canonical truth automatically; runtime receipts and triggers may propose candidates, but canonical mutation still needs the declared promotion path
 - do not invent fake runtime paths, fake E2E, or fake enforcement just to match the template more closely
+- do not let the main-thread agent self-certify strict adoption quality without independent local CLI review
 ```
+
+For the strict baseline, enforcement-maturity matrix, and the local CLI verification flow in durable doc form, see [`docs/STRICT_ADOPTION_AND_VERIFICATION.md`](docs/STRICT_ADOPTION_AND_VERIFICATION.md).
 
 ### Fastest setup
 
@@ -306,7 +335,7 @@ If you want one concrete path instead of reading the full framework first:
 2. Open the generated `.github/instructions/project-context.instructions.md` and replace the default commands plus Developer Toolchain starter values
 3. Run `python3 scripts/validate_template.py`
 4. Review [`examples/demo_project/`](examples/demo_project/) for a tiny adopted repository with a committed packet / receipt / handoff cycle
-5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path
+5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path and you want a minimal-profile reference rather than a fully bootstrapped adopter
 
 ---
 

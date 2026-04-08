@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "executors": [
+    {
+      "name": "claude",
+      "probe_command": "claude auth status --text >/dev/null",
+      "review_command": "claude -p --permission-mode plan --output-format text --add-dir \"{repo_root}\" < \"{prompt_file}\""
+    },
+    {
+      "name": "codex",
+      "probe_command": "codex --help >/dev/null",
+      "review_command": "codex exec -C \"{repo_root}\" -s read-only - < \"{prompt_file}\""
+    }
+  ]
+}

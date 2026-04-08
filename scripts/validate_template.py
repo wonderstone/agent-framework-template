@@ -46,12 +46,15 @@ REQUIRED_FILES = (
     "docs/DEVELOPER_TOOLCHAIN_DESIGN.md",
     "docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md",
     "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+    "docs/EXECUTION_PROOF_WAVE_1_PLAN.md",
+    "docs/EXECUTION_PROOF_WAVE_2_PLAN.md",
     "docs/FRAMEWORK_ARCHITECTURE.md",
     "docs/INDEX.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ROLE_STRATEGY_EXAMPLES.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
+    "docs/STRICT_ADOPTION_AND_VERIFICATION.md",
     "docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md",
     "docs/SKILL_HARVEST_LOOP_V1_DRAFT.md",
     "docs/SKILL_MECHANISM_V1_DRAFT.md",
@@ -76,23 +79,35 @@ REQUIRED_FILES = (
     "scripts/active_docs_audit.py",
     "scripts/bootstrap_adoption.py",
     "scripts/closeout_truth_audit.py",
+    "scripts/developer_toolchain_probe.py",
+    "scripts/developer_toolchain_runner.py",
     "scripts/discussion_pipeline.py",
+    "scripts/evaluation_pipeline.py",
     "scripts/git_audit_pipeline.py",
     "scripts/install_git_hooks.sh",
     "scripts/preference_drift_audit.py",
+    "scripts/review_dispatch.py",
     "scripts/state_sync_audit.py",
     "scripts/state_sync_pipeline.py",
+    "scripts/strict_adoption_audit.py",
     "scripts/runtime_surface_guardrails.py",
     "scripts/skill_evolution_pipeline.py",
     "scripts/validate-template.sh",
     "scripts/validate_template.py",
+    "templates/adoption_verification_packet.template.md",
+    "templates/developer_toolchain_probe_receipt.template.md",
+    "templates/developer_toolchain_run_receipt.template.md",
     "templates/discussion_packet.template.md",
     "templates/drift_reconciliation_packet.template.md",
     "templates/doc_first_execution_guidelines.template.md",
+    "templates/evaluation_report.template.md",
+    "templates/evaluation_request.template.md",
     "templates/execution_contract.template.md",
     "templates/execution_progress_receipt.template.md",
     "templates/failure_packet.template.md",
+    "templates/local_executor_registry.template.json",
     "templates/project-context.template.md",
+    "templates/review_dispatch_packet.template.md",
     "templates/reviewer_role_profile.template.md",
     "templates/root_cause_note.template.md",
     "templates/roadmap.template.md",
@@ -113,13 +128,18 @@ REQUIRED_FILES = (
     "tests/test_active_docs_audit.py",
     "tests/test_closeout_truth_audit.py",
     "tests/test_bootstrap_adoption.py",
+    "tests/test_developer_toolchain_runner.py",
+    "tests/test_developer_toolchain_probe.py",
     "tests/test_discussion_pipeline.py",
+    "tests/test_evaluation_pipeline.py",
     "tests/test_git_audit_pipeline.py",
     "tests/test_hook_scaffolding.py",
     "tests/test_state_sync_audit.py",
     "tests/test_state_sync_pipeline.py",
     "tests/test_runtime_surface_guardrails.py",
+    "tests/test_review_dispatch.py",
     "tests/test_skill_evolution_pipeline.py",
+    "tests/test_strict_adoption_audit.py",
     "tests/test_validate_template.py",
 )
 
@@ -462,6 +482,36 @@ SKILL_GENERATOR_TEMPLATE_REFERENCES = (
 )
 
 ADOPTER_MANIFEST_PATH = ".github/agent-framework-manifest.json"
+STRICT_ADOPTION_CONTRACT_REQUIRED_KEYS = {
+    "version",
+    "status_values",
+    "required_mechanism_ids",
+    "verification_packet_path",
+    "require_independent_review_for",
+}
+DEVELOPER_TOOLCHAIN_PROBE_CONTRACT_REQUIRED_KEYS = {
+    "version",
+    "receipt_output_dir",
+    "allowed_surface_kinds",
+    "record_freshness",
+}
+DEVELOPER_TOOLCHAIN_RUNNER_CONTRACT_REQUIRED_KEYS = {
+    "version",
+    "receipt_output_dir",
+    "allow_known_broken_override",
+}
+INDEPENDENT_EVALUATION_CONTRACT_REQUIRED_KEYS = {
+    "version",
+    "request_template",
+    "report_template",
+    "allowed_verdicts",
+}
+EXECUTOR_REVIEW_CONTRACT_REQUIRED_KEYS = {
+    "version",
+    "registry_path",
+    "packet_output_dir",
+    "require_raw_outputs",
+}
 
 
 @dataclass(frozen=True)
@@ -532,7 +582,22 @@ DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT = {
 
 STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
     "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
+    "docs/EXECUTION_PROOF_WAVE_1_PLAN.md",
+    "docs/EXECUTION_PROOF_WAVE_2_PLAN.md",
+    "docs/STRICT_ADOPTION_AND_VERIFICATION.md",
     "scripts/closeout_truth_audit.py",
+    "scripts/developer_toolchain_probe.py",
+    "scripts/developer_toolchain_runner.py",
+    "scripts/evaluation_pipeline.py",
+    "scripts/review_dispatch.py",
+    "scripts/strict_adoption_audit.py",
+    "templates/adoption_verification_packet.template.md",
+    "templates/developer_toolchain_probe_receipt.template.md",
+    "templates/developer_toolchain_run_receipt.template.md",
+    "templates/evaluation_report.template.md",
+    "templates/evaluation_request.template.md",
+    "templates/local_executor_registry.template.json",
+    "templates/review_dispatch_packet.template.md",
     "examples/skills/01_discussion_packet_workflow.md",
     "examples/skills/02_no_placeholder_runtime_guardrail.md",
     "examples/skills/03_developer_toolchain_wrapper.md",
@@ -707,6 +772,25 @@ def _clean_table_cell(value: str) -> str:
     return value.strip().strip("`")
 
 
+def _split_markdown_table_row(line: str) -> list[str]:
+    cells: list[str] = []
+    current: list[str] = []
+    in_backticks = False
+    content = line.strip().strip("|")
+    for char in content:
+        if char == "`":
+            in_backticks = not in_backticks
+            current.append(char)
+            continue
+        if char == "|" and not in_backticks:
+            cells.append("".join(current).strip())
+            current = []
+            continue
+        current.append(char)
+    cells.append("".join(current).strip())
+    return cells
+
+
 def _canonical_surface_kind(value: str) -> str:
     return re.sub(r"\s*\([^)]*\)\s*$", "", value.strip())
 
@@ -739,7 +823,9 @@ def _parse_developer_toolchain_entries(text: str) -> tuple[str | None, str | Non
             break
 
     for line in table_lines[2:]:
-        parts = [part.strip() for part in line.strip().strip("|").split("|")]
+        parts = _split_markdown_table_row(line)
+        if len(parts) > 6:
+            parts = [parts[0], " | ".join(parts[1 : len(parts) - 4]), *parts[-4:]]
         if len(parts) != 6:
             continue
         entries.append(
@@ -866,11 +952,193 @@ def _validate_bootstrap(root: Path) -> list[ValidationIssue]:
 def _validate_adopted_repo(root: Path) -> list[ValidationIssue]:
     manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
     expected_files = manifest.get("expected_files", [])
+    profile = manifest.get("profile")
 
     issues: list[ValidationIssue] = []
     for relative in sorted(expected_files):
         if not (root / relative).exists():
             issues.append(ValidationIssue("missing-adopted-asset", relative))
+
+    if manifest.get("schema_version") != 4:
+        issues.append(
+            ValidationIssue(
+                "invalid-adopter-manifest-schema-version",
+                f"{ADOPTER_MANIFEST_PATH}: expected schema_version 4",
+            )
+        )
+
+    if profile in {"standard", "full"}:
+        strict_contract = manifest.get("strict_adoption_contract")
+        if not isinstance(strict_contract, dict):
+            issues.append(
+                ValidationIssue(
+                    "missing-strict-adoption-contract",
+                    f"{ADOPTER_MANIFEST_PATH}: missing strict_adoption_contract",
+                )
+            )
+        else:
+            for key in sorted(STRICT_ADOPTION_CONTRACT_REQUIRED_KEYS - set(strict_contract)):
+                issues.append(
+                    ValidationIssue(
+                        "missing-strict-adoption-contract-key",
+                        f"{ADOPTER_MANIFEST_PATH}: strict_adoption_contract is missing key '{key}'",
+                    )
+                )
+
+        probe_contract = manifest.get("developer_toolchain_probe_contract")
+        if not isinstance(probe_contract, dict):
+            issues.append(
+                ValidationIssue(
+                    "missing-developer-toolchain-probe-contract",
+                    f"{ADOPTER_MANIFEST_PATH}: missing developer_toolchain_probe_contract",
+                )
+            )
+        else:
+            for key in sorted(DEVELOPER_TOOLCHAIN_PROBE_CONTRACT_REQUIRED_KEYS - set(probe_contract)):
+                issues.append(
+                    ValidationIssue(
+                        "missing-developer-toolchain-probe-contract-key",
+                        f"{ADOPTER_MANIFEST_PATH}: developer_toolchain_probe_contract is missing key '{key}'",
+                    )
+                )
+
+        runner_contract = manifest.get("developer_toolchain_runner_contract")
+        if not isinstance(runner_contract, dict):
+            issues.append(
+                ValidationIssue(
+                    "missing-developer-toolchain-runner-contract",
+                    f"{ADOPTER_MANIFEST_PATH}: missing developer_toolchain_runner_contract",
+                )
+            )
+        else:
+            for key in sorted(DEVELOPER_TOOLCHAIN_RUNNER_CONTRACT_REQUIRED_KEYS - set(runner_contract)):
+                issues.append(
+                    ValidationIssue(
+                        "missing-developer-toolchain-runner-contract-key",
+                        f"{ADOPTER_MANIFEST_PATH}: developer_toolchain_runner_contract is missing key '{key}'",
+                    )
+                )
+
+        evaluation_contract = manifest.get("independent_evaluation_contract")
+        if not isinstance(evaluation_contract, dict):
+            issues.append(
+                ValidationIssue(
+                    "missing-independent-evaluation-contract",
+                    f"{ADOPTER_MANIFEST_PATH}: missing independent_evaluation_contract",
+                )
+            )
+        else:
+            for key in sorted(INDEPENDENT_EVALUATION_CONTRACT_REQUIRED_KEYS - set(evaluation_contract)):
+                issues.append(
+                    ValidationIssue(
+                        "missing-independent-evaluation-contract-key",
+                        f"{ADOPTER_MANIFEST_PATH}: independent_evaluation_contract is missing key '{key}'",
+                    )
+                )
+
+        executor_review_contract = manifest.get("executor_review_contract")
+        if not isinstance(executor_review_contract, dict):
+            issues.append(
+                ValidationIssue(
+                    "missing-executor-review-contract",
+                    f"{ADOPTER_MANIFEST_PATH}: missing executor_review_contract",
+                )
+            )
+        else:
+            for key in sorted(EXECUTOR_REVIEW_CONTRACT_REQUIRED_KEYS - set(executor_review_contract)):
+                issues.append(
+                    ValidationIssue(
+                        "missing-executor-review-contract-key",
+                        f"{ADOPTER_MANIFEST_PATH}: executor_review_contract is missing key '{key}'",
+                    )
+                )
+
+    return issues
+
+
+def _validate_example_adopter_manifests(root: Path) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    example_manifest = root / "examples/full_stack_project/.github/agent-framework-manifest.json"
+    if not example_manifest.is_file():
+        return issues
+
+    manifest = json.loads(_read(example_manifest))
+    if manifest.get("schema_version") != 4:
+        issues.append(
+            ValidationIssue(
+                "invalid-example-manifest-schema-version",
+                "examples/full_stack_project/.github/agent-framework-manifest.json: expected schema_version 4",
+            )
+        )
+
+    if manifest.get("developer_toolchain_contract") != DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT:
+        issues.append(
+            ValidationIssue(
+                "example-developer-toolchain-contract-drift",
+                "examples/full_stack_project/.github/agent-framework-manifest.json: developer_toolchain_contract diverges from the shipped bootstrap default",
+            )
+        )
+
+    strict_contract = manifest.get("strict_adoption_contract")
+    if isinstance(strict_contract, dict):
+        for key in sorted(STRICT_ADOPTION_CONTRACT_REQUIRED_KEYS - set(strict_contract)):
+            issues.append(
+                ValidationIssue(
+                    "missing-example-strict-adoption-contract-key",
+                    f"examples/full_stack_project/.github/agent-framework-manifest.json: strict_adoption_contract is missing key '{key}'",
+                )
+            )
+
+    probe_contract = manifest.get("developer_toolchain_probe_contract")
+    if isinstance(probe_contract, dict):
+        for key in sorted(DEVELOPER_TOOLCHAIN_PROBE_CONTRACT_REQUIRED_KEYS - set(probe_contract)):
+            issues.append(
+                ValidationIssue(
+                    "missing-example-developer-toolchain-probe-contract-key",
+                    f"examples/full_stack_project/.github/agent-framework-manifest.json: developer_toolchain_probe_contract is missing key '{key}'",
+                )
+            )
+
+    runner_contract = manifest.get("developer_toolchain_runner_contract")
+    if isinstance(runner_contract, dict):
+        for key in sorted(DEVELOPER_TOOLCHAIN_RUNNER_CONTRACT_REQUIRED_KEYS - set(runner_contract)):
+            issues.append(
+                ValidationIssue(
+                    "missing-example-developer-toolchain-runner-contract-key",
+                    f"examples/full_stack_project/.github/agent-framework-manifest.json: developer_toolchain_runner_contract is missing key '{key}'",
+                )
+            )
+
+    evaluation_contract = manifest.get("independent_evaluation_contract")
+    if isinstance(evaluation_contract, dict):
+        for key in sorted(INDEPENDENT_EVALUATION_CONTRACT_REQUIRED_KEYS - set(evaluation_contract)):
+            issues.append(
+                ValidationIssue(
+                    "missing-example-independent-evaluation-contract-key",
+                    f"examples/full_stack_project/.github/agent-framework-manifest.json: independent_evaluation_contract is missing key '{key}'",
+                )
+            )
+
+    executor_review_contract = manifest.get("executor_review_contract")
+    if isinstance(executor_review_contract, dict):
+        for key in sorted(EXECUTOR_REVIEW_CONTRACT_REQUIRED_KEYS - set(executor_review_contract)):
+            issues.append(
+                ValidationIssue(
+                    "missing-example-executor-review-contract-key",
+                    f"examples/full_stack_project/.github/agent-framework-manifest.json: executor_review_contract is missing key '{key}'",
+                )
+            )
+
+        registry_path = executor_review_contract.get("registry_path")
+        if isinstance(registry_path, str) and registry_path.strip():
+            example_registry = root / "examples/full_stack_project" / registry_path
+            if not example_registry.is_file():
+                issues.append(
+                    ValidationIssue(
+                        "missing-example-executor-review-registry",
+                        f"examples/full_stack_project/.github/agent-framework-manifest.json: executor_review_contract registry_path '{registry_path}' does not exist",
+                    )
+                )
 
     return issues
 
@@ -1148,7 +1416,6 @@ def _validate_skill_runtime_claims(relative: str, text: str) -> list[ValidationI
                 f"{relative}: runtime-capability claims in entry instructions need a matching degradation path",
             )
         )
-
     return issues
 
 
@@ -1902,6 +2169,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_closeout_rule_guards,
         _validate_preference_drift,
         _validate_active_docs,
+        _validate_example_adopter_manifests,
         _validate_receipt_closeout_references,
         _validate_skill_contract_files,
         _validate_skill_execution_surfaces,

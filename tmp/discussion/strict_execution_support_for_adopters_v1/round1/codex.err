@@ -1,0 +1,597 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d6abb-6035-7771-b4eb-535b32564eac
+--------
+user
+You are reviewing the `agent-framework-template` repository in read-only mode.
+
+Question:
+How should this template strengthen its execution-layer support so that downstream project agents have enough concrete tools, scripts, artifacts, and verification surfaces to execute the framework's design honestly? The goal is to reduce or eliminate situations where a downstream project agent can reasonably say: "the template defined governance or design intent, but did not provide enough execution-layer tooling to carry it out."
+
+Focus:
+1. Be especially concrete about execution support for downstream project agents, not only framework philosophy.
+2. Assume the repository already has strong design/governance surfaces for anti-drift, receipts, sync audit, discussion packets, git audit, SKILL governance, and strict adoption guidance.
+3. Identify which missing execution-layer tools, wrappers, validators, review loops, schedulers, or artifact-generation surfaces should be added next.
+4. Pay extra attention to how downstream repositories can prove they adopted the framework honestly and can execute it with enough tool support.
+5. Prefer proposals that make downstream failure states auditable instead of relying on agent goodwill.
+
+Repository surfaces to inspect:
+- README.md
+- docs/ADOPTION_GUIDE.md
+- docs/STRICT_ADOPTION_AND_VERIFICATION.md
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- docs/SKILL_HARVEST_LOOP_V1_DRAFT.md
+- docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md
+- docs/DEVELOPER_TOOLCHAIN_DESIGN.md
+- docs/runbooks/multi-model-discussion-loop.md
+- docs/runbooks/resumable-git-audit-pipeline.md
+- scripts/validate_template.py
+- scripts/state_sync_audit.py
+- scripts/closeout_truth_audit.py
+- scripts/discussion_pipeline.py
+- scripts/git_audit_pipeline.py
+- scripts/skill_evolution_pipeline.py
+
+Deliverable requirements:
+1. Give an overall verdict on the current gap between design layer and execution layer.
+2. List the top 5-8 concrete additions or upgrades that would most reduce downstream execution ambiguity.
+3. For each proposal, explain:
+   - what problem it solves
+   - why current template surfaces are insufficient
+   - what artifact/script/tool/validator/runbook should be added or upgraded
+   - whether it should be mandatory, optional, or profile-gated for adopters
+4. Explicitly address how to make downstream project agents less able to blame the template for missing execution support.
+5. Flag any risk where adding more automation would dangerously bypass the template's current governance boundary.
+
+Output format:
+- Start with `Verdict:` on one line.
+- Then provide a Markdown table with columns:
+  `Priority | Proposal | Solves | Why current support is insufficient | Suggested surface | Adoption tier | Governance risk`
+- End with `Recommended next move:` and one concise paragraph.
+
+Important constraints:
+- Read-only review only.
+- Do not suggest vague ideas like "improve docs" without naming an execution surface.
+- Do not assume the template should become a full always-on runtime like Hermes Agent unless you justify that tradeoff.
+- Treat truthful anti-drift and promotion governance as assets to preserve, not friction to remove.
+mcp startup: no servers
+codex
+I’m reviewing the specified framework and focusing on where execution support stops short of letting downstream agents carry the governance through concretely. First step is to inspect the named docs and scripts, then I’ll map the current design surfaces against missing execution-layer tooling and auditability.
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/ADOPTION_GUIDE.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,220p' README.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Agent Framework Template
+
+A minimal, reusable GitHub Copilot agent framework. Drop it into any project to give your AI coding assistant structured decision rules, state management, and a clean operating protocol.
+
+---
+
+## Why This Exists
+
+Most agent setups fail in one of three ways:
+
+- the rules live only in chat history
+- the project-specific truth sources are never made explicit
+- multi-step work cannot survive a reviewer swap or interrupted CLI session
+
+This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
+
+---
+
+## What's Included
+
+ succeeded in 0ms:
+# Adoption Guide
+
+Step-by-step guide for adopting this agent framework in a new project.
+
+---
+
+## Prerequisites
+
+- GitHub repository (new or existing)
+- A coding assistant that reads `.github/copilot-instructions.md` (GitHub Copilot, Cursor, Augment, etc.)
+- Python 3.11+ (to run the bootstrap, audit helper, and validation scripts)
+- Bash is optional — `scripts/validate-template.sh` is a thin wrapper that calls `scripts/validate_template.py`; you can run either
+
+---
+
+## Step 1 — Bootstrap Or Copy The Core Files
+
+### Recommended: bootstrap the target repository
+
+Run this from the template repository:
+ succeeded in 0ms:
+# SKILL Execution Layer V1 Draft
+
+This document defines the formal v1 design draft for the framework's SKILL execution layer.
+
+It exists to close the gap between the canonical SKILL contract and real task execution so repositories can make skills improve through use without collapsing canonical truth into runtime drift.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Runtime invocation evidence, bounded candidate triggers, lineage metadata, and execution-side artifact surfaces for SKILL evolution |
+| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, receipt-anchored closeout, and discussion-backed design decisions |
+| Already changes | template surfaces, bootstrap assets, validator expectations, and future runtime evidence packaging for SKILL use |
+| Does not yet change | autonomous canonical mutation, cloud skill sharing, telemetry-backed promotion authority, or a fully automated host executor |
+
+Normative note:
+
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/STRICT_ADOPTION_AND_VERIFICATION.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Strict Adoption And Verification
+
+Use this document when an adopting repository wants to absorb the framework's execution-control stack honestly rather than copy a subset and later attribute the missing behavior to the template itself.
+
+The core rule is simple:
+
+1. do not claim full framework adoption if the target repository only copied prompt text without the checkpoint, sync, receipt, and verification mechanisms that make the rules enforceable
+2. do not let the main-thread agent self-certify adoption quality without independent local CLI review when the repository expects strong process guarantees
+3. if a mechanism cannot be adopted yet, record it explicitly as a gap or future upgrade path instead of silently downgrading the framework claim
+
+## Enforcement Maturity Matrix
+
+This matrix classifies the current template surfaces by how close they are to hard mechanical enforcement.
+
+| Layer | Surface | Current state | Main evidence | Adoption expectation |
+|---|---|---|---|---|
+| A. Pipeline + tooling enforced | Dispatch runtime and checkpoint stack | Strong | `.github/copilot-instructions.md` Rules 15, 18, 20, 21; `scripts/state_sync_audit.py`; `.githooks/pre-commit`; `.githooks/pre-push` | Keep when the repository runs multi-step work, fan-out, or checkpointed execution |
+| A. Pipeline + tooling enforced | Closeout truth and receipt anchoring | Very strong | Rule 25; `scripts/closeout_truth_audit.py`; `tests/test_closeout_truth_audit.py` | Keep whenever the repository writes closeout claims into truth surfaces |
+| A. Pipeline + tooling enforced | State-sync and drift detection | Very strong | `scripts/state_sync_audit.py`; `tests/test_state_sync_audit.py`; hooks | Keep whenever the repository uses task packets, progress receipts, or roadmap/session truth surfaces |
+| A. Pipeline + tooling enforced | Resumable git audit artifact flow | Strong | `docs/runbooks/resumable-git-audit-pipeline.md`; `scripts/git_audit_pipeline.py` | Keep whenever work may cross executors, sessions, or reviewer swaps |
+codex
+The initial pass confirms the template already has strong governance language and several artifact generators, but a lot of the “execution layer” is still structural or draft-level rather than proving downstream repos can actually run and verify those mechanisms. I’m reading the toolchain design and the concrete scripts next to isolate where the missing mechanical closure is.
+exec
+/bin/zsh -lc "sed -n '1,280p' docs/SKILL_HARVEST_LOOP_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,280p' docs/SKILL_MECHANISM_V1_DRAFT.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Harvest Loop V1 Draft
+
+This document defines the formal v1 design draft for the framework's post-task SKILL harvest and promotion-governance loop.
+
+It exists to turn the discussion in `tmp/discussion/skill_harvest_loop_v1/discussion_packet.md` into a concrete contract that templates, validators, and future promotion receipts can implement without reopening the whole workflow question each time.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Post-task candidate extraction, delegated review boundaries, and canonical promotion authority for SKILL files |
+| Depends on | `docs/SKILL_MECHANISM_V1_DRAFT.md`, `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md`, discussion packets, receipt-anchored closeout, and validator surfaces |
+| Already changes | field-authority expectations for skill templates, examples, validators, and future promotion receipts |
+| Does not yet change | packaged distribution format, installer behavior, lockfile semantics, or a fully implemented promotion-state registry |
+
+Normative note:
+
+ succeeded in 0ms:
+# SKILL Mechanism V1 Draft
+
+This document defines the formal v1 design draft for the framework's `SKILL` mechanism.
+
+It exists to turn the discussion in `tmp/discussion/skill_mechanism_v1/discussion_packet.md` into a concrete framework-level contract that later template, bootstrap, validator, and adapter work can follow.
+
+This is a design draft. It freezes the canonical framework-native contract and its governance boundaries before broader implementation or packaging work.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Framework-level skill contract and governance model |
+| Depends on | strategy-versus-mechanism split, discussion packets, validation surfaces, receipt-anchored closeout, `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md`, and `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
+| Already changes | design expectations for future skill templates, validators, adapter surfaces, and field-level promotion authority |
+| Does not yet change | packaged distribution format, lockfile semantics, vendor-specific installer behavior, or a fully implemented promotion-state registry |
+
+exec
+/bin/zsh -lc "sed -n '1,320p' docs/DEVELOPER_TOOLCHAIN_DESIGN.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' docs/runbooks/resumable-git-audit-pipeline.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Resumable Git Audit Pipeline
+
+This runbook turns Git audit and reviewer handoff into a recoverable workflow rather than a chat-only memory exercise.
+
+## Goal
+
+Use this workflow whenever implementation, audit, and Git closeout may span multiple executors or multiple interrupted sessions.
+
+The point is not to find one perfect reviewer. The point is to preserve enough state that a different reviewer or CLI session can resume safely.
+
+## Core Roles
+
+| Role | Responsibility |
+|---|---|
+| `Planner` | Freeze truth sources, allowed files, validation, and acceptance boundary |
+| `Executor` | Perform the bounded implementation or investigation |
+| `Auditor` | Review the result, risks, and validation status |
+| `Gatekeeper` | Run hard gates outside the semantic auditor when possible |
+| `Owner Review` | Final acceptance, conflict resolution, and Git closeout |
+
+ succeeded in 0ms:
+# Developer Toolchain Design
+
+This document defines the formal v1 design draft for the framework's `Developer Toolchain` concept.
+
+It exists to turn the higher-level discussion in `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` into a concrete, implementable contract that later template and bootstrap changes can follow.
+
+This is a design draft with shipped template/bootstrap adoption, manifest-gated required-core enforcement for newly bootstrapped adopters, and reminder-level validator support for softer guidance.
+
+---
+
+## Design Status
+
+| Field | Value |
+|---|---|
+| Status | Draft v1 |
+| Scope | Framework-level design for adopter-facing project adapters |
+| Depends on | `Validation Toolchain`, `Build and Test Commands`, execution contract surfaces |
+| Already changes | bootstrap output, template surfaces, manifest payloads, required-core hard-fail validation for manifest-based adopters, and reminder-level validator advisories |
+| Does not yet change | optional enrichment fields such as `Debug`, `Format`, log-inspection helpers, or freshness rules for `verified-working` |
+
+exec
+/bin/zsh -lc "sed -n '1,260p' docs/runbooks/multi-model-discussion-loop.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Multi-Model Discussion Loop
+
+This runbook turns open design questions into a recoverable discussion workflow instead of a chat-only brainstorm.
+
+## Goal
+
+Use this workflow when the task is not "implement the obvious next step" but "decide what the right next step should be".
+
+Typical cases:
+
+1. framework or library selection
+2. architecture or migration direction
+3. plan review with real tradeoffs
+4. sequencing disputes
+5. design gaps that should be discussed before code is written
+
+## Core Principle
+
+The mechanism is executor-agnostic.
+
+codex
+The docs are consistent: they define contracts, boundaries, and packet flows well. The remaining question is whether the shipped scripts actually provide enough executable support for downstream repos, or mostly create templates and structural checks. I’m reading the validators and generators now with that distinction in mind.
+exec
+/bin/zsh -lc "sed -n '1,280p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Structured validator for the agent framework template."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from active_docs_audit import audit_repo as audit_active_docs
+from preference_drift_audit import audit_repo as audit_preference_drift
+
+exec
+/bin/zsh -lc "sed -n '1,260p' scripts/discussion_pipeline.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Generate and extend multi-model discussion packet assets."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATES_DIR = REPO_ROOT / "templates"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "tmp" / "discussion"
+
+
+def _slugify(value: str) -> str:
+    normalized = value.strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+exec
+/bin/zsh -lc "sed -n '1,280p' scripts/git_audit_pipeline.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' scripts/state_sync_audit.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Generate resumable git audit packet, receipt, and handoff assets."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATES_DIR = REPO_ROOT / "templates"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "tmp" / "git_audit"
+
+
+def _slugify(value: str) -> str:
+    normalized = value.strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit execution-state sync across task artifacts, session state, and roadmap surfaces."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TASK_ROOT = "tmp/git_audit"
+PROGRESS_RECEIPT_PATTERN = re.compile(rf"^{TASK_ROOT}/[^/]+/progress_receipts/[^/]+\.md$")
+TASK_ARTIFACT_PATTERN = re.compile(rf"^{TASK_ROOT}/[^/]+/(?:audit_receipt|handoff_packet|task_packet|drift_packet)\.md$")
+
+
+@dataclass(frozen=True)
+class StateSyncIssue:
+exec
+/bin/zsh -lc "sed -n '1,260p' scripts/closeout_truth_audit.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Audit closeout claims for receipt-anchor evidence in the same diff."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+CLAIM_PATTERNS = (
+    re.compile(r"\bcompleted\b", re.IGNORECASE),
+    re.compile(r"\baccepted\b", re.IGNORECASE),
+    re.compile(r"\bstatus=passed\b", re.IGNORECASE),
+    re.compile(r"\bdone\b", re.IGNORECASE),
+    re.compile(r"\bverified\b", re.IGNORECASE),
+    re.compile(r"\ball criteria met\b", re.IGNORECASE),
+)
+exec
+/bin/zsh -lc "sed -n '1,280p' scripts/skill_evolution_pipeline.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Generate SKILL execution-layer artifacts from runtime evidence."""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _read_template(relative_path: str) -> str:
+    return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def _normalize_block(value: str) -> str:
+    text = value.strip()
+    return text or "- none"
+codex
+The scripts confirm the pattern: good generators and a few narrow auditors exist, but most tooling stops at creating Markdown artifacts or checking shallow structural coherence. I’m pulling one more layer from bootstrap and state-sync/runtime helpers to judge what downstream repos can actually prove versus merely declare.
+exec
+/bin/zsh -lc "sed -n '1,260p' scripts/state_sync_pipeline.py" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,260p' templates/skill_invocation_receipt.template.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,280p' scripts/bootstrap_adoption.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# SKILL Invocation Receipt
+
+- Receipt ID: [invocation-receipt-id]
+- Invocation ID: [invocation-id]
+- Skill ID: [skill-id]
+- Trigger Class: [explicit-request | repeated-invocation-failure | repeated-manual-correction | repeated-successful-reuse | operator-forced]
+- Execution Mode: [advisory-only | local-follow | delegated-run | host-runtime]
+- Outcome: [success | fallback | failure | manual-override]
+- Candidate Recommendation: [none | FIX | DERIVED | CAPTURED]
+
+## Trigger Reason
+
+- [Why this skill was invoked for this task or task phase.]
+
+## References Loaded
+
+| Name | Path | Loaded | Why It Was Needed |
+|---|---|---|---|
+| [reference] | [path] | [yes / no] | [what execution context it provided] |
+
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Generate progress receipts and drift reconciliation packets for state sync."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATES_DIR = REPO_ROOT / "templates"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "tmp" / "git_audit"
+
+
+def _slugify(value: str) -> str:
+    normalized = value.strip().lower()
+    normalized = re.sub(r"[^a-z0-9]+", "_", normalized)
+ succeeded in 0ms:
+#!/usr/bin/env python3
+"""Bootstrap this template into another repository."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+PROJECT_TYPE_PRESETS: dict[str, dict[str, object]] = {
+    "backend-api": {
+        "primary_language": "Python",
+        "package_manager": "pip",
+        "project_map_rows": (
+            "| `src/` | API implementation and domain services |",
+exec
+/bin/zsh -lc "sed -n '1,260p' templates/project-context.template.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+---
+name: "Project Context Adapter"
+applyTo: "**"
+description: >
+  [Project Name] project adapter. Provides the project map, critical topic triggers,
+  protected paths, build/test commands, and runtime config locations. Always read
+  this file before starting any multi-step task or when a critical keyword appears.
+---
+
+# [Project Name] — Project Context
+
+## Project Map
+
+| Path | Purpose |
+|---|---|
+| `src/` | [Main application source — describe here] |
+| `docs/` | Architecture, deployment, and system docs |
+| `tests/` | Test suites |
+| `data/` | [Runtime state / user data — if applicable] |
+| `.github/` | Agent behavior rules and project adapter |
+exec
+/bin/zsh -lc "sed -n '1,260p' scripts/runtime_surface_guardrails.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+#!/usr/bin/env python3
+"""Run registry-driven runtime surface guard checks."""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from dataclasses import dataclass
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+
+@dataclass(frozen=True)
+class GuardSurface:
+    name: str
+    exposure: str
+    trigger_prefixes: tuple[str, ...]
+    protected_source_roots: tuple[str, ...]
+    banned_phrases: tuple[str, ...]
+codex
+The bootstrap layer gives adopters placeholders and profile scaffolding, including a decent developer-toolchain contract, but it still leaves a lot of “prove this is real in this repo” work to human honesty. I’m checking whether the validator closes that gap for adopters or mostly for the template repository itself.
+exec
+/bin/zsh -lc 'rg -n "required-core|manifest|invocation|promotion|discussion|independent|verification|Developer Toolchain|strict adoption|active_docs|preference_drift|runtime surface|review" scripts/validate_template.py' in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+18:from active_docs_audit import audit_repo as audit_active_docs
+19:from preference_drift_audit import audit_repo as audit_preference_drift
+60:    "docs/runbooks/multi-model-discussion-loop.md",
+63:    "examples/skills/01_discussion_packet_workflow.md",
+74:    "examples/reviewer_roles/01_goal_acceptance_owner.md",
+75:    "examples/reviewer_roles/10_docs_spec_drift_reviewer.md",
+76:    "scripts/active_docs_audit.py",
+79:    "scripts/discussion_pipeline.py",
+82:    "scripts/preference_drift_audit.py",
+89:    "templates/discussion_packet.template.md",
+96:    "templates/reviewer_role_profile.template.md",
+101:    "templates/skill_invocation_receipt.template.md",
+103:    "templates/skill_promotion_receipt.template.md",
+106:    "templates/skill_reviewer_gate.template.md",
+110:    "examples/skills/04_receipt_anchored_reviewer.md",
+113:    "tests/test_active_docs_audit.py",
+116:    "tests/test_discussion_pipeline.py",
+209:    "docs/runbooks/multi-model-discussion-loop.md",
+212:    "templates/discussion_packet.template.md",
+216:    "templates/skill_invocation_receipt.template.md",
+exec
+/bin/zsh -lc "sed -n '1560,1895p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+                    )
+                )
+
+    return issues
+
+
+def _validate_preference_drift(root: Path) -> list[ValidationIssue]:
+    return [ValidationIssue(issue.kind, issue.detail) for issue in audit_preference_drift(root)]
+
+
+def _validate_active_docs(root: Path) -> list[ValidationIssue]:
+    return [ValidationIssue(issue.kind, issue.detail) for issue in audit_active_docs(root)]
+
+
+def _group_developer_toolchain_entries(
+    entries: list[DeveloperToolchainEntry],
+) -> dict[str, list[DeveloperToolchainEntry]]:
+    grouped: dict[str, list[DeveloperToolchainEntry]] = {}
+    for entry in entries:
+        grouped.setdefault(entry.surface_kind, []).append(entry)
+exec
+/bin/zsh -lc "sed -n '840,940p' scripts/validate_template.py" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+    seen: set[str] = set()
+    for profile in ("minimal", "standard", "full"):
+        paths = module._iter_profile_paths(profile)
+        for relative in paths:
+            if relative in seen:
+                continue
+            seen.add(relative)
+            if not (root / relative).exists():
+                issues.append(ValidationIssue("missing-bootstrap-asset", relative))
+
+    if "project_type" not in _read(module_path):
+        issues.append(ValidationIssue("bootstrap-feature-missing", "project_type support"))
+
+    if "capabilities" not in _read(module_path):
+        issues.append(ValidationIssue("bootstrap-feature-missing", "capability flags support"))
+
+    standard_paths = set(module._iter_profile_paths("standard"))
+    for relative in STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS:
+        if relative not in standard_paths:
+            issues.append(
+codex
+Verdict: The template is strong at defining truthful governance and artifact shapes, but still materially underpowered at the execution layer for downstream adopters. Today it mostly gives downstream repos contracts, generators, and a few narrow audits; it does not yet give them enough runnable wrappers, proof-producing validators, and orchestration surfaces to show that the declared design was actually executable in that repository.
+
+| Priority | Proposal | Solves | Why current support is insufficient | Suggested surface | Adoption tier | Governance risk |
+|---|---|---|---|---|---|---|
+| P1 | Adoption proof bundle and verifier | Lets a downstream repo prove it adopted the framework honestly, with concrete evidence instead of a narrative claim | `scripts/validate_template.py` for adopters mainly checks expected files plus some structure; it does not emit a durable adoption receipt showing which mechanisms were actually wired, which commands were verified, which CLI reviewers ran, and which gaps remain | Add `scripts/adoption_verifier.py` plus `templates/adoption_receipt.template.md` and a runbook section in [docs/STRICT_ADOPTION_AND_VERIFICATION.md](/Users/mac/Desktop/agent-framework-template/docs/STRICT_ADOPTION_AND_VERIFICATION.md). It should collect validator results, toolchain probe results, reviewer outputs, capability flags, missing mechanisms, and output `fully adopted` / `partially adopted` / `design-only upgrade path kept` with evidence links | Mandatory for strict adopters | Low if it only certifies evidence; high if it self-upgrades status without explicit gap reporting |
+| P2 | Developer Toolchain probe runner with freshness receipts | Stops downstream agents from saying “the template asked for run/health/repro surfaces but gave no way to verify them” | [docs/DEVELOPER_TOOLCHAIN_DESIGN.md](/Users/mac/Desktop/agent-framework-template/docs/DEVELOPER_TOOLCHAIN_DESIGN.md) defines status semantics well, but there is no shipped tool that probes declared commands, records outcomes, and updates trust state. Current validation is structural, not operational | Add `scripts/developer_toolchain_probe.py`, `templates/developer_toolchain_receipt.template.md`, and manifest wiring so adopters can run `probe diagnostics/build/run/health/repro`. The tool should check command existence, execute allowed probes, capture exit status and timestamp, and write receipts that justify `verified-working` or `known-broken` | Mandatory for standard/full; profile-gated for minimal | Medium if it auto-edits project-context statuses directly; safer if it writes receipts and requires human promotion into canonical status |
+| P3 | Task lifecycle wrapper that enforces packet/receipt/sync/closeout sequencing | Removes the gap between “these artifacts exist” and “agents actually have a concrete runner that tells them when to create them” | Current pipeline scripts are separate generators: [scripts/git_audit_pipeline.py](/Users/mac/Desktop/agent-framework-template/scripts/git_audit_pipeline.py), [scripts/state_sync_pipeline.py](/Users/mac/Desktop/agent-framework-template/scripts/state_sync_pipeline.py), and [scripts/closeout_truth_audit.py](/Users/mac/Desktop/agent-framework-template/scripts/closeout_truth_audit.py). They do not form one execution loop or scheduler | Add `scripts/task_control.py` that can `init-task`, `checkpoint`, `block`, `handoff`, `pre-closeout`, and `closeout-ready`. It should read the task packet, enforce presence of required artifacts before each transition, and run the existing sync/closeout audits automatically | Mandatory for repos claiming multi-step or multi-executor support | Medium if it becomes a rigid runtime that overrides repo-specific judgment; keep it as a bounded state machine, not a full autonomous orchestrator |
+| P4 | CLI review dispatcher and normalized independent-evaluation packet | Makes independent review executable instead of a policy expectation that varies by machine and chat memory | [docs/runbooks/multi-model-discussion-loop.md](/Users/mac/Desktop/agent-framework-template/docs/runbooks/multi-model-discussion-loop.md) and [docs/STRICT_ADOPTION_AND_VERIFICATION.md](/Users/mac/Desktop/agent-framework-template/docs/STRICT_ADOPTION_AND_VERIFICATION.md) require local multi-CLI review, but the template intentionally avoids standardizing commands. That preserves portability, but leaves downstream repos without a concrete review runner | Add a machine-local executor registry in project context or manifest plus `scripts/review_dispatch.py` that dispatches the same prompt read-only to declared executors, stores raw outputs, normalizes severity labels, and appends a synthesis-ready packet | Mandatory for strict adoption claims; optional otherwise | Medium if normalized summaries erase dissent. Preserve raw outputs and make synthesis append-only |
+| P5 | Skill host wrapper contract and invocation runner | Prevents downstream repos from keeping SKILL governance docs without any realistic way to invoke skills and emit runtime evidence | [docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md](/Users/mac/Desktop/agent-framework-template/docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md) defines host integration and receipts, but [scripts/skill_evolution_pipeline.py](/Users/mac/Desktop/agent-framework-template/scripts/skill_evolution_pipeline.py) only writes artifacts after the fact. It does not help a downstream agent decide `invoke or skip`, load references, bind tools, or record invocation truth automatically | Add `scripts/skill_runner.py`, `templates/skill_registry.template.yaml`, and validator rules that each non-knowledge skill declares its execution binding: trigger evaluator, required references, toolchain surface, receipt output path, degradation path. The runner should emit invocation receipts directly from execution | Profile-gated: mandatory when adopters keep SKILL surfaces, optional otherwise | High if it drifts into self-mutating skill automation. Keep candidate creation separate from canonical mutation |
+| P6 | Execution readiness audit across project-context, command existence, user surfaces, and runtime guard bindings | Makes failure states auditable before real work begins | Current adopter validation does not answer “is this repo execution-ready?” It cannot prove that declared toolchain commands exist, user-surface map entries map to real paths, runtime evidence sources exist, or runtime guard registries cover sensitive surfaces | Add `scripts/execution_readiness_audit.py` that cross-checks project-context commands, referenced files, smoke/repro paths, runtime evidence entries, sensitive surfaces, and optional runtime guard registry coverage; emit a receipt with pass/warn/fail per surface | Mandatory for standard/full; optional for minimal | Low if it reports gaps only; medium if it hard-fails repos that are honestly incomplete but clearly labeled |
+| P7 | Evidence recency and stale-status audit | Prevents old “verified-working” claims from becoming permanent fiction | The toolchain design names status values, but there is no freshness rule or audit for stale `verified-working` entries. A downstream repo can honestly bootstrap once and then silently decay | Add `scripts/evidence_freshness_audit.py` tied to probe receipts, adoption receipts, and review packets. It should flag stale runtime statuses, old repro claims, and expired independent-review evidence for strict adoption assertions | Optional for minimal; mandatory for strict/full | Low if it only downgrades confidence and opens a gap; risky if it silently rewrites canonical statuses |
+| P8 | Failure-packet and root-cause generation wrapper tied to sensitive surface escalation | Makes runtime failure handling executable and auditable instead of depending on agents remembering to open the right artifact | The template has failure and root-cause templates plus security escalation guidance in [templates/project-context.template.md](/Users/mac/Desktop/agent-framework-template/templates/project-context.template.md), but no concrete generator that opens the right artifact when a sensitive user surface or guardrail fails | Add `scripts/failure_capture.py` that takes impacted surface, evidence source, sensitivity, and suspected cause; generates a failure packet or root-cause note and links it to task and closeout receipts | Profile-gated for repos with live runtime paths | Medium if it encourages premature cause claims. Require explicit `cause-suspected` vs `cause-established` states |
+
+Recommended next move: Build one tight “execution proof” wave before adding more philosophy: `adoption_verifier.py`, `developer_toolchain_probe.py`, `task_control.py`, and `review_dispatch.py`. Those four additions would give downstream repos a concrete way to prove mechanism adoption, verify their declared runtime surfaces, enforce the core packet/receipt loop, and produce independent review artifacts. That is the shortest path to making downstream agents less able to blame the template for missing execution support while preserving the current governance boundary.
+tokens used
+55,592

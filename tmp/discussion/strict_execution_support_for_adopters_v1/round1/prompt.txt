@@ -1,0 +1,51 @@
+You are reviewing the `agent-framework-template` repository in read-only mode.
+
+Question:
+How should this template strengthen its execution-layer support so that downstream project agents have enough concrete tools, scripts, artifacts, and verification surfaces to execute the framework's design honestly? The goal is to reduce or eliminate situations where a downstream project agent can reasonably say: "the template defined governance or design intent, but did not provide enough execution-layer tooling to carry it out."
+
+Focus:
+1. Be especially concrete about execution support for downstream project agents, not only framework philosophy.
+2. Assume the repository already has strong design/governance surfaces for anti-drift, receipts, sync audit, discussion packets, git audit, SKILL governance, and strict adoption guidance.
+3. Identify which missing execution-layer tools, wrappers, validators, review loops, schedulers, or artifact-generation surfaces should be added next.
+4. Pay extra attention to how downstream repositories can prove they adopted the framework honestly and can execute it with enough tool support.
+5. Prefer proposals that make downstream failure states auditable instead of relying on agent goodwill.
+
+Repository surfaces to inspect:
+- README.md
+- docs/ADOPTION_GUIDE.md
+- docs/STRICT_ADOPTION_AND_VERIFICATION.md
+- docs/SKILL_MECHANISM_V1_DRAFT.md
+- docs/SKILL_HARVEST_LOOP_V1_DRAFT.md
+- docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md
+- docs/DEVELOPER_TOOLCHAIN_DESIGN.md
+- docs/runbooks/multi-model-discussion-loop.md
+- docs/runbooks/resumable-git-audit-pipeline.md
+- scripts/validate_template.py
+- scripts/state_sync_audit.py
+- scripts/closeout_truth_audit.py
+- scripts/discussion_pipeline.py
+- scripts/git_audit_pipeline.py
+- scripts/skill_evolution_pipeline.py
+
+Deliverable requirements:
+1. Give an overall verdict on the current gap between design layer and execution layer.
+2. List the top 5-8 concrete additions or upgrades that would most reduce downstream execution ambiguity.
+3. For each proposal, explain:
+   - what problem it solves
+   - why current template surfaces are insufficient
+   - what artifact/script/tool/validator/runbook should be added or upgraded
+   - whether it should be mandatory, optional, or profile-gated for adopters
+4. Explicitly address how to make downstream project agents less able to blame the template for missing execution support.
+5. Flag any risk where adding more automation would dangerously bypass the template's current governance boundary.
+
+Output format:
+- Start with `Verdict:` on one line.
+- Then provide a Markdown table with columns:
+  `Priority | Proposal | Solves | Why current support is insufficient | Suggested surface | Adoption tier | Governance risk`
+- End with `Recommended next move:` and one concise paragraph.
+
+Important constraints:
+- Read-only review only.
+- Do not suggest vague ideas like "improve docs" without naming an execution surface.
+- Do not assume the template should become a full always-on runtime like Hermes Agent unless you justify that tradeoff.
+- Treat truthful anti-drift and promotion governance as assets to preserve, not friction to remove.

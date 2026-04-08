@@ -26,7 +26,7 @@ def test_audit_repo_reports_missing_progress_receipt_for_active_task(tmp_path: P
     session_state = repo_copy / "session_state.md"
     session_state.write_text(
         session_state.read_text(encoding="utf-8").replace(
-            "**Active Task ID**: none",
+            "**Active Task ID**: (none)",
             "**Active Task ID**: demo_state_sync_task",
         ).replace(
             "**Current Step**: No active work.",

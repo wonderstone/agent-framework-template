@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -88,6 +89,121 @@ def test_validate_repo_reports_missing_required_file(tmp_path: Path) -> None:
     assert ValidationIssue("missing-file", "LICENSE") in issues
 
 
+def test_parse_developer_toolchain_entries_handles_pipe_in_command() -> None:
+    _, _, entries = MODULE._parse_developer_toolchain_entries(
+        """## Developer Toolchain\n\nPrimary language: Python\n\nPackage manager: pip\n\n| Surface | Command or source | Scope | Status | Fallback or stop | Notes |\n|---|---|---|---|---|---|\n| Diagnostics | `python -c \"print('ok')\" | cat` | `module` | `verified-working` | `Stop` | `Pipe-safe` |\n"""
+    )
+
+    assert len(entries) == 1
+    assert entries[0].command_or_source == 'python -c "print(\'ok\')" | cat'
+
+
+def test_validate_repo_reports_invalid_adopter_manifest_schema_version(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    manifest_path = adopted_root / ".github" / "agent-framework-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["schema_version"] = 2
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    issues = validate_repo(adopted_root)
+
+    assert ValidationIssue(
+        "invalid-adopter-manifest-schema-version",
+        ".github/agent-framework-manifest.json: expected schema_version 4",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_strict_adoption_contract(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    manifest_path = adopted_root / ".github" / "agent-framework-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("strict_adoption_contract")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    issues = validate_repo(adopted_root)
+
+    assert ValidationIssue(
+        "missing-strict-adoption-contract",
+        ".github/agent-framework-manifest.json: missing strict_adoption_contract",
+    ) in issues
+
+
+def test_validate_repo_accepts_minimal_adopter_without_wave_2_contracts(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="minimal",
+        project_type="cli-tool",
+    )
+
+    issues = validate_repo(adopted_root)
+
+    assert not any(issue.kind.startswith("missing-strict-adoption-contract") for issue in issues)
+    assert not any(issue.kind.startswith("missing-developer-toolchain-probe-contract") for issue in issues)
+    assert not any(issue.kind.startswith("missing-developer-toolchain-runner-contract") for issue in issues)
+    assert not any(issue.kind.startswith("missing-independent-evaluation-contract") for issue in issues)
+    assert not any(issue.kind.startswith("missing-executor-review-contract") for issue in issues)
+
+
+def test_validate_repo_reports_missing_developer_toolchain_probe_contract_key(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    manifest_path = adopted_root / ".github" / "agent-framework-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["developer_toolchain_probe_contract"].pop("receipt_output_dir")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    issues = validate_repo(adopted_root)
+
+    assert ValidationIssue(
+        "missing-developer-toolchain-probe-contract-key",
+        ".github/agent-framework-manifest.json: developer_toolchain_probe_contract is missing key 'receipt_output_dir'",
+    ) in issues
+
+
+def test_validate_repo_reports_missing_executor_review_contract(tmp_path: Path) -> None:
+    adopted_root = tmp_path / "adopted"
+    bootstrap_repo(
+        target_dir=adopted_root,
+        project_name="Adopted Demo",
+        profile="standard",
+        project_type="cli-tool",
+    )
+
+    manifest_path = adopted_root / ".github" / "agent-framework-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("executor_review_contract")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    issues = validate_repo(adopted_root)
+
+    assert ValidationIssue(
+        "missing-executor-review-contract",
+        ".github/agent-framework-manifest.json: missing executor_review_contract",
+    ) in issues
+
+
 def test_validate_repo_reports_root_project_context_placeholder(tmp_path: Path) -> None:
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
@@ -147,8 +263,8 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_unch
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "- [x] When drift remains unresolved, the repository can detect it mechanically and block closeout or next-stage dispatch.",
-        "- [ ] When drift remains unresolved, the repository can detect it mechanically and block closeout or next-stage dispatch.",
+        "- [x] When a standard or full adopter is bootstrapped, it receives the Wave 2 runner, evaluation, and executor-review assets with explicit manifest contract sections.",
+        "- [ ] When a standard or full adopter is bootstrapped, it receives the Wave 2 runner, evaluation, and executor-review assets with explicit manifest contract sections.",
         1,
     )
     session_state.write_text(updated, encoding="utf-8")

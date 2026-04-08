@@ -103,6 +103,25 @@
 
 ---
 
+## Phase 6 — Expand Execution-Proof Runtime Surfaces
+
+**Goal**: Turn the execution-proof follow-on surfaces into shipped runtime helpers so adopters can run, review, and audit the next layer mechanically rather than relying on policy text alone.
+
+**Status**: ✅ 2026-04-08
+
+| Item | Status |
+|---|---|
+| Ship a machine-facing Developer Toolchain runner with durable receipts | ✅ 2026-04-08 |
+| Ship a bounded independent-evaluation request/report pipeline | ✅ 2026-04-08 |
+| Ship a packetized local executor review loop with registry-driven dispatch | ✅ 2026-04-08 |
+
+**Acceptance Criteria**:
+- [x] Standard and full adopters inherit the Wave 2 runner, evaluator, and local-review assets with explicit manifest schema 4 contracts.
+- [x] The validator and strict-adoption auditor mechanically reject missing or malformed Wave 2 surfaces.
+- [x] Focused regressions, full repository tests, and bootstrap smoke all pass after the rollout.
+
+---
+
 ## Completed Phases
 
 | Phase | Completed |
@@ -112,3 +131,4 @@
 | Phase 3 — Strengthen Developer Toolchain Contract | 2026-04-03 |
 | Phase 4 — Formalize SKILL Contract And Harvest Governance | 2026-04-05 |
 | Phase 5 — Ship Anti-Drift Execution Control | 2026-04-08 |
+| Phase 6 — Expand Execution-Proof Runtime Surfaces | 2026-04-08 |

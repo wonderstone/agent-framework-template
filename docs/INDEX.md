@@ -16,6 +16,7 @@
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Stable progress-update format for while-style work, clearly separated from final closeout |
 | `docs/STRATEGY_MECHANISM_LAYERING.md` | How to separate role strategy from reusable workflow mechanism |
 | `docs/ROLE_STRATEGY_EXAMPLES.md` | Concrete reviewer and agent role examples spanning multiple development-stage responsibilities |
+| `docs/STRICT_ADOPTION_AND_VERIFICATION.md` | Strict adoption mode, enforcement-maturity matrix, and local CLI verification flow for downstream repositories |
 | `docs/COMPATIBILITY.md` | What is validated in this repository and what adopters still need to verify locally |
 | `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` | Formal v1 design draft for post-task SKILL harvest and per-field promotion-governance |
 | `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` | Formal v1 design draft for runtime invocation evidence, bounded candidate triggers, and typed SKILL evolution lineage |
@@ -23,6 +24,8 @@
 | `docs/SKILL_MECHANISM_V1_DRAFT.md` | Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
 | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` | Discussion surface for making language diagnostics, lint, build, run, and debug tooling first-class agent inputs |
+| `docs/EXECUTION_PROOF_WAVE_1_PLAN.md` | Executable first-wave plan for strict-adoption attestation and Developer Toolchain runtime proof surfaces |
+| `docs/EXECUTION_PROOF_WAVE_2_PLAN.md` | Executable second-wave plan for toolchain runner, independent evaluation, and local executor review loop surfaces |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion surface for making AI-era failure diagnosis, root-cause reconstruction, runtime evidence, and recovery state first-class framework inputs |
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, progressive failure capture, runtime evidence ownership, and root-cause closeout |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule plus the reusable surfaces adopters should inherit |
@@ -50,5 +53,5 @@
 
 ---
 
-*Last updated: 2026-04-08 — added the anti-drift rule refactor plan and state-reconciliation runbook*
+*Last updated: 2026-04-08 — added the Wave 2 execution-proof plan*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

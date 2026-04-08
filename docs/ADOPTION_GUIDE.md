@@ -313,6 +313,42 @@ Status-line and closeout preference to copy into local policy surfaces when rele
 - the longer focus-bearing variant is only for ambiguous cases
 - final closeout uses exactly one `📍` footer and places `---` immediately before it
 
+## Step 3B — Enforce Strict Adoption And Local CLI Verification
+
+If your repository wants to claim that it adopted this framework's strict operating model rather than a partial imitation, keep the strict baseline together.
+
+Canonical reference: [`docs/STRICT_ADOPTION_AND_VERIFICATION.md`](STRICT_ADOPTION_AND_VERIFICATION.md).
+
+Strict adoption baseline:
+
+1. truthful project adapter
+2. execution contract for long-running work
+3. checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
+4. receipt-anchored closeout enforcement
+5. user-acceptance and validation-toolchain honesty
+6. independent evaluation path for non-trivial or user-facing work
+7. resumable packet and handoff flow when multi-executor work is possible
+8. discussion-packet workflow when design ambiguity exists
+
+Adoption-status rule:
+
+1. report `fully adopted` only when all applicable baseline mechanisms are present and verified locally
+2. report `partially adopted` when one or more baseline mechanisms were intentionally downgraded or skipped
+3. report `design-only upgrade path kept` when the repository kept future upgrade docs or templates but did not wire the mechanism into current execution
+
+Required local CLI verification flow:
+
+1. freeze the adoption scope and the baseline mechanisms you expect to keep
+2. run the target repository's mechanical validators from its own root
+3. ask all locally available CLI executors to review the same verification question in read-only mode
+4. require each CLI review to answer whether the baseline mechanisms were truly kept, whether anything was silently downgraded, and whether any adoption claim overstates enforcement
+5. record the review outputs in one durable discussion packet or adjacent verification artifacts
+6. fix critical or major gaps exposed by the independent CLI reviews
+7. re-run the target repository's validators after remediation
+8. only then report the adoption status honestly
+
+This step matters because a single main-thread agent should not be the sole authority for saying that a repository fully absorbed the framework. Strict adoption should survive independent local CLI scrutiny, not only the implementing agent's own summary.
+
 ---
 
 ## Step 4 — Create docs/INDEX.md
