@@ -1,0 +1,37 @@
+Read this packet first:
+
+tmp/discussion/copilot_instructions_refactor_acceptance_v1/discussion_packet.md
+
+You are doing an acceptance evaluation for the completed refactor of:
+- `.github/copilot-instructions.md`
+
+Your job is not to propose a fresh redesign. Your job is to judge whether the original concerns were actually resolved.
+
+Original concern categories to evaluate:
+1. file-format / markdown-structure correctness
+2. writing consistency and clarity
+3. rule overlap, conflict, or awkward split points
+4. maintainability and navigation cost
+
+Acceptance question:
+Did the completed refactor materially solve those original concerns well enough to count as accepted?
+
+Important constraints:
+- Evaluate the current file on `main`, not older broken versions.
+- Distinguish between `solved`, `partially solved`, and `still unresolved`.
+- Do not open a broad redesign loop unless you believe the original concerns still materially fail.
+- Prefer concrete evidence from the current file.
+
+Required output shape:
+1. Verdict: choose one of `accept`, `conditional-accept`, or `reject`
+2. Findings table with columns:
+   - original concern
+   - status (`solved`, `partially solved`, `unresolved`)
+   - evidence from current file
+   - why this status is correct
+   - follow-up needed (or `none`)
+3. Remaining issues:
+   - list only issues that are still high-value enough to mention
+4. Final acceptance summary in 3-5 sentences
+
+Return plain text only.

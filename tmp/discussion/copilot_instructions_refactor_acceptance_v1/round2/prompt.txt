@@ -1,0 +1,37 @@
+Read this packet first:
+
+tmp/discussion/copilot_instructions_refactor_acceptance_v1/discussion_packet.md
+
+This is a narrow second-round acceptance check for the current `main` version of:
+- `.github/copilot-instructions.md`
+
+Context:
+- Round 1 already concluded the refactor passed in substance.
+- The only remaining micro-fix targets were:
+  1. move the floating `Core Truth Surfaces` subsection so it clearly belongs to Rule 17
+  2. add the missing priority badge to Rule 10 for heading consistency
+- Those two micro-fixes have now been applied.
+
+Your task:
+Judge whether those residual concerns are now cleared well enough to upgrade the overall acceptance result.
+
+Required focus:
+1. Is the `Core Truth Surfaces` placement now structurally correct?
+2. Is Rule 10 heading consistency now resolved?
+3. Do any material blockers remain against saying the original concern set is now fully accepted?
+
+Important constraints:
+- Evaluate only the current file on `main`.
+- Do not reopen broad redesign topics.
+- Mention only issues that still matter after these two micro-fixes.
+
+Required output shape:
+1. Verdict: choose one of `accept`, `conditional-accept`, or `reject`
+2. Findings table with columns:
+   - residual issue
+   - status (`resolved`, `partially resolved`, `still open`)
+   - evidence from current file
+   - follow-up needed (or `none`)
+3. Final quick acceptance summary in 2-4 sentences
+
+Return plain text only.

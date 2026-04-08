@@ -48,6 +48,8 @@ Execution drift stays manageable only when checkpoint contracts, progress receip
 ---
 
 ## Recent Receipts
+- Completed a narrow second-round acceptance pass for `.github/copilot-instructions.md`: fixed `Core Truth Surfaces` ownership, restored Rule 10 badge symmetry, repaired the resulting Rule 10 navigation anchor, and closed the topic as fully accepted.
+- Completed a 4-CLI acceptance review for the `.github/copilot-instructions.md` refactor in `tmp/discussion/copilot_instructions_refactor_acceptance_v1/discussion_packet.md`: verdict was passed in substance, with 3 `conditional-accept`, 1 `accept`, and only optional micro-polish remaining.
 - Completed round-seven cleanup of `.github/copilot-instructions.md`: reduced early checkpoint reminders in Rules 4 and 5 to pure Rule 18 pointers, and rolled older receipt history into `docs/archive/Copilot_Instructions_Refactor_Closeout_2026-04-08.md` so `session_state.md` returns to a scan-friendly receipt window.
 - Completed round-six refactor of `.github/copilot-instructions.md`: added an execution-state reading map near Rule 18 and clarified Rule 24 as the owner of scope-state classification and leftovers, without changing runtime policy.
 - Completed round-five refactor of `.github/copilot-instructions.md`: added an output-and-closeout reading map plus scope-clarifying lines for Rules 14, 22, and 25 so the response and closeout chain is easier to scan without semantic changes.

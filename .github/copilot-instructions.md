@@ -9,7 +9,7 @@
 | Cluster | Rules | Focus |
 |---|---|---|
 | Intake and safety | [Rule 0](#rule-0-challenge-incorrect-statements--mandatory) · [Rule 1](#rule-1-dangerous-operations--mandatory) · [Rule 2](#rule-2-read-before-act) · [Rule 3](#rule-3-critical-topic-triggers--mandatory) · [Rule 4](#rule-4-validation-after-every-change--mandatory) | Challenge posture, protected operations, read-before-act, topic-triggered doc loading, validation floor |
-| State and reporting | [Rule 5](#rule-5-dispatch-decision-disclosure--mandatory) · [Rule 6](#rule-6-document-organization--mandatory) · [Rule 7](#rule-7-cross-session-state--mandatory) · [Rule 8](#rule-8-progress-status-line-and-closeout-boundary--mandatory) · [Rule 9](#rule-9-subtask-completion-checkpoint--mandatory) · [Rule 10](#rule-10-phase-graduation-protocol) | Dispatch disclosure, doc placement, session state, progress lines, checkpoint closeout, phase graduation |
+| State and reporting | [Rule 5](#rule-5-dispatch-decision-disclosure--mandatory) · [Rule 6](#rule-6-document-organization--mandatory) · [Rule 7](#rule-7-cross-session-state--mandatory) · [Rule 8](#rule-8-progress-status-line-and-closeout-boundary--mandatory) · [Rule 9](#rule-9-subtask-completion-checkpoint--mandatory) · [Rule 10](#rule-10-phase-graduation-protocol--mandatory) | Dispatch disclosure, doc placement, session state, progress lines, checkpoint closeout, phase graduation |
 | Reasoning and planning | [Rule 11](#rule-11-cognitive-reasoning-loop--mandatory) · [Rule 12](#rule-12-pre-action-self-check-gate--mandatory) · [Rule 13](#rule-13-failure-recovery--mandatory) · [Rule 14](#rule-14-task-progression-loop--mandatory) · [Rule 15](#rule-15-decomposition-and-dispatch-decision--mandatory) · [Rule 16](#rule-16-planning-and-path-selection--mandatory) · [Rule 17](#rule-17-reality-check-and-goal-alignment--mandatory) | Hypothesis discipline, pre-action gate, recovery path, progression loop, decomposition, planning, alignment checks |
 | Execution and acceptance | [Rule 18](#rule-18-resumable-audit-assets--mandatory) · [Rule 19](#rule-19-executor-selection-order--mandatory) · [Rule 20](#rule-20-long-task-autonomous-execution--primary-mode) · [Rule 21](#rule-21-dispatch-stability-protocol--mandatory) · [Rule 22](#rule-22-user-acceptance-gate--mandatory) · [Rule 23](#rule-23-validation-toolchain-prerequisite--mandatory) | Task packets, executor choice, autonomy boundary, dispatch runtime rules, UAC, toolchain prerequisites |
 | Closeout and audit | [Rule 24](#rule-24-scope-entry-classification-and-leftover-contract--mandatory) · [Rule 25](#rule-25-receipt-anchored-closeout--mandatory) · [Rule 26](#rule-26-independent-evaluation--mandatory) · [Rule 27](#rule-27-policy-audit-trigger--on-demand) | Leftovers, receipt-anchored claims, independent evaluation, on-demand policy audit |
@@ -298,7 +298,7 @@ Default policy: the main thread owns normal `git add`, `git commit`, and standar
 
 ---
 
-## Rule 10: Phase Graduation Protocol
+## Rule 10: Phase Graduation Protocol (🔴 Mandatory)
 
 When all acceptance criteria are ✅:
 
@@ -653,19 +653,17 @@ Every `## Next Actions` block must include:
 - `uncertain` — one question unanswered; flag it but do not stop unless critical
 - `misaligned` — divergence from original intent detected; do not continue without correction
 
-### Constraints
-
-- Do not run a full re-analysis — answer the three questions in 1–3 sentences of evidence
-- Do not manufacture evidence to force `confirmed` — `uncertain` is a valid and safe result
-- A reality check is not a checkpoint review — it is a fast alignment pulse, not a deep audit
-
----
-
 ### Core Truth Surfaces
 
 - Project facts: `.github/instructions/project-context.instructions.md`
 - Canonical doc index: `docs/INDEX.md`
 - Cross-session state: `session_state.md`
+
+### Constraints
+
+- Do not run a full re-analysis — answer the three questions in 1–3 sentences of evidence
+- Do not manufacture evidence to force `confirmed` — `uncertain` is a valid and safe result
+- A reality check is not a checkpoint review — it is a fast alignment pulse, not a deep audit
 
 ---
 

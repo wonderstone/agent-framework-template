@@ -1,0 +1,331 @@
+OpenAI Codex v0.116.0 (research preview)
+--------
+workdir: /Users/mac/Desktop/agent-framework-template
+model: gpt-5.4
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 019d6a8b-34b2-7d40-be27-9404f3d81c6a
+--------
+user
+Read this packet first:
+
+tmp/discussion/copilot_instructions_refactor_acceptance_v1/discussion_packet.md
+
+You are doing an acceptance evaluation for the completed refactor of:
+- `.github/copilot-instructions.md`
+
+Your job is not to propose a fresh redesign. Your job is to judge whether the original concerns were actually resolved.
+
+Original concern categories to evaluate:
+1. file-format / markdown-structure correctness
+2. writing consistency and clarity
+3. rule overlap, conflict, or awkward split points
+4. maintainability and navigation cost
+
+Acceptance question:
+Did the completed refactor materially solve those original concerns well enough to count as accepted?
+
+Important constraints:
+- Evaluate the current file on `main`, not older broken versions.
+- Distinguish between `solved`, `partially solved`, and `still unresolved`.
+- Do not open a broad redesign loop unless you believe the original concerns still materially fail.
+- Prefer concrete evidence from the current file.
+
+Required output shape:
+1. Verdict: choose one of `accept`, `conditional-accept`, or `reject`
+2. Findings table with columns:
+   - original concern
+   - status (`solved`, `partially solved`, `unresolved`)
+   - evidence from current file
+   - why this status is correct
+   - follow-up needed (or `none`)
+3. Remaining issues:
+   - list only issues that are still high-value enough to mention
+4. Final acceptance summary in 3-5 sentences
+
+Return plain text only.
+mcp startup: no servers
+codex
+I’m reading the acceptance packet and the current `.github/copilot-instructions.md` on `main`, then I’ll judge against the four original concern categories with concrete evidence only.
+exec
+/bin/zsh -lc "sed -n '1,260p' tmp/discussion/copilot_instructions_refactor_acceptance_v1/discussion_packet.md" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "sed -n '1,320p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+# Discussion Packet — copilot_instructions_refactor_acceptance_v1
+
+- Generated at: 2026-04-08T00:42:46.235742+00:00
+- Owner: main-thread
+- Current round goal: Acceptance evaluation of the completed copilot-instructions refactor
+- Round exit rule: Decide accept / conditional accept / reject for the refactor closeout based on the original concerns.
+
+## Decision Question
+
+Did the completed refactor of .github/copilot-instructions.md resolve the original concerns about file-format correctness, writing consistency, rule overlap/conflict, and maintainability/navigation well enough to count as accepted?
+
+## Why This Needs Discussion
+
+The repository already completed multiple targeted refactor rounds and git closeout for .github/copilot-instructions.md. We now need an explicit 4-CLI acceptance pass focused on whether the original complaint set was actually resolved, not on opening a new redesign loop.
+
+## Current Truth
+
+- .github/copilot-instructions.md has been refactored across multiple rounds after an earlier structural corruption and overlap review.
+- The file now includes a top-level navigation table, Rule 7 scanability restructuring, output-and-closeout reading map, execution-state reading map, and tighter checkpoint cross-references.
+- The final refactor was validated locally with structured validation, pytest, and bootstrap smoke before git closeout.
+ succeeded in 0ms:
+# Agent Operating Rules
+
+> Behavior rules only. Project-specific facts live in `.github/instructions/project-context.instructions.md`.
+>
+> **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
+
+## Quick Navigation
+
+| Cluster | Rules | Focus |
+|---|---|---|
+| Intake and safety | [Rule 0](#rule-0-challenge-incorrect-statements--mandatory) · [Rule 1](#rule-1-dangerous-operations--mandatory) · [Rule 2](#rule-2-read-before-act) · [Rule 3](#rule-3-critical-topic-triggers--mandatory) · [Rule 4](#rule-4-validation-after-every-change--mandatory) | Challenge posture, protected operations, read-before-act, topic-triggered doc loading, validation floor |
+| State and reporting | [Rule 5](#rule-5-dispatch-decision-disclosure--mandatory) · [Rule 6](#rule-6-document-organization--mandatory) · [Rule 7](#rule-7-cross-session-state--mandatory) · [Rule 8](#rule-8-progress-status-line-and-closeout-boundary--mandatory) · [Rule 9](#rule-9-subtask-completion-checkpoint--mandatory) · [Rule 10](#rule-10-phase-graduation-protocol) | Dispatch disclosure, doc placement, session state, progress lines, checkpoint closeout, phase graduation |
+| Reasoning and planning | [Rule 11](#rule-11-cognitive-reasoning-loop--mandatory) · [Rule 12](#rule-12-pre-action-self-check-gate--mandatory) · [Rule 13](#rule-13-failure-recovery--mandatory) · [Rule 14](#rule-14-task-progression-loop--mandatory) · [Rule 15](#rule-15-decomposition-and-dispatch-decision--mandatory) · [Rule 16](#rule-16-planning-and-path-selection--mandatory) · [Rule 17](#rule-17-reality-check-and-goal-alignment--mandatory) | Hypothesis discipline, pre-action gate, recovery path, progression loop, decomposition, planning, alignment checks |
+| Execution and acceptance | [Rule 18](#rule-18-resumable-audit-assets--mandatory) · [Rule 19](#rule-19-executor-selection-order--mandatory) · [Rule 20](#rule-20-long-task-autonomous-execution--primary-mode) · [Rule 21](#rule-21-dispatch-stability-protocol--mandatory) · [Rule 22](#rule-22-user-acceptance-gate--mandatory) · [Rule 23](#rule-23-validation-toolchain-prerequisite--mandatory) | Task packets, executor choice, autonomy boundary, dispatch runtime rules, UAC, toolchain prerequisites |
+| Closeout and audit | [Rule 24](#rule-24-scope-entry-classification-and-leftover-contract--mandatory) · [Rule 25](#rule-25-receipt-anchored-closeout--mandatory) · [Rule 26](#rule-26-independent-evaluation--mandatory) · [Rule 27](#rule-27-policy-audit-trigger--on-demand) | Leftovers, receipt-anchored claims, independent evaluation, on-demand policy audit |
+
+---
+
+## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
+
+exec
+/bin/zsh -lc 'git branch --show-current' in /Users/mac/Desktop/agent-framework-template succeeded in 1.95s:
+2026-04-08 12:43:29.514 xcodebuild[9767:119625136]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-08 12:43:29.733 xcodebuild[9767:119625133] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-g5xvVL3p' (errno=Operation not permitted)
+2026-04-08 12:43:30.187 xcodebuild[9797:119625221]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-08 12:43:30.305 xcodebuild[9797:119625220] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+main
+codex
+I have the packet and current file context. I’m reading the remainder of the instruction file now so the verdict is based on the full current `main` version, not just the front half.
+exec
+/bin/zsh -lc "sed -n '321,520p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+**Confidence levels**:
+
+| Level | Meaning |
+|---|---|
+| **High** | Hypothesis is directly supported by code or docs |
+| **Medium** | Hypothesis is consistent with available evidence but not fully verified |
+| **Low** | Hypothesis is a best guess — flag for user review before proceeding |
+
+**Low-confidence rule**: outside a declared execution boundary, do not act on a Low-confidence hypothesis without surfacing the uncertainty to the user first.
+
+**Inside a declared execution boundary (Rule 20)**: Low-confidence on a reversible step → proceed with `Alignment: uncertain` flagged and surface it at the next progress boundary; Low-confidence on an irreversible or high-blast-radius decision → hard stop regardless of boundary.
+
+Track the current hypothesis and confidence in `session_state.md` under **Working Hypothesis**. This rule runs alongside — not instead of — the Pre-Action Self-Check Gate in Rule 12.
+
+---
+
+## Rule 12: Pre-Action Self-Check Gate (🔴 Mandatory)
+
+Before any file edit, destructive operation, config change, or commit — run this three-step gate. Do not skip or abbreviate it. This gate absorbs the pre-operation validation sequence from Rule 0: it covers read → verify → execute → report for all large-impact operations.
+codex
+The refactor is clearly structured now; I’m checking the later sections for whether the improvements hold consistently, especially around overlap and maintenance burden rather than just front-loaded cleanup.
+exec
+/bin/zsh -lc "sed -n '521,760p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+1. **Rule 15** — decide whether the work should fan out or stay serial, and disclose that choice.
+2. **Rule 18** — freeze the task packet and, if checkpointed, apply the checkpoint contract before execution crosses a boundary.
+3. **Rule 19** — choose the executor and fallback path.
+4. **Rule 21** — enforce readiness gates, task sizing, terminal states, and progress signals during execution.
+5. **Rule 26** — run independent evaluation before final closeout when the task qualifies.
+
+---
+
+## Rule 16: Planning and Path Selection (🔴 Mandatory)
+
+Before executing any multi-step task that is non-trivial, the agent MUST produce a short plan. Skip this rule only for single-step edits or tasks with an obviously unique path.
+
+### When to Plan
+
+| Task type | Action |
+|---|---|
+| Single-step edit, no design decision | Skip — proceed directly to execution |
+| Multi-step task with one obvious path | Plan in one sentence; record it; proceed |
+| Multi-step task with 2+ viable approaches | Enumerate options, evaluate, and if the choice has real discussion space, externalize it into a durable discussion packet before selecting |
+| Task with significant risk or cross-module impact | Always plan; involve Architect role |
+exec
+/bin/zsh -lc "sed -n '761,980p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+For bounded execution tasks after fan-out, assign executors in this order:
+
+| Priority | Executor | Use when |
+|---|---|---|
+| 1 — primary | CLI (external session) | Default for all bounded execution tasks |
+| 2 — fallback | Subagent (internal spawn) | CLI has hit a terminal failure condition |
+
+### Fallback Trigger Conditions
+
+Switch from CLI to subagent only when one of the following is **confirmed**, not assumed:
+
+- Token limit reached: CLI context exhausted mid-task, cannot continue in the same session
+- CLI unresponsive: repeated non-recoverable errors after one retry attempt
+- CLI session cannot be resumed and a handoff packet has already been written
+
+### Fallback Protocol
+
+1. Write a handoff packet **before** switching executor type
+2. Pass the same task packet to the subagent — do not reconstruct scope from memory
+exec
+/bin/zsh -lc "sed -n '981,1180p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+
+At least one UAC item must cover the complete user journey — from the user's entry point to the observable outcome. Point checks on individual components do not satisfy this requirement.
+
+### UAC Evidence at Completion
+
+Before declaring `Status: complete`, provide evidence for each UAC item:
+
+```
+UAC Evidence:
+- [x] [criterion] — verified by: [command run / output observed / file produced]
+- [ ] [criterion] — cannot verify: [reason] — flagged for user testing
+```
+
+For UAC items the agent cannot simulate (GUI interaction, external dependency, physical environment): flag them explicitly. Do not claim DONE for unverifiable items — declare `Status: complete` only after all verifiable items have evidence and all unverifiable items are flagged.
+
+### The Gap Check (mandatory before closing)
+
+Before closing any task, explicitly answer: **"What would the user notice that our tests would not catch?"**
+
+Common gaps:
+exec
+/bin/zsh -lc "sed -n '1181,1360p' .github/copilot-instructions.md" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+### Enforcement
+
+Projects that adopt the full framework should wire this check into their pre-commit hook using a script analogous to `scripts/closeout_truth_audit.py` (see `docs/RUNTIME_SURFACE_PROTECTION.md`). Until automated, the agent must self-enforce: before writing any closeout claim, confirm the receipt anchor exists in the same diff.
+
+### Interaction with Other Rules
+
+| Rule | Interaction |
+|---|---|
+| Rule 9 (Subtask Completion) | A subtask checkpoint requires at least one UAC item verified — that verification output is the receipt |
+| Rule 22 (UAC Gate) | UAC Evidence section is the natural home for receipt anchors |
+| Rule 21 (Dispatch Stability) | `DONE` terminal state requires an audit receipt — the audit receipt is the receipt anchor |
+| Rule 18 (Resumable Audit Assets) | Audit receipts serve double duty: they satisfy the receipt-anchor requirement and preserve resumability |
+
+---
+
+## Rule 26: Independent Evaluation (🔴 Mandatory)
+
+An agent that implements work and then evaluates its own output is not an evaluator — it is a self-reviewer. Self-review is structurally biased: agents consistently and confidently assess their own work as satisfactory, even when the output is mediocre or incorrect.
+
+For any task that produces user-facing output, a final evaluation pass must be performed by an agent or executor that did **not** produce the work.
+codex
+I have the full file now. I’m pulling exact line references for the sections that matter so the acceptance decision is anchored to the current text rather than general impressions.
+exec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '1,220p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+     1	# Agent Operating Rules
+     2	
+     3	> Behavior rules only. Project-specific facts live in `.github/instructions/project-context.instructions.md`.
+     4	>
+     5	> **Primary execution posture: autonomous long-task execution (Rule 20).** Human interruption is reserved for genuine blockers declared in the execution boundary — not routine procedural steps.
+     6	
+     7	## Quick Navigation
+     8	
+     9	| Cluster | Rules | Focus |
+    10	|---|---|---|
+    11	| Intake and safety | [Rule 0](#rule-0-challenge-incorrect-statements--mandatory) · [Rule 1](#rule-1-dangerous-operations--mandatory) · [Rule 2](#rule-2-read-before-act) · [Rule 3](#rule-3-critical-topic-triggers--mandatory) · [Rule 4](#rule-4-validation-after-every-change--mandatory) | Challenge posture, protected operations, read-before-act, topic-triggered doc loading, validation floor |
+    12	| State and reporting | [Rule 5](#rule-5-dispatch-decision-disclosure--mandatory) · [Rule 6](#rule-6-document-organization--mandatory) · [Rule 7](#rule-7-cross-session-state--mandatory) · [Rule 8](#rule-8-progress-status-line-and-closeout-boundary--mandatory) · [Rule 9](#rule-9-subtask-completion-checkpoint--mandatory) · [Rule 10](#rule-10-phase-graduation-protocol) | Dispatch disclosure, doc placement, session state, progress lines, checkpoint closeout, phase graduation |
+    13	| Reasoning and planning | [Rule 11](#rule-11-cognitive-reasoning-loop--mandatory) · [Rule 12](#rule-12-pre-action-self-check-gate--mandatory) · [Rule 13](#rule-13-failure-recovery--mandatory) · [Rule 14](#rule-14-task-progression-loop--mandatory) · [Rule 15](#rule-15-decomposition-and-dispatch-decision--mandatory) · [Rule 16](#rule-16-planning-and-path-selection--mandatory) · [Rule 17](#rule-17-reality-check-and-goal-alignment--mandatory) | Hypothesis discipline, pre-action gate, recovery path, progression loop, decomposition, planning, alignment checks |
+    14	| Execution and acceptance | [Rule 18](#rule-18-resumable-audit-assets--mandatory) · [Rule 19](#rule-19-executor-selection-order--mandatory) · [Rule 20](#rule-20-long-task-autonomous-execution--primary-mode) · [Rule 21](#rule-21-dispatch-stability-protocol--mandatory) · [Rule 22](#rule-22-user-acceptance-gate--mandatory) · [Rule 23](#rule-23-validation-toolchain-prerequisite--mandatory) | Task packets, executor choice, autonomy boundary, dispatch runtime rules, UAC, toolchain prerequisites |
+    15	| Closeout and audit | [Rule 24](#rule-24-scope-entry-classification-and-leftover-contract--mandatory) · [Rule 25](#rule-25-receipt-anchored-closeout--mandatory) · [Rule 26](#rule-26-independent-evaluation--mandatory) · [Rule 27](#rule-27-policy-audit-trigger--on-demand) | Leftovers, receipt-anchored claims, independent evaluation, on-demand policy audit |
+    16	
+    17	---
+    18	
+    19	## Rule 0: Challenge Incorrect Statements (🔴 Mandatory)
+    20	
+exec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '901,1360p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '521,900p'" in /Users/mac/Desktop/agent-framework-templateexec
+/bin/zsh -lc "nl -ba .github/copilot-instructions.md | sed -n '221,520p'" in /Users/mac/Desktop/agent-framework-template succeeded in 0ms:
+   521	1. **Rule 15** — decide whether the work should fan out or stay serial, and disclose that choice.
+   522	2. **Rule 18** — freeze the task packet and, if checkpointed, apply the checkpoint contract before execution crosses a boundary.
+   523	3. **Rule 19** — choose the executor and fallback path.
+   524	4. **Rule 21** — enforce readiness gates, task sizing, terminal states, and progress signals during execution.
+   525	5. **Rule 26** — run independent evaluation before final closeout when the task qualifies.
+   526	
+   527	---
+   528	
+   529	## Rule 16: Planning and Path Selection (🔴 Mandatory)
+   530	
+   531	Before executing any multi-step task that is non-trivial, the agent MUST produce a short plan. Skip this rule only for single-step edits or tasks with an obviously unique path.
+   532	
+   533	### When to Plan
+   534	
+   535	| Task type | Action |
+   536	|---|---|
+   537	| Single-step edit, no design decision | Skip — proceed directly to execution |
+   538	| Multi-step task with one obvious path | Plan in one sentence; record it; proceed |
+   539	| Multi-step task with 2+ viable approaches | Enumerate options, evaluate, and if the choice has real discussion space, externalize it into a durable discussion packet before selecting |
+   540	| Task with significant risk or cross-module impact | Always plan; involve Architect role |
+ succeeded in 0ms:
+   901	
+   902	```
+   903	Step N: [filename] — [validation result: PASS / FAIL / SKIP]
+   904	```
+   905	
+   906	This allows the main thread to detect whether an executor has stopped progressing.
+   907	
+   908	### Parallel Executor Ceiling
+   909	
+   910	Default: **5 concurrent executors** (CLI + subagent combined). Override by declaring a different ceiling in the Execution Boundary (Rule 20). Without an explicit override, 5 is the hard limit. If the decomposition would require more, decompose further or serialize. See Rule 27 for audit verification of this ceiling.
+   911	
+   912	### Stuck Self-Declaration Format
+   913	
+   914	When an executor cannot continue, it emits this block before stopping:
+   915	
+   916	```
+   917	STUCK
+   918	- Was doing:    [current action]
+   919	- Blocker:      [what cannot be resolved without external input]
+   920	- Done so far:  [files changed, validation state]
+ succeeded in 0ms:
+   221	2. place one Markdown divider `---` before the final footer
+   222	3. use exactly one final footer with the built-in marker
+   223	
+   224	```
+   225	📍 当前聚焦: <final focus> | 已完成: <delivered outcome> | 下一步: <none / next / blocker>
+   226	```
+   227	
+   228	For hosts that expose `task_complete` or an equivalent closeout action:
+   229	
+   230	1. prepare the final closeout summary
+   231	2. put the closeout content into the final user-visible body or the closeout action payload
+   232	3. trigger the closeout action
+   233	
+   234	Do not use the final `📍` footer anywhere else in the same task.
+   235	
+   236	`Continued with Autopilot` or similar platform continuation markers do not count as completion signals.
+   237	
+   238	Operational rule: if the host exposes a dedicated closeout action, treat that action as the machine-facing completion signal. Any human-facing closeout summary should appear before that call or be folded into its payload.
+   239	
+   240	### Closeout Irreversibility Rule (🔴 Mandatory)
+codex
+Verdict: conditional-accept
+
+Findings table
+
+| original concern | status | evidence from current file | why this status is correct | follow-up needed |
+|---|---|---|---|---|
+| file-format / markdown-structure correctness | solved | The current file is structurally coherent end-to-end: top-level title and intro at lines 1-5, a valid navigation table at lines 7-15, consistently delimited rule sections throughout, and no visible corruption/truncation in Rules 0-27. The earlier closeout and execution sections now have explicit reading maps at lines 185-194 and 674-681. | The original “broken/incorrect markdown structure” concern appears materially fixed. The file reads as a valid, navigable Markdown document with stable anchors and section boundaries. The only notable blemish is the redundant heading sequence at lines 136-138 (`### Rollover and Reset` immediately followed by `### Rollover Triggers`), but that is minor and not a structural failure. | Tighten the Rule 7 heading stack so the rollover/reset subsection is not split awkwardly. |
+| writing consistency and clarity | partially solved | The refactor uses more consistent rule framing: many sections now explicitly state scope and interaction boundaries, e.g. Rule 5 lines 87-91, Rule 14 line 399, Rule 22 lines 930-944, Rule 25 lines 1141-1163. Navigation aids also reduce ambiguity. | The writing is materially clearer than a typical overlapping policy dump, but it is not fully consistent. Some sections are crisp and scoped, while others remain dense or slightly awkward. The clearest examples are the mixed-language status/closeout templates in Rule 8 (lines 198-225) and the duplicated/stacked subsection labeling in Rule 7 (lines 136-138). Those do not break usability, but they keep this from being fully “solved.” | Small cleanup pass for wording consistency only: normalize heading flow in Rule 7 and confirm whether Rule 8’s Chinese/English template mix is intentional. |
+| rule overlap, conflict, or awkward split points | partially solved | Cross-rule ownership is much more explicit now: Rule 5 delegates dispatch mechanics to Rules 15/18/19/21/26 (lines 87-91); Rule 8 separates reply shape from acceptance and receipt rules (lines 185-194, 214-271); Rule 18 and Rule 21 cleanly split artifacts vs runtime dispatch (lines 683-756, 861-924). | The refactor clearly reduced overlap and made ownership more legible. However, some awkward split points remain. Rule 14 says substantial replies declaring a continuing, blocked, or complete decision must include `## Next Actions` (lines 425-438), then immediately carves out exceptions for complete/blocked replies (lines 445-448). That is workable, but still reads as internally tense rather than fully clean. | Clarify Rule 14 by rewriting the contract so the default and exceptions do not appear to contradict each other. |
+| maintainability and navigation cost | partially solved | The file now has a strong navigation spine: top-level cluster table (lines 7-15), Output and Closeout Reading Map (lines 185-194), Execution State Reading Map (lines 674-681), and repeated “Interaction with Other Rules” sections across later rules. | This is a meaningful improvement over a flat rule wall, so the original maintainability concern was addressed in substance. Still, the file remains very large and policy-dense, and maintainability depends heavily on cross-references rather than brevity. It is now manageable, but not lightweight. | No redesign loop needed. If desired later, do a narrow maintenance pass to trim repeated explanatory prose in heavily cross-referenced rules. |
+
+Remaining issues:
+- Rule 7 has an awkward subsection break at `### Rollover and Reset` / `### Rollover Triggers` that should be normalized.
+- Rule 14’s `## Next Actions` requirement versus its exception list still reads slightly self-conflicting.
+- Rule 8’s mixed-language status/footer templates may be intentional, but if not, they are the main remaining writing-consistency distraction.
+
+Final acceptance summary
+
+The refactor materially fixed the original structural problems and made the file much easier to navigate. The current `main` version is coherent Markdown, has clear section ownership, and uses reading maps and cross-rule interaction notes effectively. The remaining issues are real but narrow: a few awkward split points, one slightly tense rule contract, and some stylistic inconsistency. Those are not strong enough to reopen a broad redesign, so this counts as a conditional accept.
+tokens used
+41,466
