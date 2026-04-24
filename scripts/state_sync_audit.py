@@ -14,6 +14,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 TASK_ROOT = "tmp/git_audit"
 PROGRESS_RECEIPT_PATTERN = re.compile(rf"^{TASK_ROOT}/[^/]+/progress_receipts/[^/]+\.md$")
 TASK_ARTIFACT_PATTERN = re.compile(rf"^{TASK_ROOT}/[^/]+/(?:audit_receipt|handoff_packet|task_packet|drift_packet)\.md$")
+TODO_SYNC_STATUSES = {"in_sync", "needs_refresh", "n/a"}
+TODO_LINE_PATTERN = re.compile(r"^- \[(?P<marker>[ xX-])\] (?P<title>.+)$")
+SKILL_EVOLUTION_STARTUP_CHECKS = {"done", "pending", "n/a"}
+SKILL_EVOLUTION_DECISIONS = {
+    "observe_only",
+    "invocation_required",
+    "candidate_review",
+    "promotion_review",
+    "n/a",
+}
 
 
 @dataclass(frozen=True)
@@ -26,6 +36,12 @@ class StateSyncIssue:
 class DiffLine:
     path: str
     content: str
+
+
+@dataclass(frozen=True)
+class TodoItem:
+    status: str
+    title: str
 
 
 def _slugify(value: str) -> str:
@@ -117,6 +133,172 @@ def _find_leftover_reference(text: str, task_id: str) -> bool:
     return task_id in leftovers or _slugify(task_id) in leftovers
 
 
+def _extract_todo_items(section_text: str) -> list[TodoItem]:
+    items: list[TodoItem] = []
+    for line in section_text.splitlines():
+        match = TODO_LINE_PATTERN.match(line.strip())
+        if match is None:
+            continue
+        marker = match.group("marker").lower()
+        status = {
+            "x": "completed",
+            "-": "in_progress",
+            " ": "pending",
+        }[marker]
+        items.append(TodoItem(status=status, title=match.group("title").strip()))
+    return items
+
+
+def _audit_todo_sync(session_state: str, active_task_id: str | None, current_step: str | None) -> list[StateSyncIssue]:
+    issues: list[StateSyncIssue] = []
+    todo_section = _extract_markdown_section(session_state, "Todo Sync")
+
+    if todo_section is None:
+        if not _is_none_like(active_task_id) or not _is_no_active_work(current_step):
+            issues.append(
+                StateSyncIssue(
+                    "missing-todo-sync-section",
+                    "session_state.md: active execution state exists without a matching Todo Sync section",
+                )
+            )
+        return issues
+
+    source_of_truth = _extract_field(todo_section, "Source of Truth")
+    sync_status = _extract_field(todo_section, "Sync Status")
+    last_synced = _extract_field(todo_section, "Last Synced")
+    todo_items = _extract_todo_items(todo_section)
+
+    if not source_of_truth or not sync_status or not last_synced:
+        issues.append(
+            StateSyncIssue(
+                "malformed-todo-sync-section",
+                "session_state.md: Todo Sync must record Source of Truth, Sync Status, and Last Synced",
+            )
+        )
+        return issues
+
+    normalized_sync_status = _normalize_value(sync_status)
+    if normalized_sync_status not in TODO_SYNC_STATUSES:
+        issues.append(
+            StateSyncIssue(
+                "invalid-todo-sync-status",
+                f"session_state.md: Todo Sync status '{sync_status}' is invalid; use one of {sorted(TODO_SYNC_STATUSES)}",
+            )
+        )
+
+    if last_synced != "n/a" and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", last_synced):
+        issues.append(
+            StateSyncIssue(
+                "invalid-todo-sync-date",
+                "session_state.md: Todo Sync Last Synced must use YYYY-MM-DD or n/a",
+            )
+        )
+
+    in_progress_count = sum(1 for item in todo_items if item.status == "in_progress")
+    if in_progress_count > 1:
+        issues.append(
+            StateSyncIssue(
+                "multiple-in-progress-todos",
+                "session_state.md: Todo Sync may record at most one in-progress item",
+            )
+        )
+
+    has_active_execution = not _is_none_like(active_task_id) or not _is_no_active_work(current_step)
+    if has_active_execution and normalized_sync_status == "in_sync" and in_progress_count != 1:
+        issues.append(
+            StateSyncIssue(
+                "active-work-without-in-progress-todo",
+                "session_state.md: active execution marked in_sync must have exactly one in-progress todo item",
+            )
+        )
+
+    if not has_active_execution and in_progress_count > 0 and normalized_sync_status == "in_sync":
+        issues.append(
+            StateSyncIssue(
+                "idle-state-with-in-progress-todo",
+                "session_state.md: no active execution should not remain in_sync with an in-progress todo item",
+            )
+        )
+
+    return issues
+
+
+def _audit_skill_evolution(session_state: str, active_task_id: str | None, current_step: str | None) -> list[StateSyncIssue]:
+    issues: list[StateSyncIssue] = []
+    section = _extract_markdown_section(session_state, "SKILL Evolution")
+
+    if section is None:
+        issues.append(
+            StateSyncIssue(
+                "missing-skill-evolution-section",
+                "session_state.md: missing required SKILL Evolution startup-check section",
+            )
+        )
+        return issues
+
+    startup_check = _extract_field(section, "Startup Check")
+    decision = _extract_field(section, "Main-Thread Decision")
+    reason = _extract_field(section, "Reason")
+    human_role = _extract_field(section, "Human Role")
+    last_evaluated = _extract_field(section, "Last Evaluated")
+
+    if not startup_check or not decision or not reason or not human_role or not last_evaluated:
+        issues.append(
+            StateSyncIssue(
+                "malformed-skill-evolution-section",
+                "session_state.md: SKILL Evolution must record Startup Check, Main-Thread Decision, Reason, Human Role, and Last Evaluated",
+            )
+        )
+        return issues
+
+    normalized_startup_check = _normalize_value(startup_check)
+    normalized_decision = _normalize_value(decision)
+    normalized_human_role = _normalize_value(human_role)
+
+    if normalized_startup_check not in SKILL_EVOLUTION_STARTUP_CHECKS:
+        issues.append(
+            StateSyncIssue(
+                "invalid-skill-evolution-startup-check",
+                f"session_state.md: SKILL Evolution startup check '{startup_check}' is invalid; use one of {sorted(SKILL_EVOLUTION_STARTUP_CHECKS)}",
+            )
+        )
+
+    if normalized_decision not in SKILL_EVOLUTION_DECISIONS:
+        issues.append(
+            StateSyncIssue(
+                "invalid-skill-evolution-decision",
+                f"session_state.md: SKILL Evolution main-thread decision '{decision}' is invalid; use one of {sorted(SKILL_EVOLUTION_DECISIONS)}",
+            )
+        )
+
+    if last_evaluated != "n/a" and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", last_evaluated):
+        issues.append(
+            StateSyncIssue(
+                "invalid-skill-evolution-date",
+                "session_state.md: SKILL Evolution Last Evaluated must use YYYY-MM-DD or n/a",
+            )
+        )
+
+    if normalized_human_role != "n/a" and "advisory" not in normalized_human_role:
+        issues.append(
+            StateSyncIssue(
+                "invalid-skill-evolution-human-role",
+                "session_state.md: SKILL Evolution Human Role must preserve that the human is advisory only",
+            )
+        )
+
+    has_active_execution = not _is_none_like(active_task_id) or not _is_no_active_work(current_step)
+    if has_active_execution and normalized_startup_check != "done":
+        issues.append(
+            StateSyncIssue(
+                "active-work-without-skill-startup-check",
+                "session_state.md: active execution requires SKILL Evolution Startup Check to be done",
+            )
+        )
+
+    return issues
+
+
 def audit_repo(root: Path) -> list[StateSyncIssue]:
     issues: list[StateSyncIssue] = []
     session_state_path = root / "session_state.md"
@@ -127,6 +309,8 @@ def audit_repo(root: Path) -> list[StateSyncIssue]:
     active_task_id = _extract_field(session_state, "Active Task ID")
     current_step = _extract_field(session_state, "Current Step")
     blocker_section = (_extract_markdown_section(session_state, "Blocker / Decision Needed") or "").strip()
+    issues.extend(_audit_todo_sync(session_state, active_task_id, current_step))
+    issues.extend(_audit_skill_evolution(session_state, active_task_id, current_step))
 
     for packet in sorted((root / TASK_ROOT).glob("*/drift_packet.md")):
         task_dir = packet.parent

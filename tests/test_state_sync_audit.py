@@ -81,3 +81,39 @@ def test_audit_diff_reports_roadmap_completion_without_artifact() -> None:
     issues = audit_diff(diff_text)
 
     assert any(issue.kind == "roadmap-completion-without-artifact" for issue in issues)
+
+
+def test_audit_repo_reports_missing_skill_evolution_section(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    session_state = repo_copy / "session_state.md"
+    session_state.write_text(
+        session_state.read_text(encoding="utf-8").replace(
+            "## SKILL Evolution\n\n**Startup Check**: done\n\n**Main-Thread Decision**: observe_only\n\n**Reason**: No repeated runtime pattern in the current idle round warrants invocation, candidate creation, or promotion work.\n\n**Human Role**: advisory only\n\n**Last Evaluated**: 2026-04-24\n\n---\n\n",
+            "",
+        ),
+        encoding="utf-8",
+    )
+
+    issues = audit_repo(repo_copy)
+
+    assert any(issue.kind == "missing-skill-evolution-section" for issue in issues)
+
+
+def test_audit_repo_reports_invalid_skill_evolution_human_role(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    session_state = repo_copy / "session_state.md"
+    session_state.write_text(
+        session_state.read_text(encoding="utf-8").replace(
+            "**Human Role**: advisory only",
+            "**Human Role**: decision maker",
+        ),
+        encoding="utf-8",
+    )
+
+    issues = audit_repo(repo_copy)
+
+    assert any(issue.kind == "invalid-skill-evolution-human-role" for issue in issues)

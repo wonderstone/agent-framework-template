@@ -1,6 +1,6 @@
 # State Reconciliation Runbook
 
-This runbook defines how the repository repairs execution drift when `session_state.md`, `ROADMAP.md`, task packets, progress receipts, handoff packets, or closeout surfaces no longer agree.
+This runbook defines how the repository repairs execution drift when `session_state.md`, `ROADMAP.md`, the `Todo Sync` section, the `SKILL Evolution` startup-check section, task packets, progress receipts, handoff packets, or closeout surfaces no longer agree.
 
 ## Goal
 
@@ -18,7 +18,9 @@ Use this runbook when any of the following is true:
 2. `session_state.md` says no active work while task receipts or handoff artifacts still show in-flight work
 3. a blocker exists without a matching handoff packet or leftover record
 4. `ROADMAP.md` and receipt-bearing task artifacts disagree about whether a boundary was reached
-5. closeout or next-stage dispatch is about to continue while a contradiction remains unresolved
+5. the workspace todo mirror or repo todo snapshot no longer matches the canonical `Todo Sync` state recorded in `session_state.md`
+6. the `SKILL Evolution` startup check is missing, stale, or contradicts the artifact trail for the current round
+7. closeout or next-stage dispatch is about to continue while a contradiction remains unresolved
 
 ## Canonical Artifact
 
@@ -31,9 +33,11 @@ Use this runbook when any of the following is true:
 1. Run `python3 scripts/state_sync_audit.py --root <repo>` or the relevant hook boundary.
 2. If the audit reports a contradiction, open or update `tmp/git_audit/<task_slug>/drift_packet.md`.
 3. Record what evidence is stale and which surfaces must be reconciled.
-4. Update the relevant truth surfaces.
-5. Re-run the sync audit before closeout or dispatch continues.
-6. If the work is intentionally paused rather than reconciled, convert it into a truthful handoff or leftover record.
+4. If the contradiction includes current todos, update the canonical todo state in `session_state.md` first, then mirror that state back into the workspace todo list.
+5. If the contradiction includes SKILL evolution for the round, refresh the `SKILL Evolution` section in `session_state.md` before continuing execution.
+6. Update the remaining truth surfaces.
+7. Re-run the sync audit before closeout or dispatch continues.
+8. If the work is intentionally paused rather than reconciled, convert it into a truthful handoff or leftover record.
 
 ## Required Packet Fields
 
@@ -82,5 +86,7 @@ It blocks the moment the repository would otherwise freeze a false narrative int
 ```bash
 python3 scripts/state_sync_pipeline.py record-progress ...
 python3 scripts/state_sync_pipeline.py upsert-drift ...
+python3 scripts/state_sync_pipeline.py sync-todos --source-of-truth "session_state.md Todo Sync section; workspace todo list is a mirror only" --sync-status in_sync --todo "in_progress:Implement sync" ...
+python3 scripts/state_sync_pipeline.py sync-skill-evolution --startup-check done --main-thread-decision observe_only --reason "No repeated pattern worth promotion this round" --human-role "advisory only"
 python3 scripts/state_sync_audit.py --root .
 ```

@@ -50,6 +50,32 @@ Execution-proof credibility improves only when strict adoption, runtime toolchai
 
 ---
 
+## Todo Sync
+
+**Source of Truth**: session_state.md Todo Sync section; workspace todo list is a mirror only
+
+**Sync Status**: in_sync
+
+**Last Synced**: 2026-04-24
+
+- (none)
+
+---
+
+## SKILL Evolution
+
+**Startup Check**: done
+
+**Main-Thread Decision**: observe_only
+
+**Reason**: No repeated runtime pattern in the current idle round warrants invocation, candidate creation, or promotion work.
+
+**Human Role**: advisory only
+
+**Last Evaluated**: 2026-04-24
+
+---
+
 ## Recent Receipts
 - Completed the final independent evaluation closeout for Wave 2 in `tmp/evaluation/execution_proof_wave_2/`: `evaluation_request.md` and `evaluation_report.md` now form a bounded PASS verdict pair backed by validator clean, `111 passed`, and standard dry-run smoke clean.
 - Completed Wave 2 of the execution-proof stack: shipped the Developer Toolchain runner, independent-evaluation pipeline, and local executor review loop through docs, templates, bootstrap, manifest schema 4, validator rules, strict-adoption mechanism definitions, targeted regressions, full tests, and bootstrap smoke validation (`111 passed`, validator clean, standard dry-run smoke clean).

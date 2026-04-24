@@ -15,7 +15,11 @@ SPEC.loader.exec_module(MODULE)
 
 DriftPacketOptions = MODULE.DriftPacketOptions
 ProgressReceiptOptions = MODULE.ProgressReceiptOptions
+SkillEvolutionOptions = MODULE.SkillEvolutionOptions
+TodoSyncOptions = MODULE.TodoSyncOptions
 create_progress_receipt = MODULE.create_progress_receipt
+sync_skill_evolution = MODULE.sync_skill_evolution
+sync_todos = MODULE.sync_todos
 upsert_drift_packet = MODULE.upsert_drift_packet
 
 
@@ -59,3 +63,42 @@ def test_upsert_drift_packet_writes_reconciliation_fields(tmp_path: Path) -> Non
     assert output_path.name == "drift_packet.md"
     assert "receipt-1" in contents
     assert "session_state.md" in contents
+
+
+def test_sync_todos_upserts_canonical_todo_section(tmp_path: Path) -> None:
+    session_state = tmp_path / "session_state.md"
+    session_state.write_text("## Completed This Phase\n\n- (none)\n", encoding="utf-8")
+
+    output_path = sync_todos(
+        TodoSyncOptions(
+            session_state_path=session_state,
+            source_of_truth="session_state.md Todo Sync section; workspace todo list is a mirror only",
+            sync_status="in_sync",
+            last_synced="2026-04-24",
+            todo_items=(),
+        )
+    )
+
+    contents = output_path.read_text(encoding="utf-8")
+    assert "## Todo Sync" in contents
+    assert "workspace todo list is a mirror only" in contents
+
+
+def test_sync_skill_evolution_upserts_startup_check(tmp_path: Path) -> None:
+    session_state = tmp_path / "session_state.md"
+    session_state.write_text("## Completed This Phase\n\n- (none)\n", encoding="utf-8")
+
+    output_path = sync_skill_evolution(
+        SkillEvolutionOptions(
+            session_state_path=session_state,
+            startup_check="done",
+            main_thread_decision="observe_only",
+            reason="No repeated pattern worth promotion in this round.",
+            human_role="advisory only",
+            last_evaluated="2026-04-24",
+        )
+    )
+
+    contents = output_path.read_text(encoding="utf-8")
+    assert "## SKILL Evolution" in contents
+    assert "**Main-Thread Decision**: observe_only" in contents

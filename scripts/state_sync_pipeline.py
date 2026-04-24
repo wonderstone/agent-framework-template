@@ -13,6 +13,21 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES_DIR = REPO_ROOT / "templates"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "tmp" / "git_audit"
+TODO_SECTION_HEADING = "Todo Sync"
+TODO_STATUS_MARKERS = {
+    "pending": " ",
+    "in_progress": "-",
+    "completed": "x",
+}
+SKILL_EVOLUTION_SECTION_HEADING = "SKILL Evolution"
+SKILL_EVOLUTION_STARTUP_CHECKS = {"done", "pending", "n/a"}
+SKILL_EVOLUTION_DECISIONS = {
+    "observe_only",
+    "invocation_required",
+    "candidate_review",
+    "promotion_review",
+    "n/a",
+}
 
 
 def _slugify(value: str) -> str:
@@ -25,6 +40,10 @@ def _slugify(value: str) -> str:
 def _normalize_block(value: str) -> str:
     text = value.strip()
     return text or "- none"
+
+
+def _today_utc_date() -> str:
+    return datetime.now(timezone.utc).date().isoformat()
 
 
 def render_template(template_text: str, values: dict[str, str]) -> str:
@@ -59,6 +78,31 @@ def next_receipt_seq(task_dir: Path) -> int:
     return (max(sequences) + 1) if sequences else 1
 
 
+def _extract_markdown_section(text: str, heading: str) -> str | None:
+    heading_match = re.search(rf"^## {re.escape(heading)}\s*$", text, flags=re.MULTILINE)
+    if heading_match is None:
+        return None
+    start = heading_match.start()
+    next_heading = re.search(r"^## ", text[heading_match.end() :], flags=re.MULTILINE)
+    if next_heading is None:
+        return text[start:]
+    return text[start : heading_match.end() + next_heading.start()]
+
+
+def _upsert_markdown_section(text: str, heading: str, body: str, *, insert_before: str) -> str:
+    replacement = f"## {heading}\n\n{body.strip()}\n\n---\n\n"
+    existing = _extract_markdown_section(text, heading)
+    if existing is not None:
+        return text.replace(existing, replacement, 1)
+
+    anchor = re.search(rf"^## {re.escape(insert_before)}\s*$", text, flags=re.MULTILINE)
+    if anchor is not None:
+        return text[: anchor.start()] + replacement + text[anchor.start() :]
+
+    suffix = "" if text.endswith("\n") else "\n"
+    return text + suffix + "\n" + replacement
+
+
 @dataclass(frozen=True)
 class ProgressReceiptOptions:
     task_id: str
@@ -84,6 +128,96 @@ class DriftPacketOptions:
     status: str
     notes: str
     output_root: Path
+
+
+@dataclass(frozen=True)
+class TodoItem:
+    status: str
+    title: str
+
+
+@dataclass(frozen=True)
+class TodoSyncOptions:
+    session_state_path: Path
+    source_of_truth: str
+    sync_status: str
+    last_synced: str
+    todo_items: tuple[TodoItem, ...]
+
+
+@dataclass(frozen=True)
+class SkillEvolutionOptions:
+    session_state_path: Path
+    startup_check: str
+    main_thread_decision: str
+    reason: str
+    human_role: str
+    last_evaluated: str
+
+
+def _render_todo_items(todo_items: tuple[TodoItem, ...]) -> str:
+    if not todo_items:
+        return "- (none)"
+
+    lines: list[str] = []
+    for item in todo_items:
+        marker = TODO_STATUS_MARKERS[item.status]
+        lines.append(f"- [{marker}] {item.title}")
+    return "\n".join(lines)
+
+
+def sync_todos(options: TodoSyncOptions) -> Path:
+    session_state = options.session_state_path.read_text(encoding="utf-8")
+    todo_body = (
+        f"**Source of Truth**: {options.source_of_truth}\n\n"
+        f"**Sync Status**: {options.sync_status}\n\n"
+        f"**Last Synced**: {options.last_synced}\n\n"
+        f"{_render_todo_items(options.todo_items)}"
+    )
+    updated = _upsert_markdown_section(
+        session_state,
+        TODO_SECTION_HEADING,
+        todo_body,
+        insert_before="Completed This Phase",
+    )
+    options.session_state_path.write_text(updated.rstrip() + "\n", encoding="utf-8")
+    return options.session_state_path
+
+
+def sync_skill_evolution(options: SkillEvolutionOptions) -> Path:
+    session_state = options.session_state_path.read_text(encoding="utf-8")
+    skill_body = (
+        f"**Startup Check**: {options.startup_check}\n\n"
+        f"**Main-Thread Decision**: {options.main_thread_decision}\n\n"
+        f"**Reason**: {options.reason}\n\n"
+        f"**Human Role**: {options.human_role}\n\n"
+        f"**Last Evaluated**: {options.last_evaluated}"
+    )
+    updated = _upsert_markdown_section(
+        session_state,
+        SKILL_EVOLUTION_SECTION_HEADING,
+        skill_body,
+        insert_before="Completed This Phase",
+    )
+    options.session_state_path.write_text(updated.rstrip() + "\n", encoding="utf-8")
+    return options.session_state_path
+
+
+def _parse_todo_arg(raw_value: str) -> TodoItem:
+    if ":" not in raw_value:
+        raise argparse.ArgumentTypeError(
+            "todo entries must use the format 'pending:title', 'in_progress:title', or 'completed:title'"
+        )
+    status, title = raw_value.split(":", 1)
+    normalized_status = status.strip().lower()
+    if normalized_status not in TODO_STATUS_MARKERS:
+        raise argparse.ArgumentTypeError(
+            "todo status must be one of: pending, in_progress, completed"
+        )
+    normalized_title = title.strip()
+    if not normalized_title:
+        raise argparse.ArgumentTypeError("todo title must not be empty")
+    return TodoItem(status=normalized_status, title=normalized_title)
 
 
 def create_progress_receipt(options: ProgressReceiptOptions) -> Path:
@@ -159,6 +293,53 @@ def _build_parser() -> argparse.ArgumentParser:
     upsert_drift.add_argument("--notes", default="- none")
     upsert_drift.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
 
+    sync_todos_parser = subparsers.add_parser(
+        "sync-todos",
+        help="Upsert the Todo Sync section in session_state.md",
+    )
+    sync_todos_parser.add_argument(
+        "--session-state-path",
+        type=Path,
+        default=REPO_ROOT / "session_state.md",
+    )
+    sync_todos_parser.add_argument("--source-of-truth", required=True)
+    sync_todos_parser.add_argument(
+        "--sync-status",
+        default="in_sync",
+        choices=["in_sync", "needs_refresh", "n/a"],
+    )
+    sync_todos_parser.add_argument("--last-synced", default=_today_utc_date())
+    sync_todos_parser.add_argument(
+        "--todo",
+        action="append",
+        default=[],
+        type=_parse_todo_arg,
+        help="todo entry in the format 'status:title'",
+    )
+
+    sync_skill_parser = subparsers.add_parser(
+        "sync-skill-evolution",
+        help="Upsert the SKILL Evolution section in session_state.md",
+    )
+    sync_skill_parser.add_argument(
+        "--session-state-path",
+        type=Path,
+        default=REPO_ROOT / "session_state.md",
+    )
+    sync_skill_parser.add_argument(
+        "--startup-check",
+        required=True,
+        choices=sorted(SKILL_EVOLUTION_STARTUP_CHECKS),
+    )
+    sync_skill_parser.add_argument(
+        "--main-thread-decision",
+        required=True,
+        choices=sorted(SKILL_EVOLUTION_DECISIONS),
+    )
+    sync_skill_parser.add_argument("--reason", required=True)
+    sync_skill_parser.add_argument("--human-role", default="advisory only")
+    sync_skill_parser.add_argument("--last-evaluated", default=_today_utc_date())
+
     return parser
 
 
@@ -181,7 +362,7 @@ def main() -> int:
                 receipt_seq=args.receipt_seq,
             )
         )
-    else:
+    elif args.command == "upsert-drift":
         output_path = upsert_drift_packet(
             DriftPacketOptions(
                 task_id=args.task_id,
@@ -193,6 +374,27 @@ def main() -> int:
                 status=args.status,
                 notes=args.notes,
                 output_root=args.output_root,
+            )
+        )
+    elif args.command == "sync-todos":
+        output_path = sync_todos(
+            TodoSyncOptions(
+                session_state_path=args.session_state_path,
+                source_of_truth=args.source_of_truth,
+                sync_status=args.sync_status,
+                last_synced=args.last_synced,
+                todo_items=tuple(args.todo),
+            )
+        )
+    else:
+        output_path = sync_skill_evolution(
+            SkillEvolutionOptions(
+                session_state_path=args.session_state_path,
+                startup_check=args.startup_check,
+                main_thread_decision=args.main_thread_decision,
+                reason=args.reason,
+                human_role=args.human_role,
+                last_evaluated=args.last_evaluated,
             )
         )
 

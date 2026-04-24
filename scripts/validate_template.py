@@ -1184,6 +1184,13 @@ def _validate_session_state_template(root: Path) -> list[ValidationIssue]:
         "**State Sync Schedule**:",
         "**True Closeout Boundary**:",
         "**Host Closeout Action**:",
+        "## Todo Sync",
+        "**Source of Truth**:",
+        "## SKILL Evolution",
+        "**Startup Check**:",
+        "**Main-Thread Decision**:",
+        "**Human Role**:",
+        "**Last Evaluated**:",
         "## Leftover Units",
     )
     for snippet in required_snippets:

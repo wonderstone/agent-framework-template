@@ -125,6 +125,12 @@ scripts/
   pre-push                        ← optional hook that runs runtime push checks
 ```
 
+State discipline defaults:
+
+- keep `session_state.md` as the canonical todo truth and treat any workspace todo UI as a mirror only
+- record one `SKILL Evolution` startup check at the beginning of every conversation, task pickup, or phase re-entry before substantial execution continues
+- let the main-thread agent decide whether the round stays `observe_only` or escalates into invocation, candidate, or promotion work; the human may advise but does not own that trigger
+
 ---
 
 ## Quick Start

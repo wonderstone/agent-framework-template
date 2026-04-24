@@ -129,9 +129,18 @@ tmp/git_audit/<task_slug>/
 
 - Before any multi-step or cross-day task: read `session_state.md`
 - Update `session_state.md` when: sub-phase completes · major decision made · task interrupted · current goal diverges from actual state
+- When a task uses todos, treat `session_state.md` as the canonical todo truth; update its `Todo Sync` section in the same bounded step as the task-state change, and only then mirror that state into any workspace todo UI
 - **Technical Insights** section: permanent — never auto-delete; supersede explicitly
 - If `session_state.md` exceeds ~100 lines: archive old phase content to `docs/archive/`
 - For checkpointed long tasks, `Active Work` must mirror the fields required by the Rule 18 checkpoint contract
+
+### SKILL Evolution Startup Check
+
+- At the start of every new conversation, task pickup, or phase re-entry, the main-thread agent must explicitly evaluate whether SKILL evolution work should start for that round
+- Record that decision in `session_state.md` under `## SKILL Evolution` before substantial execution or closeout continues
+- Minimum fields are: `Startup Check`, `Main-Thread Decision`, `Reason`, `Human Role`, and `Last Evaluated`
+- Allowed main-thread decisions are: `observe_only`, `invocation_required`, `candidate_review`, `promotion_review`, and `n/a`
+- Human suggestions may inform the decision, but the main-thread agent remains the owner of whether SKILL evolution starts in that round
 
 ### Rollover and Reset
 

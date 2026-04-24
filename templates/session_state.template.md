@@ -68,6 +68,40 @@
 
 ---
 
+## Todo Sync
+
+<!-- Keep canonical todo truth here when the task uses one. -->
+<!-- The workspace todo list is a mirror, not the source of truth. -->
+<!-- Status values: in_sync / needs_refresh / n/a -->
+<!-- Todo markers: [ ] pending, [-] in progress, [x] completed -->
+
+**Source of Truth**: [session_state.md Todo Sync section / other]
+
+**Sync Status**: [in_sync / needs_refresh / n/a]
+
+**Last Synced**: [YYYY-MM-DD / n/a]
+
+- (none)
+
+---
+
+## SKILL Evolution
+
+<!-- Record the per-round startup check here before substantial execution continues. -->
+<!-- Main-thread agent owns the decision; humans are advisory only. -->
+
+**Startup Check**: [done / pending / n/a]
+
+**Main-Thread Decision**: [observe_only / invocation_required / candidate_review / promotion_review / n/a]
+
+**Reason**: [why SKILL evolution does or does not start this round]
+
+**Human Role**: [advisory only / n/a]
+
+**Last Evaluated**: [YYYY-MM-DD / n/a]
+
+---
+
 ## Completed This Phase
 
 <!-- Verified subtasks — cleared on phase graduation -->

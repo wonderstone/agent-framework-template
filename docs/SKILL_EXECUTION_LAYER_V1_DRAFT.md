@@ -122,11 +122,37 @@ promotion receipts remain the canonical evidence of approved mutation.
 
 ---
 
+## Startup Evaluation Contract
+
+Before substantial execution begins in a new conversation, task pickup, or phase re-entry, the main-thread agent must make one explicit SKILL evolution decision for that round.
+
+That startup check is lighter-weight than an invocation receipt.
+
+Its job is to answer whether the round should stay `observe_only`, require an invocation receipt, open candidate review, or route into promotion review.
+
+The minimal startup record should live in `session_state.md` and include:
+
+| Field | Meaning |
+|---|---|
+| `startup_check` | whether the round-level check was completed |
+| `main_thread_decision` | `observe_only`, `invocation_required`, `candidate_review`, `promotion_review`, or `n/a` |
+| `reason` | why the main thread chose that decision |
+| `human_role` | records that the human may advise but does not own the final trigger judgment |
+| `last_evaluated` | date of the most recent startup check |
+
+Design rule:
+
+the startup check is mandatory each round.
+
+the main-thread agent owns the decision of whether SKILL evolution starts.
+
+---
+
 ## Invocation Lifecycle
 
 The minimal v1 lifecycle is:
 
-1. a host or executor evaluates whether a skill should apply
+1. the main-thread agent records the round-level startup check and decides `observe_only`, `invocation_required`, `candidate_review`, `promotion_review`, or `n/a`
 2. if the skill is used, an invocation receipt is written
 3. the receipt records the skill, trigger class, references loaded, outcome, and evidence links
 4. bounded trigger rules decide whether a candidate packet should be created
