@@ -31,6 +31,8 @@
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule plus the reusable surfaces adopters should inherit |
 | `docs/RUNTIME_SURFACE_PROTECTION.md` | Surface guard registry pattern: protecting user-facing runtime paths from placeholder regression |
 | `docs/LEFTOVER_UNIT_CONTRACT.md` | Leftover unit contract: how to record, classify, and recover partial work truthfully |
+| `docs/AGENT_DELEGATION_GUIDE.md` | Multi-agent delegation rules: capability matrix, parallelism, prompt templates, agent-specific rules, escalation policy, and acceptance gates — distilled from a real A–E1 phase pipeline |
+| `templates/receipt_contract.template.md` | Receipt contract template: directory naming, file naming, supporting files, README inventory, correction protocol, and owner acceptance checklist for operator evaluations |
 
 ## Repository Root
 
@@ -48,10 +50,13 @@
 | Document | Description |
 |---|---|
 | `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
+| `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including two-phase prompt dispatch, execution-ID recording, and display-name versus control-handle rules |
+| `docs/runbooks/post-task-harvest.md` | Landing-tier workflow for turning reusable post-task learning into runbooks, scripts, CI gates, or skills |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit, replaceable reviewers, and Git closeout recovery |
 | `docs/runbooks/state-reconciliation.md` | Drift-packet workflow for reconciling `session_state.md`, `ROADMAP.md`, receipts, and handoff truth before closeout |
+| `templates/managed_terminal_prompt_dispatch_receipt.template.md` | Reusable three-step receipt template for `prompt_staged -> Enter -> post-dispatch output read` managed-terminal dispatches |
 
 ---
 
-*Last updated: 2026-04-08 — added the Wave 2 execution-proof plan*
+*Last updated: 2026-05-03 — updated managed terminal delegation assets for two-phase prompt dispatch and added the reusable dispatch receipt template*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*

@@ -39,6 +39,8 @@ description: >
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, progressive failure capture, runtime evidence ownership, and root-cause closeout |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion history and alternative viewpoints for AI-era traceability and recovery surfaces |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and the reusable surfaces adopters should inherit |
+| `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including two-phase prompt dispatch, execution-ID recording, and display-name versus control-handle rules |
+| `templates/managed_terminal_prompt_dispatch_receipt.template.md` | Reusable three-step receipt template for `prompt_staged -> Enter -> post-dispatch output read` managed-terminal dispatches |
 | `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` | Default final closeout-summary shape for hosts with terminal completion actions |
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Default in-progress update shape for long-running or while-style tasks |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
@@ -83,6 +85,7 @@ When resuming a multi-step task, recover context in this order:
 | `skill execution\|invocation receipt\|evolution mode\|fix\|derived\|captured` | `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` |
 | `developer toolchain design\|toolchain design\|verification status\|repro path\|scope tag` | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` |
 | `skill\|skills\|skill design\|skill mechanism\|triggerability\|progressive disclosure\|guardrail skill` | `docs/SKILL_MECHANISM_V1_DRAFT.md` |
+| `windows ssh\|encodedcommand\|non-scm\|win32_service\|windows automation\|copied binary\|observe lane` | `.github/skills/windows-ssh-automation/SKILL.md` |
 | `language tool\|developer toolchain\|diagnostic\|diagnostics\|lint\|build\|run\|debug` | `docs/DEVELOPER_TOOLCHAIN_DISCUSSION.md` |
 | `traceability\|recovery\|root cause\|incident\|failure packet\|runtime evidence\|user surface map\|security escalation` | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` |
 | `ai traceability\|traceability discussion\|recovery discussion\|incident discussion` | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` |
@@ -91,9 +94,13 @@ When resuming a multi-step task, recover context in this order:
 | `compatibility\|supported tool\|verified\|known limits` | `docs/COMPATIBILITY.md` |
 | `execution contract\|task confirmation\|long task\|while loop\|autonomous mode\|commit push policy` | `templates/execution_contract.template.md` |
 | `discussion\|debate\|framework choice\|plan review\|architecture option\|second round` | `docs/runbooks/multi-model-discussion-loop.md` |
+| `managed terminal\|execution id\|dangerously-skip-permissions\|dangerously-bypass-approvals-and-sandbox\|ccrun\|yolo` | `docs/runbooks/managed_cli_terminal_delegation.md` |
+| `windows host evaluation\|operator onboarding\|receipt capture\|receipt review\|native windows build\|watchdog prereq\|windows operator flow` | `.github/skills/windows-host-evaluation/SKILL.md` |
 | `runtime surface\|placeholder\|mock path\|banned phrase\|live smoke` | `docs/RUNTIME_SURFACE_PROTECTION.md` |
 | `leftover\|partial work\|slice classification\|scope entry` | `docs/LEFTOVER_UNIT_CONTRACT.md` |
 | `release\|version\|changelog\|upgrade notes` | `CHANGELOG.md` |
+| `delegation\|agent delegation\|multi-agent\|tranche dispatch\|prompt template\|escalation policy\|acceptance gate\|capability matrix` | `docs/AGENT_DELEGATION_GUIDE.md` |
+| `receipt contract\|receipt naming\|receipt inventory\|correction protocol\|operator receipt\|evaluation receipt\|receipt directory` | `templates/receipt_contract.template.md` |
 | `strategy\|mechanism\|review role\|reviewer split\|codex\|claude` | `docs/STRATEGY_MECHANISM_LAYERING.md` |
 | `role example\|review example\|role profile\|starter role\|runtime reviewer\|maintainability reviewer\|git reviewer\|performance reviewer` | `docs/ROLE_STRATEGY_EXAMPLES.md` |
 | `audit\|handoff\|receipt\|packet\|reviewer\|git closeout` | `docs/runbooks/resumable-git-audit-pipeline.md` |
