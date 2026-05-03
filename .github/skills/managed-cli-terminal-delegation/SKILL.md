@@ -28,7 +28,7 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 
 - The agent keeps trusted-local managed-terminal usage bounded, recorded, and honest.
 - The execution ID remains the machine control anchor even when the terminal label changes later.
-- Prompt dispatch obeys the explicit `prompt_staged -> Enter -> running` sequence before execution may be treated as active.
+- Prompt dispatch uses the repository-standard handshake, with outcomes limited to `started`, `started_after_submit`, or `degraded` and lane reuse preserved until control, readable output, or prompt-plus-enter viability is lost.
 
 ## Entry Instructions
 
@@ -36,9 +36,10 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 - Confirm the task is packet-ready before opening a managed executor terminal.
 - Choose the executor lane and use the approved trusted-local starter command from the runbook.
 - Retain the execution ID as the machine control anchor.
-- Immediately write `execution_id -> terminal label -> starter command -> purpose -> control state` into a durable repo-visible truth surface.
-- Stage the prompt body first and record the session as `prompt_staged` until an explicit Enter action has been sent when the executor lane requires Enter to dispatch.
-- Read the next terminal output and only then treat the managed session as `running`.
+- Immediately write `execution_id -> terminal label -> starter command -> purpose -> lane state` into a durable repo-visible truth surface.
+- Run the prompt-dispatch handshake in order: pre-read, send prompt, read output immediately, send one allowed Enter only if the prompt buffered, read output again, then classify the outcome.
+- Use only `started`, `started_after_submit`, or `degraded` as dispatch outcomes.
+- Keep using the same lane while the execution ID is controllable, output is readable, and the prompt body plus the one allowed Enter step still makes the agent continue running.
 - If the user later surfaces or renames the terminal tab, treat that name as a human anchor only.
 - If the execution ID is lost or the session becomes unresponsive, restart the controlled terminal or fall back to copy-paste prompt handoff explicitly.
 - Keep packet boundaries, terminal-state reporting, owner review, and focused validation unchanged.
@@ -50,7 +51,7 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 | managed terminal runbook | docs/runbooks/managed_cli_terminal_delegation.md | yes | Canonical trusted-local managed-terminal workflow |
 | managed terminal instruction pack | .github/instructions/managed-cli-terminal-delegation.instructions.md | yes | Execution-time guideline for when to use managed sessions |
 | project context adapter | .github/instructions/project-context.instructions.md | yes | Routes managed-terminal topics to the canonical runbook |
-| prompt dispatch receipt template | templates/managed_terminal_prompt_dispatch_receipt.template.md | no | Reusable three-step receipt shape for managed-terminal prompt dispatch |
+| prompt dispatch receipt template | templates/managed_terminal_prompt_dispatch_receipt.template.md | no | Reusable dispatch receipt shape for the managed-terminal handshake and final outcome |
 | skill mechanism design | docs/SKILL_MECHANISM_V1_DRAFT.md | no | Governs reusable skill structure and promotion expectations |
 
 ## Governance
@@ -85,7 +86,8 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 
 - If a controlled execution ID is unavailable, degrade to explicit copy-paste prompt handoff rather than pretending the human-visible terminal label is a control surface.
 - If the host tooling cannot keep a managed executor terminal alive reliably, restart the session and rewrite the registry truth instead of reusing a stale label.
-- If a prompt body was staged but the explicit Enter dispatch step has not happened yet, keep the session in `prompt_staged` or reset it truthfully instead of claiming active execution.
+- If a prompt body was sent but the lane buffered it, use one explicit Enter step and re-read output before deciding whether the outcome is `started_after_submit` or `degraded`.
+- If execution ID control is lost, output becomes unreadable, or the prompt body plus the one allowed Enter step still does not make the agent continue running, degrade or restart instead of guessing.
 
 ## Validator Notes
 

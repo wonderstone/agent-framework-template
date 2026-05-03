@@ -9,33 +9,54 @@
 
 ## Dispatch Contract
 
-The managed terminal prompt-dispatch contract is complete only when all three steps are captured in order:
+Record the prompt-dispatch handshake in order, then classify the outcome:
 
-1. `prompt_staged`
-2. `enter_sent`
-3. `post_dispatch_output_read`
+1. pre-read
+2. send prompt
+3. read output immediately
+4. one allowed Enter only if the prompt buffered in the visible input area
+5. read output again
+6. classify the outcome as `started`, `started_after_submit`, or `degraded`
 
-## Step 1 — Prompt Staged
+## Step 1 — Pre-Read
 
-- Timestamp: {{prompt_staged_at}}
+- Timestamp: {{pre_read_at}}
+- Readable Output Before Send: {{pre_read_output}}
+- Notes: {{pre_read_notes}}
+
+## Step 2 — Send Prompt
+
+- Timestamp: {{prompt_sent_at}}
 - Prompt Source: {{prompt_source}}
-- Control State After Step: `prompt_staged`
-- Notes: {{prompt_staged_notes}}
+- Notes: {{prompt_sent_notes}}
 
-## Step 2 — Enter Sent
+## Step 3 — Immediate Output Read
 
-- Timestamp: {{enter_sent_at}}
-- Dispatch Action: {{dispatch_action}}
-- Control State After Step: `enter_sent`
-- Notes: {{enter_sent_notes}}
+- Timestamp: {{first_output_read_at}}
+- Immediate Output: {{first_observed_output}}
+- Prompt Buffered In Visible Input Area: {{prompt_buffered}}
+- Notes: {{first_output_read_notes}}
 
-## Step 3 — Post-Dispatch Output Read
+## Step 4 — Allowed Enter Step
 
-- Timestamp: {{output_read_at}}
-- First Observed Output: {{first_observed_output}}
-- Running Confirmed: {{running_confirmed}}
-- Control State After Step: {{final_control_state}}
-- Notes: {{output_read_notes}}
+- Timestamp: {{submit_enter_at}}
+- Allowed Enter Used: {{submit_enter_used}}
+- Notes: {{submit_enter_notes}}
+
+## Step 5 — Second Output Read
+
+- Timestamp: {{second_output_read_at}}
+- Output After Allowed Enter: {{second_observed_output}}
+- Notes: {{second_output_read_notes}}
+
+## Outcome Classification
+
+- Dispatch Outcome: {{dispatch_outcome}}
+- Outcome Meaning:
+	- `started`: prompt continued without the Enter step
+	- `started_after_submit`: prompt buffered, one allowed Enter was sent, and the agent then continued running
+	- `degraded`: control was lost, output was unreadable, or prompt-plus-one-allowed-Enter still did not continue execution
+- Lane Reuse Decision: {{lane_reuse_decision}}
 
 ## Result
 

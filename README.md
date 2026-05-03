@@ -14,6 +14,8 @@ Most agent setups fail in one of three ways:
 
 This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
 
+Windows host evaluation packaging is also a reusable framework surface: use `.github/skills/windows-host-evaluation/SKILL.md` when an adopted repository needs truthful operator onboarding, native Windows build policy, and receipt-backed host evaluation rather than ad-hoc Windows notes.
+
 ---
 
 ## What's Included
@@ -31,6 +33,10 @@ This template exists to make those failure modes harder by default. It gives tea
     project-context.instructions.md ← project adapter (fill in for your project)
     backend.instructions.md        ← protocol for backend code changes
     docs.instructions.md           ← protocol for documentation changes
+  skills/
+    post-task-harvest/SKILL.md     ← workflow for landing reusable post-task learning in durable surfaces
+    windows-host-evaluation/SKILL.md ← workflow for packaging Windows operator onboarding, native-build policy, and receipt-backed evaluation lanes
+    windows-ssh-automation/SKILL.md ← workflow for macOS→Windows SSH execution, truthful control-plane discovery, and host-local build fallback
 
 docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
@@ -47,6 +53,7 @@ docs/
   DEVELOPER_TOOLCHAIN_DISCUSSION.md ← discussion history and tradeoffs behind that contract
   DOC_FIRST_EXECUTION_GUIDELINES.md ← repository-default doc-first planning rule for non-trivial work
   LEFTOVER_UNIT_CONTRACT.md        ← how to classify and record partial work truthfully
+  runbooks/post-task-harvest.md    ← landing-tier workflow for making reusable lessons durable
   STRATEGY_MECHANISM_LAYERING.md   ← strategy-layer vs mechanism-layer design pattern
   ROLE_STRATEGY_EXAMPLES.md        ← concrete reviewer / agent role examples
   RUNTIME_SURFACE_PROTECTION.md    ← guard-registry pattern for live user-facing paths
@@ -64,6 +71,7 @@ templates/
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   execution_progress_receipt.template.md ← receipt-bearing checkpoint artifact for long-running execution
+  experience_harvest_packet.template.md ← packet template for durable post-task learning and landing decisions
   skill_invocation_receipt.template.md ← runtime invocation evidence surface for skill use
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions

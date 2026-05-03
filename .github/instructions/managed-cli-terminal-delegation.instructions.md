@@ -15,20 +15,24 @@ Managed executor terminals are allowed only for trusted local environments and o
 
 1. open the terminal through a controlled execution surface and keep the returned execution ID
 2. treat the execution ID as the machine control anchor for input, output, and cleanup
-3. immediately record `execution_id -> label -> command -> purpose -> control state` in a durable repo-visible truth surface
+3. immediately record `execution_id -> label -> command -> purpose -> lane state` in a durable repo-visible truth surface
 4. if the user manually surfaces or renames the terminal in the editor, treat that terminal label as a human recognition anchor only
 5. use the approved trusted-local starter commands from `docs/runbooks/managed_cli_terminal_delegation.md`
-6. stage the prompt body first and send one explicit Enter action when the executor lane requires Enter to dispatch the prompt
-7. do not classify the managed session as running until the Enter step has been sent and a follow-up terminal output read has been attempted
-8. keep the session open during the long task unless restart or cleanup is required
+6. run the prompt-dispatch handshake in order: pre-read, send prompt, read output immediately, send one allowed Enter only if the prompt buffered, read output again, then classify the outcome
+7. classify the dispatch outcome only as `started`, `started_after_submit`, or `degraded`
+8. keep using the same lane while the execution ID is controllable, output is readable, and the prompt body plus the one allowed Enter step still makes the agent continue running
+9. keep the session open during the long task unless restart or cleanup is required
 
 ## Hard Rules
 
 1. do not assume a terminal display name is machine-addressable
 2. do not use trusted-local auto-approve starter commands for unknown, remote, or production-like hosts
 3. do not open a managed terminal before the task is packet-ready
-4. do not treat a staged prompt as active execution before the explicit Enter dispatch step
-5. if the execution ID is lost, explicitly downgrade to copy-paste prompt handoff or restart the terminal; do not pretend the renamed tab is still controllable
+4. do not treat a visible prompt echo as proof that execution already started
+5. do not treat visible old terminal output as a reason to replace the lane by itself
+6. do not treat the one allowed Enter step as a downgrade signal when the prompt buffered
+7. if the execution ID is lost, explicitly downgrade to copy-paste prompt handoff or restart the terminal; do not pretend the renamed tab is still controllable
+8. if output is no longer readable, or the prompt body plus the one allowed Enter step still does not make the agent continue running, classify the lane as degraded and restart or downgrade instead of guessing
 
 ## References
 

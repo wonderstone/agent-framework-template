@@ -39,8 +39,8 @@ description: >
 | `docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md` | Formal v1 design draft for user-surface mapping, progressive failure capture, runtime evidence ownership, and root-cause closeout |
 | `docs/AI_TRACEABILITY_AND_RECOVERY_DISCUSSION.md` | Discussion history and alternative viewpoints for AI-era traceability and recovery surfaces |
 | `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` | Repository-default doc-first planning rule and the reusable surfaces adopters should inherit |
-| `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including two-phase prompt dispatch, execution-ID recording, and display-name versus control-handle rules |
-| `templates/managed_terminal_prompt_dispatch_receipt.template.md` | Reusable three-step receipt template for `prompt_staged -> Enter -> post-dispatch output read` managed-terminal dispatches |
+| `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including the prompt-dispatch handshake, `started` / `started_after_submit` / `degraded` outcomes, execution-ID recording, and hard-condition lane reuse rules |
+| `templates/managed_terminal_prompt_dispatch_receipt.template.md` | Reusable handshake receipt template for managed-terminal dispatches, including one allowed Enter step only when the prompt buffered |
 | `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` | Default final closeout-summary shape for hosts with terminal completion actions |
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Default in-progress update shape for long-running or while-style tasks |
 | `docs/COMPATIBILITY.md` | Verified surfaces, intended integrations, and known limits |
