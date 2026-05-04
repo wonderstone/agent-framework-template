@@ -15,8 +15,9 @@ Use this skill when the user wants to:
 
 ## Files
 
-- Script: `/Users/mac/Desktop/AgentTools/scripts/provider-switch.sh`
-- README: `/Users/mac/Desktop/AgentTools/README.md`
+- Script: `scripts/provider-switch.sh`
+- Shell helpers: `shell/provider-switch.zsh`
+- README: `README.md`
 
 ## Profiles
 
@@ -32,13 +33,13 @@ Use this skill when the user wants to:
 If the framework can source shell scripts:
 
 ```bash
-source /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh apply ds-pro
+source scripts/provider-switch.sh apply ds-pro
 ```
 
 If the framework cannot source but can evaluate command output:
 
 ```bash
-eval "$(bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh env ds-pro)"
+eval "$(bash scripts/provider-switch.sh env ds-pro)"
 ```
 
 ### 2. Run one command with a profile
@@ -46,20 +47,20 @@ eval "$(bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh env ds-pro
 Use this when the framework should not mutate the parent shell:
 
 ```bash
-bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh exec ds-flash claude
+bash scripts/provider-switch.sh exec ds-flash claude
 ```
 
 Examples:
 
 ```bash
-bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh exec ds-pro claude
-bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh exec anth claude
+bash scripts/provider-switch.sh exec ds-pro claude
+bash scripts/provider-switch.sh exec anth claude
 ```
 
 ### 3. Inspect the current state
 
 ```bash
-bash /Users/mac/Desktop/AgentTools/scripts/provider-switch.sh status
+bash scripts/provider-switch.sh status
 ```
 
 ## Expected environment
@@ -70,11 +71,7 @@ For `ds-pro` and `ds-flash`, set:
 DEEPSEEK_API_KEY="your-key-here"
 ```
 
-Preferred location:
-
-```bash
-/Users/mac/Desktop/AgentTools/.env
-```
+Preferred location: `.env` at the framework root.
 
 The script maps Claude Code variables such as:
 
@@ -100,8 +97,8 @@ The script maps Claude Code variables such as:
 
 To add a new provider profile later:
 
-1. Edit `/Users/mac/Desktop/AgentTools/scripts/provider-switch.sh`
+1. Edit `scripts/provider-switch.sh`
 2. Add the profile name in `profile_exists`
 3. Add its environment mapping in `print_exports`
 4. Update this `SKILL.md`
-5. Update `/Users/mac/Desktop/AgentTools/README.md`
+5. Update `README.md`

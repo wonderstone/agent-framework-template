@@ -4,8 +4,12 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
+.env
 # AgentTools
 .cache/
 .charts/
 __pycache__/
 *.pyc
+examples/hpc/bench_O2
+examples/hpc/bench_O3
+examples/hpc/bench_full

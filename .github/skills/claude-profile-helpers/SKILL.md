@@ -15,9 +15,9 @@ Use this skill when the user wants to:
 
 ## Files
 
-- Shell helpers: `/Users/mac/Desktop/AgentTools/shell/provider-switch.zsh`
-- Script backend: `/Users/mac/Desktop/AgentTools/scripts/provider-switch.sh`
-- README: `/Users/mac/Desktop/AgentTools/README.md`
+- Shell helpers: `shell/provider-switch.zsh`
+- Script backend: `scripts/provider-switch.sh`
+- README: `README.md`
 
 ## Available helpers
 
@@ -38,7 +38,7 @@ Supported profiles:
 ### 1. Load the helper file into zsh
 
 ```bash
-source /Users/mac/Desktop/AgentTools/shell/provider-switch.zsh
+source shell/provider-switch.zsh
 ```
 
 ### 2. Switch the current shell profile
@@ -68,16 +68,10 @@ ccprofiles
 
 ## Expected environment
 
-For `ds-pro` and `ds-flash`, make sure `DEEPSEEK_API_KEY` is set in:
-
-```bash
-/Users/mac/Desktop/AgentTools/.env
-```
-
-or already exported in the shell.
+For `ds-pro` and `ds-flash`, make sure `DEEPSEEK_API_KEY` is set in `.env` at the framework root or already exported in the shell.
 
 ## Notes
 
 - This skill is for interactive zsh sessions.
-- For framework-agnostic or non-interactive usage, prefer `skills/provider-switch/SKILL.md`.
+- For framework-agnostic or non-interactive usage, prefer the provider-switch skill.
 - The zsh helpers delegate to the same backend script, so profile behavior stays consistent across both skills.
