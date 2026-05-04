@@ -33,10 +33,28 @@ Windows host evaluation packaging is also a reusable framework surface: use `.gi
     project-context.instructions.md ← project adapter (fill in for your project)
     backend.instructions.md        ← protocol for backend code changes
     docs.instructions.md           ← protocol for documentation changes
-  skills/
-    post-task-harvest/SKILL.md     ← workflow for landing reusable post-task learning in durable surfaces
-    windows-host-evaluation/SKILL.md ← workflow for packaging Windows operator onboarding, native-build policy, and receipt-backed evaluation lanes
-    windows-ssh-automation/SKILL.md ← workflow for macOS→Windows SSH execution, truthful control-plane discovery, and host-local build fallback
+  skills/                         ← 21 reusable agent skills
+    finance-macro/                 ← macroeconomic analysis engine (8 domains, 15+ models, 5 MCP servers)
+    code-audit/                    ← PoC-driven security audit (9 attack surface passes)
+    code-quality/                  ← 8-dimension code review with severity ranking
+    code-refactor/                 ← 14 code smell detection + safe transformations
+    code-testing/                  ← test strategy, mock/stub selection, smell detection
+    db-engineering/                ← schema design, indexing, migrations, query optimization
+    design-patterns/               ← 5-layer pattern catalog + decision trees
+    hpc-cpu/                       ← SIMD, OpenMP/TBB, BLAS/LAPACK, Cache optimization
+    hpc-gpu-cuda/                  ← CUDA kernels, CUTLASS, cuBLAS, Nsight
+    hpc-gpu-metal/                 ← Apple Silicon, MPS, MLX
+    hpc-gpu-rocm/                  ← HIP, rocBLAS, CUDA→ROCm porting
+    hpc-gpu-crossplatform/         ← OpenCL, Vulkan, SYCL, OpenACC
+    hpc-framework/                 ← PyTorch ext, Triton, JAX, GGML
+    hpc-workflow/                  ← Profile→Analyze→Optimize→Verify
+    post-task-harvest/             ← durable post-task learning workflow
+    windows-host-evaluation/       ← Windows operator onboarding + receipt-backed evaluation
+    windows-ssh-automation/        ← macOS→Windows SSH execution
+    managed-cli-terminal-delegation/ ← CLI terminal delegation protocol
+    provider-switch/               ← AI provider configuration switching
+    claude-profile-helpers/        ← interactive zsh profile configuration
+    execution-budget/              ← execution budget tracking
 
 docs/
   INDEX.md                         ← navigation index for all TYPE-A docs
