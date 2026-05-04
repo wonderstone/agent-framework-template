@@ -89,6 +89,22 @@ def test_validate_repo_reports_missing_required_file(tmp_path: Path) -> None:
     assert ValidationIssue("missing-file", "LICENSE") in issues
 
 
+def test_validate_repo_reports_missing_absorbed_skill_assets(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+    (repo_copy / ".github" / "skills" / "context7-docs" / "SKILL.md").unlink()
+    (repo_copy / "docs" / "SKILL_EXTERNAL_ABSORPTION_GUIDE.md").unlink()
+    (repo_copy / "docs" / "runbooks" / "design_gated_bounded_autonomy.md").unlink()
+    (repo_copy / "templates" / "design_gated_bounded_autonomy_packet.template.md").unlink()
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("missing-file", ".github/skills/context7-docs/SKILL.md") in issues
+    assert ValidationIssue("missing-file", "docs/SKILL_EXTERNAL_ABSORPTION_GUIDE.md") in issues
+    assert ValidationIssue("missing-file", "docs/runbooks/design_gated_bounded_autonomy.md") in issues
+    assert ValidationIssue("missing-file", "templates/design_gated_bounded_autonomy_packet.template.md") in issues
+
+
 def test_parse_developer_toolchain_entries_handles_pipe_in_command() -> None:
     _, _, entries = MODULE._parse_developer_toolchain_entries(
         """## Developer Toolchain\n\nPrimary language: Python\n\nPackage manager: pip\n\n| Surface | Command or source | Scope | Status | Fallback or stop | Notes |\n|---|---|---|---|---|---|\n| Diagnostics | `python -c \"print('ok')\" | cat` | `module` | `verified-working` | `Stop` | `Pipe-safe` |\n"""
@@ -777,6 +793,28 @@ def test_validate_repo_reports_standard_profile_bootstrap_drift(tmp_path: Path) 
     assert ValidationIssue(
         "bootstrap-profile-mismatch",
         "standard profile missing 'examples/demo_project/docs/runbooks/execution_contract_example.md'",
+    ) in issues
+
+
+def test_validate_repo_reports_standard_profile_bootstrap_drift_for_absorbed_assets(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    bootstrap_script = repo_copy / "scripts" / "bootstrap_adoption.py"
+    bootstrap_script.write_text(
+        bootstrap_script.read_text(encoding="utf-8").replace(
+            '        "templates/design_gated_bounded_autonomy_packet.template.md",\n',
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "bootstrap-profile-mismatch",
+        "standard profile missing 'templates/design_gated_bounded_autonomy_packet.template.md'",
     ) in issues
 
 

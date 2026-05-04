@@ -53,6 +53,8 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
 
     assert existing.read_text(encoding="utf-8") == "keep me"
     assert existing in result.skipped
+    assert (tmp_path / ".github" / "skills" / "context7-docs" / "SKILL.md").exists()
+    assert (tmp_path / ".github" / "skills" / "frontend-design" / "SKILL.md").exists()
     assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DESIGN.md").exists()
     assert (tmp_path / "docs" / "DEVELOPER_TOOLCHAIN_DISCUSSION.md").exists()
     assert (tmp_path / "docs" / "DOC_FIRST_EXECUTION_GUIDELINES.md").exists()
@@ -63,10 +65,13 @@ def test_bootstrap_standard_skips_existing_without_force(tmp_path: Path) -> None
     assert (tmp_path / "docs" / "LEFTOVER_UNIT_CONTRACT.md").exists()
     assert (tmp_path / "docs" / "STRICT_ADOPTION_AND_VERIFICATION.md").exists()
     assert (tmp_path / "docs" / "SKILL_EXECUTION_LAYER_V1_DRAFT.md").exists()
+    assert (tmp_path / "docs" / "SKILL_EXTERNAL_ABSORPTION_GUIDE.md").exists()
     assert (tmp_path / "docs" / "SKILL_HARVEST_LOOP_V1_DRAFT.md").exists()
     assert (tmp_path / "docs" / "SKILL_MECHANISM_V1_DRAFT.md").exists()
+    assert (tmp_path / "docs" / "runbooks" / "design_gated_bounded_autonomy.md").exists()
     assert (tmp_path / "docs" / "runbooks" / "multi-model-discussion-loop.md").exists()
     assert (tmp_path / "docs" / "runbooks" / "state-reconciliation.md").exists()
+    assert (tmp_path / "templates" / "design_gated_bounded_autonomy_packet.template.md").exists()
     assert (tmp_path / "templates" / "doc_first_execution_guidelines.template.md").exists()
     assert (tmp_path / "templates" / "discussion_packet.template.md").exists()
     assert (tmp_path / "templates" / "drift_reconciliation_packet.template.md").exists()

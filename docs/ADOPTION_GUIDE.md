@@ -45,6 +45,9 @@ Copy these files into your new repository, preserving their paths:
 .github/
   copilot-instructions.md          ← operating rules (Rule 0–27)
   RELEASE_TEMPLATE.md              ← release notes starting point
+  skills/
+    context7-docs/SKILL.md         ← adapter-backed external docs skill for version-sensitive third-party API truth
+    frontend-design/SKILL.md       ← workflow skill for stronger frontend visual direction and anti-generic output
   agents/
     architect.agent.md             ← analysis/planning agent
     implementer.agent.md           ← execution/validation agent
@@ -70,13 +73,16 @@ docs/
   STRATEGY_MECHANISM_LAYERING.md   ← keep if you want formal reviewer or agent role splits
   ROLE_STRATEGY_EXAMPLES.md        ← keep if you want ready-to-adapt role examples for different reviewer families
   RUNTIME_SURFACE_PROTECTION.md    ← keep if your project has active runtime paths to protect
+  SKILL_EXTERNAL_ABSORPTION_GUIDE.md ← canonical boundary for absorbing external skill ecosystems into local framework surfaces
   runbooks/
+    design_gated_bounded_autonomy.md ← recommended when design approval and keep-or-revert loops must be explicit before autonomous execution
     multi-model-discussion-loop.md ← recommended for framework choice, plan review, and other open design questions
     resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
     state-reconciliation.md        ← recommended when execution-state truth surfaces must be reconciled before closeout
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
 templates/
+  design_gated_bounded_autonomy_packet.template.md ← compact packet for explicit routing, design approval, and bounded keep-or-revert loops
   discussion_packet.template.md   ← append-only discussion packet for open design questions
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks

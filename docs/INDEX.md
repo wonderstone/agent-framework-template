@@ -20,6 +20,7 @@
 | `docs/COMPATIBILITY.md` | What is validated in this repository and what adopters still need to verify locally |
 | `docs/SKILL_HARVEST_LOOP_V1_DRAFT.md` | Formal v1 design draft for post-task SKILL harvest and per-field promotion-governance |
 | `docs/SKILL_EXECUTION_LAYER_V1_DRAFT.md` | Formal v1 design draft for runtime invocation evidence, bounded candidate triggers, and typed SKILL evolution lineage |
+| `docs/SKILL_EXTERNAL_ABSORPTION_GUIDE.md` | Canonical boundary for turning external skill ecosystems into local skill, adapter, or mechanism surfaces without importing their host-specific assumptions |
 | `docs/SKILL_FIVE_PATTERN_EXECUTION_PLAN_V1.md` | Doc-first execution plan for absorbing Google's five SKILL patterns into concrete template surfaces |
 | `docs/SKILL_MECHANISM_V1_DRAFT.md` | Formal v1 design draft for a framework-native SKILL contract, evidence gates, and honest degradation |
 | `docs/DEVELOPER_TOOLCHAIN_DESIGN.md` | Formal v1 design draft for the agent-facing Developer Toolchain surface |
@@ -50,6 +51,7 @@
 | Document | Description |
 |---|---|
 | `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
+| `docs/runbooks/design_gated_bounded_autonomy.md` | Concrete workflow for explicit routing, design approval, bounded keep-or-revert execution loops, and post-task learning landing |
 | `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including the prompt-dispatch handshake, `started` / `started_after_submit` / `degraded` outcomes, execution-ID recording, and hard-condition lane reuse rules |
 | `docs/runbooks/post-task-harvest.md` | Landing-tier workflow for turning reusable post-task learning into runbooks, scripts, CI gates, or skills |
 | `docs/runbooks/resumable-git-audit-pipeline.md` | Packet / receipt / handoff workflow for resumable audit, replaceable reviewers, and Git closeout recovery |
@@ -58,5 +60,5 @@
 
 ---
 
-*Last updated: 2026-05-03 — updated managed terminal delegation assets for prompt-dispatch handshake, hard-condition lane reuse, and the reusable dispatch receipt template*
+*Last updated: 2026-05-04 — added the external skill absorption guide plus absorbed `frontend-design` and `context7-docs` skill surfaces*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*
