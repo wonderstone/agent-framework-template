@@ -48,7 +48,7 @@ def _nz_request(endpoint, timeout=30):
     url = f"{STATS_NZ_BASE}/{endpoint}"
     try:
         req = urllib.request.Request(url, headers={
-            "User-Agent": "AgentTools-Macro/1.0",
+            "User-Agent": "MacroFinance-MCP/1.0",
             "Ocp-Apim-Subscription-Key": api_key,
         })
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -71,7 +71,7 @@ def _abs_request(endpoint, timeout=30):
     url = f"{ABS_BASE}/{endpoint}"
     try:
         req = urllib.request.Request(url, headers={
-            "User-Agent": "AgentTools-Macro/1.0",
+            "User-Agent": "MacroFinance-MCP/1.0",
             "x-api-key": api_key,
         })
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -188,7 +188,7 @@ def handle_mcp_call(tool_name, arguments):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Stats MCP Server for AgentTools Macro Skills")
+        print("Stats MCP Server for Macro Finance Skills")
         print("Supported: Stats NZ, ABS (Australia), ONS (UK)")
         print("Usage: python3 server.py <tool> '<json_arguments>'")
         print("Examples:")

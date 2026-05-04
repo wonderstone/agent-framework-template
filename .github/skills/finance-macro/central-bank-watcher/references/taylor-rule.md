@@ -92,7 +92,7 @@ Taylor Rule has limited applicability to BOJ — structural deflation, YCC frame
 4. **Single-equation** — doesn't capture the Fed's reaction to international developments
 5. **No ZLB handling** — the rule prescribes negative rates during deep recessions
 
-## Practical Usage in AgentTools
+## Practical Usage
 
 When analyzing whether a central bank is hawkish or dovish, the Taylor Rule provides a quantitative benchmark:
 

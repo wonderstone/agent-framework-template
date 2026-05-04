@@ -64,7 +64,7 @@ def _fred_request(endpoint, params=None):
 
     url = f"{FRED_BASE}/{endpoint}?{urllib.parse.urlencode(base_params)}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "AgentTools-Macro/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "MacroFinance-MCP/1.0"})
         with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
@@ -220,7 +220,7 @@ def handle_mcp_call(tool_name, arguments):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("FRED MCP Server for AgentTools Macro Skills")
+        print("FRED MCP Server for Macro Finance Skills")
         print("Usage: python3 server.py <tool> <json_arguments>")
         print("Example: python3 server.py get_series '{\"series_id\": \"GDP\", \"limit\": 10}'")
         sys.exit(1)

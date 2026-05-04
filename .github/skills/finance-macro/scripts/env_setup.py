@@ -41,11 +41,19 @@ OPTIONAL_VARS = {
 
 
 def _load_dotenv():
-    """Load .env from AgentTools root if present."""
-    env_paths = [
-        Path(__file__).resolve().parent.parent.parent / ".env",
-        Path.home() / ".claude" / ".env",
-    ]
+    """Load .env from framework root or home directory if present."""
+    env_paths = []
+    # search upward from this script until we find .env or hit the filesystem root
+    p = Path(__file__).resolve().parent
+    for _ in range(10):
+        candidate = p / ".env"
+        if candidate.exists():
+            env_paths.append(candidate)
+            break
+        if p.parent == p:
+            break
+        p = p.parent
+    env_paths.append(Path.home() / ".claude" / ".env")
     for env_path in env_paths:
         if env_path.exists():
             with open(env_path) as f:

@@ -41,7 +41,7 @@ def _bis_csv(url, timeout=30):
     """Fetch BIS CSV data."""
     try:
         req = urllib.request.Request(url, headers={
-            "User-Agent": "AgentTools-Macro/1.0",
+            "User-Agent": "MacroFinance-MCP/1.0",
             "Accept": "text/csv",
         })
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -210,7 +210,7 @@ def handle_mcp_call(tool_name, arguments):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("BIS MCP Server for AgentTools Macro Skills")
+        print("BIS MCP Server for Macro Finance Skills")
         print("Data: Credit gaps, property prices, total credit, debt service ratios")
         print("Usage: python3 server.py <tool> '<json_arguments>'")
         print("Examples:")

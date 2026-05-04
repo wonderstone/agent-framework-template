@@ -101,7 +101,7 @@ def get_weo(country="NZL", indicator="NGDP_RPCH", limit=10):
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "AgentTools-Macro/1.0", "Accept": "application/json"},
+            headers={"User-Agent": "MacroFinance-MCP/1.0", "Accept": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode())
@@ -146,7 +146,7 @@ def get_ifs(indicator="ENDA_XDC_USD_RATE", country="NZ", limit=12):
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "AgentTools-Macro/1.0", "Accept": "application/json"},
+            headers={"User-Agent": "MacroFinance-MCP/1.0", "Accept": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode())
@@ -213,7 +213,7 @@ def handle_mcp_call(tool_name, arguments):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("IMF MCP Server for AgentTools Macro Skills")
+        print("IMF MCP Server for Macro Finance Skills")
         print("IMPORTANT: Requires free registration at https://data.imf.org/")
         print("Common WEO codes: NGDP_RPCH (GDP growth), PCPIEPCH (CPI), BCA_NGDPD (Current Account)")
         print("Usage: python3 server.py <tool> '<json_arguments>'")
