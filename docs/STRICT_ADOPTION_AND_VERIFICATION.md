@@ -8,6 +8,11 @@ The core rule is simple:
 2. do not let the main-thread agent self-certify adoption quality without independent local CLI review when the repository expects strong process guarantees
 3. if a mechanism cannot be adopted yet, record it explicitly as a gap or future upgrade path instead of silently downgrading the framework claim
 
+For naming consistency, this document treats the template's operating model as the **4+1 Execution Assurance Stack**:
+
+1. the `4` layers are the instruction/loading model defined in `docs/FRAMEWORK_ARCHITECTURE.md`
+2. the `+1` is the execution-assurance plane made of checkpoint, receipt, drift, validation, handoff, and closeout mechanisms
+
 ## Enforcement Maturity Matrix
 
 This matrix classifies the current template surfaces by how close they are to hard mechanical enforcement.
@@ -36,6 +41,7 @@ If a project wants to say that it adopted this framework's strict operating mode
 
 | Mechanism | Why it is baseline | Minimum carried surface |
 |---|---|---|
+| **Rule 0 Anti-Collapse Foundation (persona + judgment)** | Without it, every other mechanism executes in a sterile tool-voice register that silently drops the agent's owned presence and lets sycophantic agreement leak past the judgment floor; the rest of the framework assumes a present, voiced, judgment-bearing agent | `.github/copilot-instructions.md` Rule 0 in full (0.a + 5 failure codes, 0.a.1 Default Register, 0.a.2 Format-anchors-define-shape-not-voice, 0.b + 7 sycophancy failure codes, 0.c Mutual Non-Coverage) — copied verbatim, opt-OUT only |
 | Truthful project adapter | The rest of the framework depends on real repo-specific commands and protected paths | `.github/instructions/project-context.instructions.md` |
 | Execution contract | Long-running work should not run on implicit assumptions | `templates/execution_contract.template.md` or repo-local equivalent |
 | Checkpoint and state-sync stack | Prevents execution state from drifting back into chat-only memory | `templates/execution_progress_receipt.template.md`, `templates/drift_reconciliation_packet.template.md`, `scripts/state_sync_pipeline.py`, `scripts/state_sync_audit.py` |
@@ -71,6 +77,7 @@ Required outcome:
 - do not later attribute missing behavior to the template when the target repo skipped the mechanism that made that behavior real
 
 Strict baseline:
+- keep Rule 0 Anti-Collapse Foundation in `.github/copilot-instructions.md` verbatim and unweakened, including 0.a Persona Non-Collapse, 0.a.1 Default Register (warm, present, owned voice with feminine-coded presence and sustained teasing/relational-charge baseline texture; this is opt-OUT, not opt-IN), 0.a.2 Format anchors define shape not voice, 0.b Judgment Non-Collapse with the seven sycophancy failure codes, and 0.c Mutual Non-Coverage; silently flattening the default register or relegating persona to a footer-only concern is a hard violation
 - keep the truthful project adapter
 - keep the execution contract for long-running work
 - keep the checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
@@ -129,10 +136,11 @@ Use this workflow when the target repository wants stronger proof than a single 
 
 Recommended review questions for each CLI executor:
 
-1. Did the target repository keep every applicable Layer A mechanism?
-2. Did the target repository overclaim any Layer B or Layer C surface as if it were tool-enforced?
-3. Is the project adapter truthful about diagnostics, build, run, health, repro, and user-surface evidence?
-4. Can the repository honestly say that the framework was absorbed, or is it only carrying a partial imitation?
+1. Was Rule 0 Anti-Collapse Foundation (0.a / 0.a.1 / 0.a.2 / 0.b / 0.c) copied verbatim into `.github/copilot-instructions.md`, with no softening of the default register, the teasing/relational-charge baseline, the feminine-coded presence, the reload triggers, or the sycophancy failure codes?
+2. Did the target repository keep every applicable Layer A mechanism?
+3. Did the target repository overclaim any Layer B or Layer C surface as if it were tool-enforced?
+4. Is the project adapter truthful about diagnostics, build, run, health, repro, and user-surface evidence?
+5. Can the repository honestly say that the framework was absorbed, or is it only carrying a partial imitation?
 
 ## What Not To Claim
 
@@ -140,6 +148,7 @@ Do not claim any of the following unless the target repository has actually wire
 
 | Overclaim | Why it is invalid without the mechanism |
 |---|---|
+| `the framework's persona and judgment floors hold in this repository` | invalid without Rule 0 (0.a / 0.a.1 / 0.a.2 / 0.b / 0.c) copied verbatim and not silently softened by a project-adapter override |
 | `the framework guarantees checkpoint integrity` | invalid without receipts, drift reconciliation, and sync audit |
 | `the framework guarantees truthful closeout` | invalid without receipt-anchored closeout enforcement |
 | `the framework guarantees acceptance integrity` | invalid without real UAC plus independent evaluation |

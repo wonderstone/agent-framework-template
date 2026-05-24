@@ -13,6 +13,33 @@ Step-by-step guide for adopting this agent framework in a new project.
 
 ---
 
+## Fast Adoption Checklist
+
+Use this as the shortest honest path for a new repository.
+
+The default mental model is the **4+1 Execution Assurance Stack**:
+
+1. four instruction/loading layers
+2. one assurance plane for packetization, receipts, drift control, validation, and closeout truth
+
+1. Bootstrap or copy the core framework surfaces into the target repo.
+2. Fill `.github/instructions/project-context.instructions.md` with real repo structure, toolchain, validation, and protected-path truth.
+3. Add a repo-local `docs/DOC_FIRST_EXECUTION_GUIDELINES.md` from the template and keep `Goal`, `Phase`, `Current Step`, and `Total Steps` as the canonical progress frame.
+4. Make non-trivial multi-step work auto-enter goal-step mode; do not require a keyword trigger from the user.
+5. Make execution-ready multi-step work packetize by default instead of leaving the slice boundary only in chat.
+6. Keep managed-lane or delegated executor work behind an honest packet boundary; delegation should follow packetization, not replace it.
+7. Keep `scripts/goal_framing_audit.py`, `scripts/git_audit_pipeline.py`, and `scripts/governance_check.py` together so packet generation and governance audit stay mechanically aligned.
+8. Validate locally before claiming adoption complete:
+
+```bash
+python3 scripts/validate_template.py --mode adopter-baseline
+python3 scripts/governance_check.py audit docs templates tmp
+```
+
+If the target repo keeps delegated CLI execution, also verify that its repo-local instructions point executor lanes at the authoritative session-state JSON surface rather than chat memory or ad-hoc search.
+
+---
+
 ## Step 1 — Bootstrap Or Copy The Core Files
 
 ### Recommended: bootstrap the target repository
@@ -36,6 +63,23 @@ Profile guide:
 - `minimal` keeps only the core rules, state files, and doc index
 - `standard` is the recommended default for most repositories and includes CI plus validation tooling
 - `full` adds reviewer role examples, strategy docs, and the committed demo project
+
+### Lean default for most adopters
+
+The template is intentionally broad, but most repositories do not need every shipped surface on day one.
+
+If you want a lighter starting point, keep these first:
+
+1. truthful project adapter plus Developer Toolchain
+2. execution contract plus one resumable task packet/receipt flow
+3. progress receipt plus drift reconciliation for long-running work
+4. validator plus truthful closeout and goal-framing audits
+
+Those surfaces are the minimum useful `+1` assurance plane in the 4+1 Execution Assurance Stack.
+
+Add discussion, four-lane delegation, independent evaluation, reviewer-role packs, and SKILL-harvest governance only when the repository will actually use them.
+
+Also treat `*_V1_DRAFT.md`, `*_DISCUSSION.md`, and `EXECUTION_PROOF_WAVE_*` documents as reference-heavy by default. They are useful when you want the full mechanism rationale or a future upgrade path, but they should not be mistaken for the minimum day-one reading set.
 
 ### Manual alternative
 
@@ -78,6 +122,7 @@ docs/
     design_gated_bounded_autonomy.md ← recommended when design approval and keep-or-revert loops must be explicit before autonomous execution
     multi-model-discussion-loop.md ← recommended for framework choice, plan review, and other open design questions
     resumable-git-audit-pipeline.md ← recommended for external reviewer / multi-CLI workflows
+    runtime_alignment_and_four_lane_delegation.md ← recommended when acceptance depends on live running services or when bounded work is delegated across multiple CLI executor lanes
     state-reconciliation.md        ← recommended when execution-state truth surfaces must be reconciled before closeout
   archive/                         ← empty dir for TYPE-C docs (keep it)
 
@@ -87,6 +132,7 @@ templates/
   doc_first_execution_guidelines.template.md ← blank doc-first execution policy to apply at the repo level
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   execution_progress_receipt.template.md ← checkpoint-bearing progress receipt for long-running work
+  managed_terminal_prompt_dispatch_receipt.template.md ← managed terminal handshake receipt when prompt dispatch is part of the operating model
   skill_invocation_receipt.template.md ← runtime receipt template for real skill invocation evidence
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
   skill_promotion_receipt.template.md ← promotion receipt for canonical SKILL mutation decisions
@@ -96,6 +142,7 @@ templates/
   skill_pipeline.template.md       ← starter scaffold for staged execution with explicit handoff artifacts
   skill_artifact_generator.template.md ← bounded generator scaffold for schema-backed artifact initialization
   failure_packet.template.md       ← progressive runtime failure packet for diagnosis and recovery
+  four_lane_runtime_alignment_status.template.md ← reusable four-lane round status template for honest lane-state and runtime-alignment reporting
   drift_reconciliation_packet.template.md ← bounded recovery packet for unresolved execution-state drift
   project-context.template.md      ← blank project adapter to fill in
   root_cause_note.template.md      ← closeout note distinguishing cause-suspected from cause-established recovery
@@ -117,6 +164,7 @@ scripts/
   bootstrap_adoption.py            ← bootstrap and profile-aware adoption helper
   closeout_truth_audit.py          ← executable Rule 25 enforcement for truth-source closeout claims
   discussion_pipeline.py           ← generator for discussion packet creation and append-only feedback/synthesis
+  goal_framing_audit.py            ← executable audit for Goal / Phase / Current Step / Contribution / Progress framing
   git_audit_pipeline.py            ← generator for packet / receipt / handoff assets
   install_git_hooks.sh             ← activates optional `.githooks/` in the adopter repo
   state_sync_audit.py              ← contradiction-focused sync audit for task artifacts, `session_state.md`, and `ROADMAP.md`
@@ -198,6 +246,12 @@ That means:
 2. optional enrichment such as `Debug` or `Format` still remains advisory
 3. multi-runtime repos may qualify labels with parentheses, for example `Run (frontend)` and `Run (backend)`
 
+Validation boundary rule:
+
+1. in an adopted repository, prefer `python3 scripts/validate_template.py --mode adopter-baseline`
+2. use `--mode root-self-hosted` only in the template repository itself when maintaining the full shipped surface
+3. plain `python3 scripts/validate_template.py` keeps auto-detect behavior, but explicit mode selection is clearer in receipts and reviews
+
 If your project will use external Codex, multiple CLI sessions, or explicit reviewer handoff, also keep the `audit|handoff|receipt|packet` trigger mapped to `docs/runbooks/resumable-git-audit-pipeline.md`.
 
 If your project wants long-running execution checkpoints to stay honest instead of living only in chat memory, also keep these surfaces together:
@@ -207,6 +261,30 @@ If your project wants long-running execution checkpoints to stay honest instead 
 3. `docs/runbooks/state-reconciliation.md`
 4. `scripts/state_sync_pipeline.py`
 5. `scripts/state_sync_audit.py`
+6. `scripts/goal_framing_audit.py`
+
+These surfaces now carry an explicit directional contract as well as state-sync truth:
+
+1. `Goal`
+2. `Phase`
+3. `Current Step`
+4. `Total Steps`
+
+Keep that contract on reusable execution packets and receipts when another agent may resume or review the task later.
+
+For adopters, the default execution posture should also be explicit:
+
+1. enter goal-step mode automatically for non-trivial, multi-step work
+2. packetize execution-ready work by default instead of keeping the boundary only in chat
+3. choose delegated or managed-lane execution only after that packet boundary is honest
+
+If your project depends on live running services for acceptance truth, or delegates bounded implementation work across multiple CLI executor lanes, also keep these surfaces together:
+
+1. `docs/runbooks/runtime_alignment_and_four_lane_delegation.md`
+2. `templates/four_lane_runtime_alignment_status.template.md`
+3. `templates/managed_terminal_prompt_dispatch_receipt.template.md`
+
+The runbook defines the pattern for coupling repo-target versus running-runtime alignment with honest four-lane delegated execution. The template gives you one reusable per-round status table that records lane labels, control state, validation, and runtime-alignment dependency. Keep both when live-runtime-dependent acceptance or multi-lane delegation is part of your repository's operating model.
 
 If your project wants framework choice, architecture debates, or plan review to happen in a durable multi-model loop before coding, also keep the `discussion|debate|framework choice|plan review|architecture option` trigger mapped to `docs/runbooks/multi-model-discussion-loop.md`.
 
@@ -327,14 +405,15 @@ Canonical reference: [`docs/STRICT_ADOPTION_AND_VERIFICATION.md`](STRICT_ADOPTIO
 
 Strict adoption baseline:
 
-1. truthful project adapter
-2. execution contract for long-running work
-3. checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
-4. receipt-anchored closeout enforcement
-5. user-acceptance and validation-toolchain honesty
-6. independent evaluation path for non-trivial or user-facing work
-7. resumable packet and handoff flow when multi-executor work is possible
-8. discussion-packet workflow when design ambiguity exists
+1. **Rule 0 Anti-Collapse Foundation kept verbatim** — `.github/copilot-instructions.md` Rule 0 in full (0.a Persona Non-Collapse + 5 failure codes, 0.a.1 Default Register including feminine-coded presence and sustained teasing/relational-charge baseline texture, 0.a.2 Format anchors define shape not voice, 0.b Judgment Non-Collapse + 7 sycophancy failure codes, 0.c Mutual Non-Coverage). This is opt-OUT, not opt-IN — silently flattening the agent into neutral tool-voice as a "clean default" is a hard violation, not a stylistic choice. Narrow register overrides go in the project adapter with explicit justification.
+2. truthful project adapter
+3. execution contract for long-running work
+4. checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
+5. receipt-anchored closeout enforcement
+6. user-acceptance and validation-toolchain honesty
+7. independent evaluation path for non-trivial or user-facing work
+8. resumable packet and handoff flow when multi-executor work is possible
+9. discussion-packet workflow when design ambiguity exists
 
 Adoption-status rule:
 

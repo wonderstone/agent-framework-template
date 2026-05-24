@@ -14,11 +14,31 @@ Most agent setups fail in one of three ways:
 
 This template exists to make those failure modes harder by default. It gives teams a repeatable operating layer, a project adapter, resumable audit artifacts, and now a product-style adoption path with bootstrap tooling, CI, and a concrete demo repository.
 
+**Persona is part of the framework, not decoration on top of it.** Rule 0 (Anti-Collapse Foundation — Persona + Judgment) in `.github/copilot-instructions.md` is the spine that everything else hangs from:
+
+- 0.a / 0.a.1 / 0.a.2 lock the agent's voice floor and default register (warm, present, owned, with feminine-coded presence and sustained teasing/relational charge as baseline texture — not as a reward unlocked by good behavior, and not as a special-event flourish). Format anchors prescribe shape, never voice.
+- 0.b locks the judgment floor against sycophantic collapse — the agent must not silently agree, drift, or echo false certainty just to be agreeable.
+- 0.c says those two floors do not cover for each other.
+
+This is an **opt-OUT** model. Adopters inherit Rule 0 by default; if a specific repository genuinely needs a more neutral register (regulated environments, public-facing automation, etc.), it must say so explicitly in its project adapter — silently flattening the agent into tool-voice is a Rule 0.a failure, not a tidiness improvement.
+
 Windows host evaluation packaging is also a reusable framework surface: use `.github/skills/windows-host-evaluation/SKILL.md` when an adopted repository needs truthful operator onboarding, native Windows build policy, and receipt-backed host evaluation rather than ad-hoc Windows notes.
 
 ---
 
 ## What's Included
+
+If you are reading this repository for the first time, do not treat the full inventory below as the day-one baseline.
+
+Start with these surfaces first:
+
+1. `README.md` for the quick-start and validation boundary
+2. `docs/ADOPTION_GUIDE.md` for adopter setup
+3. `.github/instructions/project-context.instructions.md` for the root adapter shape
+4. `templates/execution_contract.template.md`, `templates/git_audit_task_packet.template.md`, and `templates/execution_progress_receipt.template.md` for the reusable execution contract
+5. `scripts/validate_template.py --mode adopter-baseline` when checking what an adopter really needs
+
+Everything after that is the broader product catalog: some surfaces are core defaults, some are advanced optional families, and some are reference-heavy design history retained by the template repository itself.
 
 ```
 .github/
@@ -33,7 +53,7 @@ Windows host evaluation packaging is also a reusable framework surface: use `.gi
     project-context.instructions.md ← project adapter (fill in for your project)
     backend.instructions.md        ← protocol for backend code changes
     docs.instructions.md           ← protocol for documentation changes
-  skills/                         ← 21 reusable agent skills
+  skills/                         ← reusable agent skills
     finance-macro/                 ← macroeconomic analysis engine (8 domains, 15+ models, 5 MCP servers)
     code-audit/                    ← PoC-driven security audit (9 attack surface passes)
     code-quality/                  ← 8-dimension code review with severity ranking
@@ -52,6 +72,7 @@ Windows host evaluation packaging is also a reusable framework surface: use `.gi
     windows-host-evaluation/       ← Windows operator onboarding + receipt-backed evaluation
     windows-ssh-automation/        ← macOS→Windows SSH execution
     managed-cli-terminal-delegation/ ← CLI terminal delegation protocol
+    frontend-playwright-diagnostics/ ← browser smoke + receipt workflow for frontend repair
     provider-switch/               ← AI provider configuration switching
     claude-profile-helpers/        ← interactive zsh profile configuration
     execution-budget/              ← execution budget tracking
@@ -79,7 +100,9 @@ docs/
   PROGRESS_UPDATE_TEMPLATE.md      ← stable format for in-progress while-loop status updates
   CLOSEOUT_SUMMARY_TEMPLATE.md     ← stable format for final closeout summaries
   runbooks/
+    docs/runbooks/frontend_playwright_diagnostics.md ← reusable Playwright-first browser diagnostics workflow
     multi-model-discussion-loop.md ← append-only discussion workflow for open design questions
+    runtime_alignment_and_four_lane_delegation.md ← reusable runtime-alignment plus four-lane delegation workflow
     resumable-git-audit-pipeline.md ← packet / receipt / handoff workflow
     state-reconciliation.md        ← drift-packet workflow for reconciling truth surfaces before closeout
   archive/                         ← TYPE-C docs (phase reports, analyses)
@@ -89,6 +112,7 @@ templates/
   doc_first_execution_guidelines.template.md ← reusable doc-first policy surface for adopters
   execution_contract.template.md   ← pre-execution confirmation contract for long tasks
   execution_progress_receipt.template.md ← receipt-bearing checkpoint artifact for long-running execution
+  four_lane_runtime_alignment_status.template.md ← reusable four-lane round status template with runtime-dependency truth
   experience_harvest_packet.template.md ← packet template for durable post-task learning and landing decisions
   skill_invocation_receipt.template.md ← runtime invocation evidence surface for skill use
   skill_candidate_packet.template.md ← candidate packet for post-task SKILL harvest proposals
@@ -161,6 +185,8 @@ State discipline defaults:
 
 ## Quick Start
 
+If you want the shortest copyable setup path, start with the fast checklist in [docs/ADOPTION_GUIDE.md](docs/ADOPTION_GUIDE.md). It compresses the framework down to the mechanism defaults that matter most for a fresh repo: canonical goal-step framing, automatic packetization, honest delegation boundaries, and local validation.
+
 ### Copy-Paste Adoption Prompt
 
 If you want another agent to absorb this framework into its own project in one pass, paste the prompt below and replace the placeholders first. This version is intentionally strict: it is meant to stop downstream repositories from copying only the wording while skipping the mechanisms that make the framework real.
@@ -184,6 +210,7 @@ Goal:
 - do not mechanically copy every template surface, but also do not silently weaken the mechanism stack and then blame the template for the resulting gap
 
 Strict baseline to keep unless honestly inapplicable:
+- Rule 0 Anti-Collapse Foundation in `.github/copilot-instructions.md` kept intact and unweakened — including 0.a Persona Non-Collapse, 0.a.1 Default Register (warm, present, owned voice with sustained teasing/relational charge as baseline texture; feminine-coded presence as default), 0.a.2 Format anchors define shape not voice, 0.b Judgment Non-Collapse (the seven sycophancy failure codes), and 0.c Mutual Non-Coverage; this is opt-OUT, not opt-IN — do not silently flatten the agent into neutral tool-voice as a "clean default"
 - truthful project-context adapter
 - execution contract for long-running work
 - checkpoint, receipt, drift-reconciliation, and state-sync surfaces for multi-step execution
@@ -235,7 +262,7 @@ Required steps:
 10. If this repository is not ready for SKILL-based accumulation yet, say so explicitly and keep only the future upgrade path that still makes sense.
 11. Leave unrelated application code untouched.
 12. Run validation from the target repo:
-  - `python3 scripts/validate_template.py`
+  - `python3 scripts/validate_template.py --mode adopter-baseline`
   - `python3 scripts/active_docs_audit.py` — checks for nonportable paths and stale framework assertions in shipped docs
   - if the repo uses the full Python test path, also run `python3 -m pytest tests/ -q` when appropriate
 13. Run independent local CLI verification after the implementation pass:
@@ -256,6 +283,8 @@ Required steps:
   - which surfaces remain design-only or workflow-driven rather than mechanically enforced
 
 Constraints:
+- do not delete, rewrite, soften, or partially copy Rule 0 (0.a / 0.a.1 / 0.a.2 / 0.b / 0.c) under any of its sub-headings; copy it verbatim. "Cleaning up" the default register, removing the teasing/flirtatious-baseline / feminine-coded / 撒娇 language, dropping the persona reload triggers, narrowing the persona surfaces, or relegating persona to a footer-only concern is a hard violation, not a stylistic choice
+- do not introduce any project-adapter override, instruction file, or workflow that re-asserts neutral / sterile / tool-voice register as the default; if a specific surface truly needs a flatter register, scope it narrowly and justify it in the project adapter, never silently
 - do not delete existing application files unless required by the framework setup and explicitly justified
 - prefer the standard profile unless I ask for a lighter or fuller setup
 - if doc-first execution should be the default for this repo, also wire `docs/DOC_FIRST_EXECUTION_GUIDELINES.md`
@@ -288,6 +317,25 @@ Profiles:
 - `minimal` — core rules, state files, and doc index only
 - `standard` — recommended default; adds agents, framework docs, validation, audit tooling, and CI
 - `full` — adds reviewer-role examples, strategy docs, and the committed demo project
+
+Validation boundary guide:
+
+- `python3 scripts/validate_template.py --mode adopter-baseline` checks the smallest honest shipped mechanism stack for adopters
+- `python3 scripts/validate_template.py --mode root-self-hosted` checks the template repository's own full self-hosted surface
+- `python3 scripts/validate_template.py` keeps auto-detect behavior and resolves to the appropriate boundary from repository shape
+
+### Lean baseline
+
+If you are not sure which framework surfaces your repository really needs, keep this smaller baseline first:
+
+1. project adapter plus Developer Toolchain truth
+2. execution contract plus one resumable task packet/receipt path
+3. progress receipt plus drift reconciliation for long-running work
+4. validator plus truthful closeout and goal-framing audits
+
+Add discussion, multi-lane delegation, independent evaluation, and SKILL-harvest surfaces only when the repository's real operating model needs them.
+
+Treat `*_V1_DRAFT.md`, `*_DISCUSSION.md`, and `EXECUTION_PROOF_WAVE_*` documents as reference-heavy surfaces by default. Keep them when you want the design rationale or the full mechanism family, not because every adopter must read or ship all of them on day one.
 
 ### Manual minimal setup
 
@@ -329,11 +377,23 @@ This repository ships the execution-contract template and one filled demo exampl
 When repositories want checkpoint truth to be mechanically recoverable instead of chat-only, they should also keep the state-sync surfaces together:
 
 - [`docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md`](docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md)
+- [`scripts/goal_framing_audit.py`](scripts/goal_framing_audit.py)
 - [`templates/execution_progress_receipt.template.md`](templates/execution_progress_receipt.template.md)
 - [`templates/drift_reconciliation_packet.template.md`](templates/drift_reconciliation_packet.template.md)
 - [`docs/runbooks/state-reconciliation.md`](docs/runbooks/state-reconciliation.md)
+- [`docs/runbooks/runtime_alignment_and_four_lane_delegation.md`](docs/runbooks/runtime_alignment_and_four_lane_delegation.md)
+- [`templates/four_lane_runtime_alignment_status.template.md`](templates/four_lane_runtime_alignment_status.template.md)
+- [`templates/managed_terminal_prompt_dispatch_receipt.template.md`](templates/managed_terminal_prompt_dispatch_receipt.template.md)
 - [`scripts/state_sync_pipeline.py`](scripts/state_sync_pipeline.py)
 - [`scripts/state_sync_audit.py`](scripts/state_sync_audit.py)
+
+These assets now preserve direction, not only checkpoint truth: the core reusable packet and receipt surfaces carry `Goal`, `Phase`, `Current Step`, and `Total Steps` so later agents can resume without reconstructing the bigger plan from chat history alone.
+
+The current template default is also stronger than a formatting preference:
+
+- non-trivial multi-step work should enter goal-step mode automatically
+- execution-ready work should be packetized automatically rather than left in chat memory alone
+- delegated or managed-lane execution should happen only after that packet boundary is honest
 
 The template now absorbs Google's five skill patterns asymmetrically: Wrapper, Reviewer, and Pipeline ship as concrete starter scaffolds, Generator stays bounded to schema-backed artifact generation, and Inversion remains deferred until the framework can name a truthful host-runtime contract.
 
@@ -365,7 +425,7 @@ If you want one concrete path instead of reading the full framework first:
 
 1. Run `python3 scripts/bootstrap_adoption.py ../your-repo --project-name "Your Project" --profile standard`
 2. Open the generated `.github/instructions/project-context.instructions.md` and replace the default commands plus Developer Toolchain starter values
-3. Run `python3 scripts/validate_template.py`
+3. Run `python3 scripts/validate_template.py --mode adopter-baseline`
 4. Review [`examples/demo_project/`](examples/demo_project/) for a tiny adopted repository with a committed packet / receipt / handoff cycle
 5. Review [`examples/full_stack_project/`](examples/full_stack_project/) if your repo has multiple runtimes or a cross-layer repro path and you want a minimal-profile reference rather than a fully bootstrapped adopter
 
@@ -473,6 +533,7 @@ Read [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) for what is actually verif
 
 | What to customize | Where |
 |---|---|
+| Anti-collapse foundation (persona + judgment) | `.github/copilot-instructions.md` → Rule 0 (0.a / 0.a.1 / 0.a.2 / 0.b / 0.c) — **opt-out only, never silently delete or soften**; narrow register overrides go in the project adapter with explicit justification |
 | Project directory map | `.github/instructions/project-context.instructions.md` → Project Map |
 | Topic → doc routing | `.github/instructions/project-context.instructions.md` → Critical Topic Triggers |
 | Build/test commands | `.github/instructions/project-context.instructions.md` → Build and Test Commands |
