@@ -5,9 +5,12 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+
+from goal_framing_audit import audit_file
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +26,7 @@ def _slugify(value: str) -> str:
 
 
 def _normalize_block(value: str) -> str:
-    text = value.strip()
+    text = value.replace("\\n", "\n").strip()
     return text or "- none"
 
 
@@ -48,10 +51,35 @@ def write_rendered_file(output_path: Path, contents: str) -> Path:
     return output_path
 
 
+def _warn_legacy_cli_aliases(argv: list[str]) -> None:
+    legacy_messages = {
+        "--phase-plan": "legacy argument --phase-plan is deprecated; use --phase",
+        "--step-contribution": "legacy argument --step-contribution is deprecated and ignored; fold rationale into --phase, --summary, or --notes",
+        "--progress-state": "legacy argument --progress-state is deprecated and ignored; use --current-step and --total-steps",
+    }
+    for arg, message in legacy_messages.items():
+        if arg in argv:
+            print(f"warning: {message}", file=sys.stderr)
+
+
+def _audit_generated_artifact(path: Path, *, canonical_only: bool) -> None:
+    result = audit_file(path, canonical_only=canonical_only)
+    if result.kind == "unknown":
+        raise SystemExit(f"generated artifact has unknown audit kind: {path}")
+    for warning in result.warnings:
+        print(f"warning: {warning}", file=sys.stderr)
+    if result.missing:
+        missing = ", ".join(result.missing)
+        raise SystemExit(f"generated artifact failed goal-framing audit for {path}: missing {missing}")
+
+
 @dataclass(frozen=True)
 class TaskPacketOptions:
     task_id: str
     goal: str
+    phase: str
+    current_step: str
+    total_steps: str
     truth_sources: str
     allowed_files: str
     do_not_touch: str
@@ -74,6 +102,10 @@ class ReceiptOptions:
     task_id: str
     executor: str
     status: str
+    goal: str
+    phase: str
+    current_step: str
+    total_steps: str
     summary: str
     touched_files: str
     validation: str
@@ -86,6 +118,10 @@ class ReceiptOptions:
 class HandoffOptions:
     task_id: str
     next_executor: str
+    goal: str
+    phase: str
+    current_step: str
+    total_steps: str
     reason: str
     resume_point: str
     blocked_by: str
@@ -106,6 +142,9 @@ def create_task_packet(options: TaskPacketOptions) -> Path:
             "executor_plan": options.executor_plan,
             "start_here": _normalize_block(options.start_here),
             "goal": options.goal,
+            "phase": _normalize_block(options.phase),
+            "current_step": _normalize_block(options.current_step),
+            "total_steps": _normalize_block(options.total_steps),
             "truth_sources": _normalize_block(options.truth_sources),
             "allowed_files": _normalize_block(options.allowed_files),
             "do_not_touch": _normalize_block(options.do_not_touch),
@@ -132,7 +171,11 @@ def create_receipt(options: ReceiptOptions) -> Path:
             "task_id": options.task_id,
             "executor": options.executor,
             "status": options.status,
-            "summary": options.summary,
+            "goal": _normalize_block(options.goal),
+            "phase": _normalize_block(options.phase),
+            "current_step": _normalize_block(options.current_step),
+            "total_steps": _normalize_block(options.total_steps),
+            "summary": _normalize_block(options.summary),
             "touched_files": _normalize_block(options.touched_files),
             "validation": _normalize_block(options.validation),
             "risks": _normalize_block(options.risks),
@@ -151,6 +194,10 @@ def create_handoff(options: HandoffOptions) -> Path:
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "task_id": options.task_id,
             "next_executor": options.next_executor,
+            "goal": _normalize_block(options.goal),
+            "phase": _normalize_block(options.phase),
+            "current_step": _normalize_block(options.current_step),
+            "total_steps": _normalize_block(options.total_steps),
             "reason": options.reason,
             "resume_point": _normalize_block(options.resume_point),
             "blocked_by": _normalize_block(options.blocked_by),
@@ -170,6 +217,12 @@ def _build_parser() -> argparse.ArgumentParser:
     init_task = subparsers.add_parser("init-task", help="Create a task packet")
     init_task.add_argument("--task-id", required=True)
     init_task.add_argument("--goal", required=True)
+    init_task.add_argument("--phase", dest="phase")
+    init_task.add_argument("--phase-plan", dest="phase")
+    init_task.add_argument("--current-step", required=True)
+    init_task.add_argument("--total-steps", required=True)
+    init_task.add_argument("--step-contribution", default="", help=argparse.SUPPRESS)
+    init_task.add_argument("--progress-state", default="", help=argparse.SUPPRESS)
     init_task.add_argument("--truth-sources", required=True)
     init_task.add_argument("--allowed-files", required=True)
     init_task.add_argument("--do-not-touch", required=True)
@@ -184,17 +237,26 @@ def _build_parser() -> argparse.ArgumentParser:
     init_task.add_argument("--state-sync-schedule", default="- none")
     init_task.add_argument("--closeout-boundary", default="- none")
     init_task.add_argument("--notes", default="- none")
+    init_task.add_argument("--skip-audit", action="store_true")
     init_task.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
 
     record_receipt = subparsers.add_parser("record-receipt", help="Create an audit receipt")
     record_receipt.add_argument("--task-id", required=True)
     record_receipt.add_argument("--executor", required=True)
     record_receipt.add_argument("--status", required=True)
+    record_receipt.add_argument("--goal", required=True)
+    record_receipt.add_argument("--phase", dest="phase")
+    record_receipt.add_argument("--phase-plan", dest="phase")
+    record_receipt.add_argument("--current-step", required=True)
+    record_receipt.add_argument("--total-steps", required=True)
+    record_receipt.add_argument("--step-contribution", default="", help=argparse.SUPPRESS)
+    record_receipt.add_argument("--progress-state", default="", help=argparse.SUPPRESS)
     record_receipt.add_argument("--summary", required=True)
     record_receipt.add_argument("--touched-files", required=True)
     record_receipt.add_argument("--validation", required=True)
     record_receipt.add_argument("--risks", required=True)
     record_receipt.add_argument("--handoff-note", default="- none")
+    record_receipt.add_argument("--skip-audit", action="store_true")
     record_receipt.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
 
     create_handoff_parser = subparsers.add_parser(
@@ -202,25 +264,44 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     create_handoff_parser.add_argument("--task-id", required=True)
     create_handoff_parser.add_argument("--next-executor", required=True)
+    create_handoff_parser.add_argument("--goal", required=True)
+    create_handoff_parser.add_argument("--phase", dest="phase")
+    create_handoff_parser.add_argument("--phase-plan", dest="phase")
+    create_handoff_parser.add_argument("--current-step", required=True)
+    create_handoff_parser.add_argument("--total-steps", required=True)
+    create_handoff_parser.add_argument("--step-contribution", default="", help=argparse.SUPPRESS)
+    create_handoff_parser.add_argument("--progress-state", default="", help=argparse.SUPPRESS)
     create_handoff_parser.add_argument("--reason", required=True)
     create_handoff_parser.add_argument("--resume-point", required=True)
     create_handoff_parser.add_argument("--blocked-by", required=True)
     create_handoff_parser.add_argument("--recheck-before-continue", required=True)
     create_handoff_parser.add_argument("--notes", default="- none")
+    create_handoff_parser.add_argument("--skip-audit", action="store_true")
     create_handoff_parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
 
     return parser
 
 
+def _require_phase(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+    if getattr(args, "phase", None):
+        return
+    parser.error("the following arguments are required: --phase")
+
+
 def main() -> int:
     parser = _build_parser()
     args = parser.parse_args()
+    _warn_legacy_cli_aliases(sys.argv[1:])
 
     if args.command == "init-task":
+        _require_phase(args, parser)
         output_path = create_task_packet(
             TaskPacketOptions(
                 task_id=args.task_id,
                 goal=args.goal,
+                phase=args.phase,
+                current_step=args.current_step,
+                total_steps=args.total_steps,
                 truth_sources=args.truth_sources,
                 allowed_files=args.allowed_files,
                 do_not_touch=args.do_not_touch,
@@ -239,11 +320,16 @@ def main() -> int:
             )
         )
     elif args.command == "record-receipt":
+        _require_phase(args, parser)
         output_path = create_receipt(
             ReceiptOptions(
                 task_id=args.task_id,
                 executor=args.executor,
                 status=args.status,
+                goal=args.goal,
+                phase=args.phase,
+                current_step=args.current_step,
+                total_steps=args.total_steps,
                 summary=args.summary,
                 touched_files=args.touched_files,
                 validation=args.validation,
@@ -253,10 +339,15 @@ def main() -> int:
             )
         )
     else:
+        _require_phase(args, parser)
         output_path = create_handoff(
             HandoffOptions(
                 task_id=args.task_id,
                 next_executor=args.next_executor,
+                goal=args.goal,
+                phase=args.phase,
+                current_step=args.current_step,
+                total_steps=args.total_steps,
                 reason=args.reason,
                 resume_point=args.resume_point,
                 blocked_by=args.blocked_by,
@@ -265,6 +356,9 @@ def main() -> int:
                 output_root=args.output_root,
             )
         )
+
+    if not args.skip_audit:
+        _audit_generated_artifact(output_path, canonical_only=True)
 
     print(output_path)
     return 0

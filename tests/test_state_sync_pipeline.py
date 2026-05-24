@@ -29,6 +29,11 @@ def test_create_progress_receipt_writes_structured_receipt(tmp_path: Path) -> No
             task_id="Template State Sync",
             status="checkpoint_reached",
             progress_unit="review-pass",
+            goal="Keep execution checkpoints directional rather than summary-only.",
+            phase_plan="1. Freeze task context\n2. Emit checkpoint receipts\n3. Reconcile drift before closeout",
+            current_step="2. Emit checkpoint receipts",
+            step_contribution="This checkpoint proves the current pass and preserves how it advances the larger task.",
+            progress_state="Completed: 1. Freeze task context\nIn Progress: 1. Emit checkpoint receipts\nRemaining: 1. Reconcile drift",
             summary="Reached the first checkpoint",
             touched_files="- session_state.md",
             expected_state_effect="- session_state.md: current step updated",
@@ -41,6 +46,8 @@ def test_create_progress_receipt_writes_structured_receipt(tmp_path: Path) -> No
     contents = output_path.read_text(encoding="utf-8")
     assert output_path.name.startswith("0001_")
     assert "checkpoint_reached" in contents
+    assert "## Goal" in contents
+    assert "## Phase Plan" in contents
     assert "current step updated" in contents
 
 

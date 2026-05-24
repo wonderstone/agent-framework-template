@@ -10,6 +10,8 @@ It is derived from real multi-agent coordination problems observed across
 a full A–E1 phase pipeline. Agent names (Claude Code, Codex, DeepSeeK) are
 used as concrete examples; the rules apply to any comparable agent setup.
 
+When a delegated tranche also depends on live running services, pair this guide with `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` so source-level acceptance is not confused with runtime-aligned acceptance.
+
 ---
 
 ## 1. Agent Capability Matrix
@@ -224,6 +226,7 @@ discriminating evidence.
 |---|---|
 | Scope | Edits stayed inside tranche boundary |
 | Tests | Tranche-specific and existing regressions pass |
+| Runtime alignment | When live runtime matters, the running service or equivalent runtime surface is aligned closely enough with the intended target to support acceptance |
 | Contract | Caller-visible nouns and envelope shape remain coherent |
 | Docs | Docs reflect real implementation state |
 | Drift | No hidden widening into out-of-scope behavior |
@@ -292,3 +295,4 @@ When adopting this guide for a specific repository:
    config surfaces).
 5. Link this guide from your project-context adapter under the
    `delegation\|agent\|tranche\|dispatch` trigger.
+6. If your repository depends on live services for acceptance, also link `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` from your project-context adapter under runtime-alignment or multi-lane topics.

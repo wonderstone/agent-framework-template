@@ -7,6 +7,22 @@
 - Terminal Label: {{terminal_label}}
 - Prompt Purpose: {{prompt_purpose}}
 
+## Goal
+
+{{goal}}
+
+## Phase
+
+{{phase}}
+
+## Current Step
+
+{{current_step}}
+
+## Total Steps
+
+{{total_steps}}
+
 ## Dispatch Contract
 
 Record the prompt-dispatch handshake in order, then classify the outcome:

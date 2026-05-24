@@ -52,6 +52,7 @@ def test_strict_adoption_audit_reports_partially_adopted_without_review_evidence
     assert result.stdout.strip() == str(output_path)
     rendered = output_path.read_text(encoding="utf-8")
     assert "- Adoption verdict: partially-adopted" in rendered
+    assert "## Goal" in rendered
     assert "No independent review artifacts were supplied" in rendered
 
 
@@ -92,6 +93,7 @@ def test_strict_adoption_audit_rejects_non_passing_evidence(tmp_path: Path) -> N
 
     rendered = output_path.read_text(encoding="utf-8")
     assert "- Adoption verdict: partially-adopted" in rendered
+    assert "goal-framing-contract | kept" in rendered
     assert "Validation evidence includes non-passing markers." in rendered
 
 

@@ -91,8 +91,28 @@ Hard rules:
 4. visible old terminal output by itself is not a reason to replace the lane
 5. keep using the same lane while the execution ID remains controllable, output remains readable, and the prompt body plus the one allowed Enter step still makes the agent continue running
 6. degrade or restart only when one of those hard conditions stops holding
+7. once a concrete start signal confirms `started` or `started_after_submit`, stop interacting with the lane in the current turn and wait for the user to return for acceptance or a requested status check
 
 Use `templates/managed_terminal_prompt_dispatch_receipt.template.md` when the repository wants a dedicated receipt for the handshake plus the final outcome.
+
+## Post-Start Non-Interference
+
+After a managed lane shows a concrete start signal, the repository-default action is to leave it alone.
+
+Strong start signals include:
+
+1. `Read` or `Reading` lines for the packet or repo files
+2. executor reasoning banners such as `thinking`, `Whisking`, `✢ ...`, or `✶ ...`
+3. `• Working (...)` status bars or close structural variants
+4. packet-specific shell or tool execution lines
+5. creation or overwrite of the expected packet receipt or result file
+
+Hard rules:
+
+1. once the lane is confirmed `started` or `started_after_submit`, do not send another task prompt, reminder, or `continue` nudge during the same packet round just because no receipt or diff is visible yet
+2. after a valid start classification, the correct default action is to end the current dispatch-monitoring turn and let the user return later for acceptance or a status check
+3. absence of fresh output, old transcript residue, or operator impatience are not valid reasons to re-prompt a lane that already shows a strong start signal
+4. only break this non-interference rule when the executor explicitly asks for input, reports a clear terminal state such as `DONE` / `STUCK` / `ESCALATE`, or a hard failure destroys control or readability
 
 ## Standard Workflow
 
@@ -106,9 +126,10 @@ Use `templates/managed_terminal_prompt_dispatch_receipt.template.md` when the re
 8. send the long prompt or staged follow-up prompt body through the execution ID and read output right away
 9. if the prompt only buffered, send one explicit Enter action through the same execution ID and read output again
 10. classify the dispatch outcome as `started`, `started_after_submit`, or `degraded`
-11. keep the session alive during the packet lifecycle unless hard-condition lane reuse fails or restart is required
-12. read outputs and enforce `DONE`, `STUCK`, or `ESCALATE`
-13. clean up the session only when the task or handoff boundary is complete
+11. if the lane reached `started` or `started_after_submit` and is not asking for input, end the current turn and wait for the user to return later for acceptance or a status check
+12. keep the session alive during the packet lifecycle unless hard-condition lane reuse fails or restart is required
+13. only resume reads when the user asks for acceptance or status, or when the lane itself requests input
+14. clean up the session only when the task or handoff boundary is complete
 
 ## Recording Requirement
 
@@ -182,3 +203,5 @@ Recovery rules:
 > Updated 2026-05-02: added the reusable managed terminal delegation runbook, including the display-name versus execution-ID split and the requirement to record every execution ID immediately after terminal creation.
 >
 > Updated 2026-05-03: replaced the old staged-prompt wording with the prompt-dispatch handshake standard, the `started` / `started_after_submit` / `degraded` outcome set, and hard-condition lane reuse.
+>
+> Updated 2026-05-11: repositories using this template now treat `started` and `started_after_submit` as the normal stop boundary for the current dispatch turn. Once a strong start signal appears and no input is requested, the main thread should leave the lane alone and wait for the user to bring it back for acceptance rather than continuing same-turn observation or follow-up prompting.

@@ -33,6 +33,7 @@ REQUIRED_FILES = (
     ".github/instructions/docs.instructions.md",
     ".github/RELEASE_TEMPLATE.md",
     ".github/skills/context7-docs/SKILL.md",
+    ".github/skills/frontend-playwright-diagnostics/SKILL.md",
     ".github/skills/frontend-design/SKILL.md",
     ".github/workflows/ci.yml",
     "README.md",
@@ -64,7 +65,9 @@ REQUIRED_FILES = (
     "docs/STRATEGY_MECHANISM_LAYERING.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/design_gated_bounded_autonomy.md",
+    "docs/runbooks/frontend_playwright_diagnostics.md",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/runtime_alignment_and_four_lane_delegation.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
     "docs/runbooks/state-reconciliation.md",
     "examples/skills/01_discussion_packet_workflow.md",
@@ -88,6 +91,7 @@ REQUIRED_FILES = (
     "scripts/discussion_pipeline.py",
     "scripts/evaluation_pipeline.py",
     "scripts/git_audit_pipeline.py",
+    "scripts/goal_framing_audit.py",
     "scripts/install_git_hooks.sh",
     "scripts/preference_drift_audit.py",
     "scripts/review_dispatch.py",
@@ -110,7 +114,9 @@ REQUIRED_FILES = (
     "templates/execution_contract.template.md",
     "templates/execution_progress_receipt.template.md",
     "templates/failure_packet.template.md",
+    "templates/four_lane_runtime_alignment_status.template.md",
     "templates/local_executor_registry.template.json",
+    "templates/managed_terminal_prompt_dispatch_receipt.template.md",
     "templates/project-context.template.md",
     "templates/review_dispatch_packet.template.md",
     "templates/reviewer_role_profile.template.md",
@@ -137,6 +143,7 @@ REQUIRED_FILES = (
     "tests/test_developer_toolchain_probe.py",
     "tests/test_discussion_pipeline.py",
     "tests/test_evaluation_pipeline.py",
+    "tests/test_goal_framing_audit.py",
     "tests/test_git_audit_pipeline.py",
     "tests/test_hook_scaffolding.py",
     "tests/test_state_sync_audit.py",
@@ -153,6 +160,43 @@ REQUIRED_DIRS = (
     "docs/archive",
     "examples/demo_project",
 )
+
+BASELINE_REQUIRED_FILES = (
+    ".github/copilot-instructions.md",
+    ".github/instructions/project-context.instructions.md",
+    "README.md",
+    "docs/ADOPTION_GUIDE.md",
+    "docs/CLOSEOUT_SUMMARY_TEMPLATE.md",
+    "docs/COMPATIBILITY.md",
+    "docs/DOC_FIRST_EXECUTION_GUIDELINES.md",
+    "docs/PROGRESS_UPDATE_TEMPLATE.md",
+    "scripts/bootstrap_adoption.py",
+    "scripts/git_audit_pipeline.py",
+    "scripts/goal_framing_audit.py",
+    "scripts/state_sync_audit.py",
+    "scripts/state_sync_pipeline.py",
+    "scripts/validate_template.py",
+    "templates/doc_first_execution_guidelines.template.md",
+    "templates/drift_reconciliation_packet.template.md",
+    "templates/execution_contract.template.md",
+    "templates/execution_progress_receipt.template.md",
+    "templates/git_audit_receipt.template.md",
+    "templates/git_audit_task_packet.template.md",
+)
+
+VALIDATION_MODES = ("auto", "root-self-hosted", "adopter-baseline")
+
+VALIDATION_MODE_LABELS = {
+    "auto": "Auto-detected validation boundary",
+    "root-self-hosted": "Root self-hosted completeness",
+    "adopter-baseline": "Adopter baseline compliance",
+}
+
+VALIDATION_MODE_NOTES = {
+    "auto": "Chooses adopter baseline when a bootstrapped manifest exists; otherwise checks the template repo's full self-hosted surface.",
+    "root-self-hosted": "Use this in the template repository when you want every shipped root surface, framework-native skill, and self-hosted reference layer to stay coherent.",
+    "adopter-baseline": "Use this for adopters or lean baseline checks when you care about the minimum honest mechanism stack rather than every root-level reference surface.",
+}
 
 REQUIRED_SECTIONS = {
     "README.md": (
@@ -231,7 +275,9 @@ README_REQUIRED_REFERENCES = (
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md",
+    "docs/runbooks/frontend_playwright_diagnostics.md",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/runtime_alignment_and_four_lane_delegation.md",
     "docs/runbooks/state-reconciliation.md",
     "templates/doc_first_execution_guidelines.template.md",
     "templates/discussion_packet.template.md",
@@ -246,6 +292,7 @@ README_REQUIRED_REFERENCES = (
     "templates/skill_reviewer_gate.template.md",
     "templates/skill_pipeline.template.md",
     "templates/skill_artifact_generator.template.md",
+    "templates/four_lane_runtime_alignment_status.template.md",
     "examples/skills/",
     "scripts/closeout_truth_audit.py",
     "scripts/discussion_pipeline.py",
@@ -281,10 +328,13 @@ INDEX_REQUIRED_ROWS = (
     "docs/PROGRESS_UPDATE_TEMPLATE.md",
     "docs/ANTI_DRIFT_RULE_REFACTOR_PLAN_V1.md",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/frontend_playwright_diagnostics.md",
+    "docs/runbooks/runtime_alignment_and_four_lane_delegation.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
     "docs/TRACEABILITY_AND_RECOVERY_V1_DRAFT.md",
     "docs/runbooks/resumable-git-audit-pipeline.md",
+    "docs/runbooks/frontend_playwright_diagnostics.md",
     "docs/runbooks/state-reconciliation.md",
 )
 
@@ -304,6 +354,8 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "## Developer Toolchain",
     "Primary language: Python",
     "docs/runbooks/multi-model-discussion-loop.md",
+    "docs/runbooks/frontend_playwright_diagnostics.md",
+    "docs/runbooks/runtime_alignment_and_four_lane_delegation.md",
     "docs/runbooks/state-reconciliation.md",
     "docs/RUNTIME_SURFACE_PROTECTION.md",
     "docs/LEFTOVER_UNIT_CONTRACT.md",
@@ -312,6 +364,7 @@ ROOT_PROJECT_CONTEXT_REQUIRED_SNIPPETS = (
     "templates/execution_contract.template.md",
     "templates/execution_progress_receipt.template.md",
     "templates/drift_reconciliation_packet.template.md",
+    "templates/four_lane_runtime_alignment_status.template.md",
     "templates/skill_invocation_receipt.template.md",
     "templates/skill_candidate_packet.template.md",
     "templates/skill_promotion_receipt.template.md",
@@ -594,6 +647,7 @@ STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
     "docs/SKILL_EXTERNAL_ABSORPTION_GUIDE.md",
     "docs/STRICT_ADOPTION_AND_VERIFICATION.md",
     "docs/runbooks/design_gated_bounded_autonomy.md",
+    "docs/runbooks/runtime_alignment_and_four_lane_delegation.md",
     "scripts/closeout_truth_audit.py",
     "scripts/developer_toolchain_probe.py",
     "scripts/developer_toolchain_runner.py",
@@ -606,6 +660,7 @@ STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
     "templates/developer_toolchain_run_receipt.template.md",
     "templates/evaluation_report.template.md",
     "templates/evaluation_request.template.md",
+    "templates/four_lane_runtime_alignment_status.template.md",
     "templates/local_executor_registry.template.json",
     "templates/review_dispatch_packet.template.md",
     "examples/skills/01_discussion_packet_workflow.md",
@@ -620,12 +675,27 @@ STANDARD_PROFILE_REQUIRED_BOOTSTRAP_ASSETS = (
     "examples/reviewer_roles/01_goal_acceptance_owner.md",
     "examples/reviewer_roles/10_docs_spec_drift_reviewer.md",
     "docs/runbooks/state-reconciliation.md",
+    "scripts/goal_framing_audit.py",
     "scripts/state_sync_audit.py",
     "scripts/state_sync_pipeline.py",
     "templates/execution_progress_receipt.template.md",
     "templates/drift_reconciliation_packet.template.md",
+    "templates/managed_terminal_prompt_dispatch_receipt.template.md",
     "examples/demo_project/tmp/git_audit/add_task_priority/drift_packet.md",
     "examples/demo_project/tmp/git_audit/add_task_priority/progress_receipts/0001_priority_review_started.md",
+)
+
+GOAL_FRAMING_TEMPLATE_SNIPPETS = (
+    "## Goal",
+    "## Phase",
+    "## Current Step",
+    "## Total Steps",
+)
+
+GOAL_FRAMING_RECEIPT_TEMPLATE_SNIPPETS = GOAL_FRAMING_TEMPLATE_SNIPPETS + ("## Summary",)
+GOAL_FRAMING_DISPATCH_TEMPLATE_SNIPPETS = GOAL_FRAMING_TEMPLATE_SNIPPETS + (
+    "## Dispatch Contract",
+    "## Result",
 )
 
 SKILL_ALLOWED_TYPES = {"knowledge", "workflow", "verification", "guardrail"}
@@ -650,7 +720,7 @@ SKILL_REQUIRED_METADATA_LABELS = (
     "Owner",
     "Review Threshold",
 )
-SKILL_RUNTIME_IGNORE_PARTS = {".git", ".venv", "node_modules", "tmp", "__pycache__"}
+SKILL_RUNTIME_IGNORE_PARTS = {".git", ".venv", "node_modules", "tmp", "__pycache__", ".claude"}
 SKILL_ALLOWED_REVIEW_THRESHOLDS = {"single-reviewer", "dual-reviewer", "owner-only"}
 SKILL_ALLOWED_PROMOTION_TIERS = {"delegated-safe", "delegated-reviewed", "human-only"}
 SKILL_REQUIRED_MATRIX_FIELDS = (
@@ -853,15 +923,32 @@ def _parse_developer_toolchain_entries(text: str) -> tuple[str | None, str | Non
     return primary_language, package_manager, entries
 
 
-def _validate_required_paths(root: Path) -> list[ValidationIssue]:
+def _validate_required_paths_set(
+    root: Path,
+    *,
+    required_files: tuple[str, ...],
+    required_dirs: tuple[str, ...] = (),
+) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
-    for relative in REQUIRED_FILES:
+    for relative in required_files:
         if not (root / relative).is_file():
             issues.append(ValidationIssue("missing-file", relative))
-    for relative in REQUIRED_DIRS:
+    for relative in required_dirs:
         if not (root / relative).is_dir():
             issues.append(ValidationIssue("missing-dir", relative))
     return issues
+
+
+def _validate_required_paths(root: Path) -> list[ValidationIssue]:
+    return _validate_required_paths_set(
+        root,
+        required_files=REQUIRED_FILES,
+        required_dirs=REQUIRED_DIRS,
+    )
+
+
+def _validate_baseline_required_paths(root: Path) -> list[ValidationIssue]:
+    return _validate_required_paths_set(root, required_files=BASELINE_REQUIRED_FILES)
 
 
 def _validate_sections(root: Path) -> list[ValidationIssue]:
@@ -1321,6 +1408,31 @@ def _validate_git_audit_task_packet_template(root: Path) -> list[ValidationIssue
     return issues
 
 
+def _validate_goal_framing_templates(root: Path) -> list[ValidationIssue]:
+    checks = {
+        "templates/adoption_verification_packet.template.md": GOAL_FRAMING_TEMPLATE_SNIPPETS,
+        "templates/evaluation_request.template.md": GOAL_FRAMING_TEMPLATE_SNIPPETS,
+        "templates/evaluation_report.template.md": GOAL_FRAMING_RECEIPT_TEMPLATE_SNIPPETS,
+        "templates/git_audit_task_packet.template.md": GOAL_FRAMING_TEMPLATE_SNIPPETS,
+        "templates/git_audit_receipt.template.md": GOAL_FRAMING_RECEIPT_TEMPLATE_SNIPPETS,
+        "templates/execution_progress_receipt.template.md": GOAL_FRAMING_RECEIPT_TEMPLATE_SNIPPETS,
+        "templates/managed_terminal_prompt_dispatch_receipt.template.md": GOAL_FRAMING_DISPATCH_TEMPLATE_SNIPPETS,
+        "templates/review_dispatch_packet.template.md": GOAL_FRAMING_TEMPLATE_SNIPPETS,
+    }
+    issues: list[ValidationIssue] = []
+    for relative_path, snippets in checks.items():
+        text = _read(root / relative_path)
+        for snippet in snippets:
+            if snippet not in text:
+                issues.append(
+                    ValidationIssue(
+                        "missing-goal-framing-snippet",
+                        f"{relative_path}: {snippet}",
+                    )
+                )
+    return issues
+
+
 def _validate_state_sync_hooks(root: Path) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     pre_commit = _read(root / ".githooks/pre-commit")
@@ -1390,6 +1502,10 @@ def _iter_skill_contract_paths(root: Path) -> tuple[Path, ...]:
     for path in root.rglob("SKILL.md"):
         if any(part in SKILL_RUNTIME_IGNORE_PARTS for part in path.parts):
             continue
+        if path.is_relative_to(root / ".github" / "skills"):
+            text = _read(path)
+            if "## Receipt And Review Matrix" not in text or "## Governance" not in text:
+                continue
         if path not in paths:
             paths.append(path)
 
@@ -2149,7 +2265,7 @@ def collect_advisories(root: Path) -> list[ValidationAdvisory]:
     return advisories
 
 
-def validate_repo(root: Path) -> list[ValidationIssue]:
+def _validate_manifest_backed_repo(root: Path) -> list[ValidationIssue]:
     if (root / ADOPTER_MANIFEST_PATH).is_file():
         issues = _validate_adopted_repo(root)
         manifest = json.loads(_read(root / ADOPTER_MANIFEST_PATH))
@@ -2168,6 +2284,14 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         issues.extend(_validate_skill_execution_surfaces(root))
         return issues
 
+    return []
+
+
+def _validate_root_self_hosted_repo(root: Path) -> list[ValidationIssue]:
+    manifest_issues = _validate_manifest_backed_repo(root)
+    if manifest_issues:
+        return manifest_issues
+
     checks = (
         _validate_required_paths,
         _validate_sections,
@@ -2182,6 +2306,7 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
         _validate_root_session_state_freshness,
         _validate_execution_contract,
         _validate_git_audit_task_packet_template,
+        _validate_goal_framing_templates,
         _validate_state_sync_hooks,
         _validate_closeout_rule_guards,
         _validate_preference_drift,
@@ -2204,6 +2329,50 @@ def validate_repo(root: Path) -> list[ValidationIssue]:
     return issues
 
 
+def _validate_adopter_baseline_repo(root: Path) -> list[ValidationIssue]:
+    if (root / ADOPTER_MANIFEST_PATH).is_file():
+        return _validate_manifest_backed_repo(root)
+
+    checks = (
+        _validate_baseline_required_paths,
+        _validate_doc_links,
+        _validate_execution_contract,
+        _validate_git_audit_task_packet_template,
+        _validate_goal_framing_templates,
+        _validate_closeout_rule_guards,
+        _validate_preference_drift,
+    )
+    issues: list[ValidationIssue] = []
+    for check in checks:
+        issues.extend(check(root))
+
+    project_context = root / ".github/instructions/project-context.instructions.md"
+    if project_context.is_file():
+        issues.extend(
+            _validate_developer_toolchain_contract(
+                project_context,
+                project_type=_extract_project_type(_read(project_context)),
+                contract=DEFAULT_DEVELOPER_TOOLCHAIN_CONTRACT,
+            )
+        )
+
+    return issues
+
+
+def validate_repo(root: Path, *, mode: str = "auto") -> list[ValidationIssue]:
+    if mode not in VALIDATION_MODES:
+        raise ValueError(f"Unsupported validation mode: {mode}")
+
+    resolved_mode = mode
+    if resolved_mode == "auto":
+        resolved_mode = "adopter-baseline" if (root / ADOPTER_MANIFEST_PATH).is_file() else "root-self-hosted"
+
+    if resolved_mode == "adopter-baseline":
+        return _validate_adopter_baseline_repo(root)
+
+    return _validate_root_self_hosted_repo(root)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate the agent framework template")
     parser.add_argument(
@@ -2212,13 +2381,26 @@ def main() -> int:
         default=REPO_ROOT,
         help="Repository root to validate",
     )
+    parser.add_argument(
+        "--mode",
+        choices=VALIDATION_MODES,
+        default="auto",
+        help="Validation target: root self-hosted completeness, adopter baseline compliance, or auto-detect",
+    )
     args = parser.parse_args()
     root = args.root.resolve()
 
-    issues = validate_repo(root)
+    issues = validate_repo(root, mode=args.mode)
     advisories = collect_advisories(root)
 
+    resolved_mode = args.mode
+    if resolved_mode == "auto":
+        resolved_mode = "adopter-baseline" if (root / ADOPTER_MANIFEST_PATH).is_file() else "root-self-hosted"
+
     print("=== Agent Framework Template — Structured Validation ===")
+    print(f"Mode: {args.mode} -> {resolved_mode}")
+    print(f"Boundary: {VALIDATION_MODE_LABELS[resolved_mode]}")
+    print(f"Note: {VALIDATION_MODE_NOTES[resolved_mode]}")
     print("")
     if not issues:
         for advisory in advisories:

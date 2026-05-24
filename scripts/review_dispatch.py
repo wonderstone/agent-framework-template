@@ -68,6 +68,10 @@ def _render_packet(template: str, *, generated_at: str, review_id: str, reposito
         "[repository-root]": str(repository_root),
         "[registry-path]": str(registry_path),
         "[prompt-file]": prompt_file,
+        "[goal]": "Collect bounded local-executor review results for the supplied prompt file.",
+        "[phase]": "Probe registered executors, dispatch the prompt to available executors, and preserve raw outputs as reviewable packet truth.",
+        "[current-step]": "3. Preserve raw outputs and packetize availability truth",
+        "[total-steps]": "3",
         "| [executor] | [available | unavailable] | [completed | unavailable | dispatch-failed | skipped] | [stdout-path or `none`] | [stderr-path or `none`] | [notes] |": result_rows,
     }
     for source, target in replacements.items():

@@ -8,6 +8,13 @@ This document explains how the agent framework layers work and why they are stru
 
 The framework is a layered instruction system for AI coding agents. Each layer has a distinct responsibility and a well-defined load condition. Layers do not duplicate content across each other.
 
+For future reference, this repository names the combined model the **4+1 Execution Assurance Stack**.
+
+That name means:
+
+1. `4` instruction and loading layers that determine what the agent reads before acting
+2. `+1` execution-assurance plane that preserves state, validation, recovery, and closeout truth around those layers without pretending to be a fifth instruction layer
+
 ```
 Layer 1 — Operating Rules         (always loaded)
 Layer 2 — Project Adapter         (loaded on task start or keyword match)
@@ -15,11 +22,11 @@ Layer 3 — Canonical Docs          (loaded on confirmed topic match)
 Layer 4 — Code / Config Files     (loaded immediately before any edit)
 ```
 
-The framework also ships a **resumable audit artifact system**. It is **not** a fifth instruction layer. It is an operational recovery mechanism that runs alongside the four-layer loading model.
+The framework also ships a **resumable audit artifact system**. Inside the 4+1 Execution Assurance Stack, this belongs to the `+1` assurance plane rather than a fifth instruction layer.
 
-The framework also ships an **anti-drift execution-control surface**. It is also **not** a fifth instruction layer. It is a checkpoint and reconciliation mechanism that keeps `session_state.md`, `ROADMAP.md`, and task artifacts from silently diverging.
+The framework also ships an **anti-drift execution-control surface**. Inside the 4+1 Execution Assurance Stack, this also belongs to the `+1` assurance plane. It is a checkpoint and reconciliation mechanism that keeps `session_state.md`, `ROADMAP.md`, and task artifacts from silently diverging.
 
-The framework also ships a **discussion-loop artifact system** for open design questions. It is also **not** a fifth instruction layer. It is a mechanism for freezing the question, collecting append-only feedback, and converging before implementation starts.
+The framework also ships a **discussion-loop artifact system** for open design questions. This also lives in the `+1` assurance plane. It is a mechanism for freezing the question, collecting append-only feedback, and converging before implementation starts.
 
 The framework also distinguishes **strategy** from **mechanism**:
 
@@ -189,7 +196,7 @@ These artifacts are operational state, not instruction layers:
 
 These artifacts matter because semantic reviewers are replaceable, but hard gates are not. A new CLI session or reviewer should be able to resume from the artifacts without reconstructing state from memory alone.
 
-### Why This Is Not A Fifth Layer
+### Why This Is The `+1` And Not A Fifth Layer
 
 The load layers answer **what to read before acting**.
 
@@ -202,6 +209,8 @@ They do not change the layer order:
 3. Load canonical docs
 4. Read code/config to edit
 5. Externalize execution state into packet / receipt / handoff when work must survive interruption
+
+That is exactly why this repository uses the name **4+1 Execution Assurance Stack** instead of `five-layer framework`.
 
 ### Default Flow
 

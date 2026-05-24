@@ -20,8 +20,9 @@ Managed executor terminals are allowed only for trusted local environments and o
 5. use the approved trusted-local starter commands from `docs/runbooks/managed_cli_terminal_delegation.md`
 6. run the prompt-dispatch handshake in order: pre-read, send prompt, read output immediately, send one allowed Enter only if the prompt buffered, read output again, then classify the outcome
 7. classify the dispatch outcome only as `started`, `started_after_submit`, or `degraded`
-8. keep using the same lane while the execution ID is controllable, output is readable, and the prompt body plus the one allowed Enter step still makes the agent continue running
-9. keep the session open during the long task unless restart or cleanup is required
+8. once the lane reaches `started` or `started_after_submit` and is not asking for input, stop interacting with it in the current turn and wait for the user to bring it back for acceptance or status
+9. keep using the same lane while the execution ID is controllable, output is readable, and the prompt body plus the one allowed Enter step still makes the agent continue running
+10. keep the session open during the long task unless restart or cleanup is required
 
 ## Hard Rules
 
@@ -33,6 +34,7 @@ Managed executor terminals are allowed only for trusted local environments and o
 6. do not treat the one allowed Enter step as a downgrade signal when the prompt buffered
 7. if the execution ID is lost, explicitly downgrade to copy-paste prompt handoff or restart the terminal; do not pretend the renamed tab is still controllable
 8. if output is no longer readable, or the prompt body plus the one allowed Enter step still does not make the agent continue running, classify the lane as degraded and restart or downgrade instead of guessing
+9. once a strong start signal has appeared, do not send another task instruction in the same packet round just because a receipt, diff, or result file is not visible yet
 
 ## References
 

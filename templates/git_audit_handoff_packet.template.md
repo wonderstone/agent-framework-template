@@ -4,6 +4,22 @@
 - Task ID: {{task_id}}
 - Next Executor: {{next_executor}}
 
+## Goal
+
+{{goal}}
+
+## Phase
+
+{{phase}}
+
+## Current Step
+
+{{current_step}}
+
+## Total Steps
+
+{{total_steps}}
+
 ## Reason
 
 {{reason}}

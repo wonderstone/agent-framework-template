@@ -71,8 +71,12 @@ def test_evaluation_pipeline_creates_request_and_report(tmp_path: Path) -> None:
 
     assert request.stdout.strip() == str(request_output)
     assert report.stdout.strip() == str(report_output)
-    assert "- Generator: implementer" in request_output.read_text(encoding="utf-8")
-    assert "- Verdict: PASS" in report_output.read_text(encoding="utf-8")
+    request_text = request_output.read_text(encoding="utf-8")
+    report_text = report_output.read_text(encoding="utf-8")
+    assert "- Generator: implementer" in request_text
+    assert "## Phase Plan" in request_text
+    assert "- Verdict: PASS" in report_text
+    assert "## Progress State" in report_text
 
 
 def test_evaluation_pipeline_rejects_unknown_verdict(tmp_path: Path) -> None:

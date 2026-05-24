@@ -23,6 +23,13 @@ Drive a Windows host from macOS over SSH without losing control to quoting failu
 - Do not use for local-only Windows work performed directly on the host without SSH.
 - Do not use when the task is purely application-level debugging with no remote-host control-plane question.
 
+### Expected Effect
+
+- Remote Windows commands stay reproducible.
+- SCM and non-SCM hosts are distinguished truthfully.
+- Copied-binary failures do not get misdiagnosed as contract failures if a Windows-local build path still works.
+- The evaluation lane produces receipt-bearing evidence instead of hand-wavy host conclusions.
+
 ## Entry Instructions
 
 1. Prefer `powershell -NoProfile -NonInteractive -EncodedCommand <base64-utf16le>` for non-trivial remote commands.
@@ -31,13 +38,6 @@ Drive a Windows host from macOS over SSH without losing control to quoting failu
 4. Discover the control plane before editing profiles: prefer `Get-CimInstance Win32_Service` filtered by `PathName`, then check scheduled tasks, watchdog scripts, batch launchers, and live process command lines.
 5. If the host is not really SCM-backed, keep the lifecycle mode honest and use `observe` rather than inventing `windows_service_name` values.
 6. Before blaming the CLI, try a Windows-local build with cache and temp directories pinned to a stable `C:` path. Treat copied-binary crashes and Windows-local build results as different evidence streams.
-
-## Expected Effect
-
-- Remote Windows commands stay reproducible.
-- SCM and non-SCM hosts are distinguished truthfully.
-- Copied-binary failures do not get misdiagnosed as contract failures if a Windows-local build path still works.
-- The evaluation lane produces receipt-bearing evidence instead of hand-wavy host conclusions.
 
 ## Working Recipe
 
@@ -58,11 +58,13 @@ COPYFILE_DISABLE=1 tar -cf - -C <local-root> <relative-path> | ssh <win-alias> "
 ### Windows-local Go build pattern
 
 ```powershell
-$env:GOCACHE = "C:\host-cache\go-build-cache"
-$env:GOTMPDIR = "C:\host-cache\go-temp"
-$env:TEMP = "C:\host-cache\go-temp"
-$env:TMP = "C:\host-cache\go-temp"
-go build -o C:\host-cache\remote-win-runtime-local.exe ./cmd/remote-win-runtime
+$cacheRoot = if ($env:HOST_CACHE_ROOT) { $env:HOST_CACHE_ROOT } else { Join-Path $env:TEMP "host-cache" }
+$tempRoot = Join-Path $cacheRoot "go-temp"
+$env:GOCACHE = Join-Path $cacheRoot "go-build-cache"
+$env:GOTMPDIR = $tempRoot
+$env:TEMP = $tempRoot
+$env:TMP = $tempRoot
+go build -o (Join-Path $cacheRoot "remote-win-runtime-local.exe") ./cmd/remote-win-runtime
 ```
 
 If that succeeds while a copied `.exe` still fails, prefer the Windows-local binary for evaluation and treat the copied path as a separate deployment issue.

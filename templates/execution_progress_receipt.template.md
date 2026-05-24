@@ -6,6 +6,22 @@
 - Status: {{status}}
 - Progress Unit: {{progress_unit}}
 
+## Goal
+
+{{goal}}
+
+## Phase
+
+{{phase}}
+
+## Current Step
+
+{{current_step}}
+
+## Total Steps
+
+{{total_steps}}
+
 ## Summary
 
 {{summary}}

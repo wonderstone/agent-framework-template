@@ -10,6 +10,18 @@
 
 [goal]
 
+## Phase
+
+[phase]
+
+## Current Step
+
+[current-step]
+
+## Total Steps
+
+[total-steps]
+
 ## UAC Focus
 
 [uac-focus]

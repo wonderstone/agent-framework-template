@@ -82,6 +82,16 @@ def create_request(options: RequestOptions) -> Path:
             "[evaluator]": options.evaluator,
             "[review-scope]": options.review_scope,
             "[goal]": options.goal,
+            "[phase-plan]": _normalize_block(
+                "1. Freeze evaluation scope and evidence\n2. Run independent review against UAC\n3. Record report and remaining conditions"
+            ),
+            "[current-step]": _normalize_block("1. Freeze evaluation scope and evidence"),
+            "[step-contribution]": _normalize_block(
+                "This request turns evaluation into a bounded review task with explicit UAC focus and evidence boundaries."
+            ),
+            "[progress-state]": _normalize_block(
+                "Completed: none\nIn Progress: 1. Freeze evaluation scope and evidence\nRemaining: 1. Run independent review against UAC\n2. Record report and remaining conditions"
+            ),
             "[uac-focus]": _normalize_block(options.uac_focus),
             "[evidence-to-review]": _normalize_block(options.evidence_to_review),
             "[allowed-files]": _normalize_block(options.allowed_files),
@@ -105,6 +115,20 @@ def create_report(options: ReportOptions) -> Path:
             "[task-id]": options.task_id,
             "[evaluator]": options.evaluator,
             "[PASS | CONDITIONAL | FAIL]": options.verdict,
+            "[goal]": _normalize_block("Validate the bounded task result against the declared UAC and user-visible gap check."),
+            "[phase-plan]": _normalize_block(
+                "1. Freeze evaluation scope and evidence\n2. Run independent review against UAC\n3. Record report and remaining conditions"
+            ),
+            "[current-step]": _normalize_block("3. Record report and remaining conditions"),
+            "[step-contribution]": _normalize_block(
+                "This report closes the evaluation loop by recording whether the bounded task actually satisfied independent review."
+            ),
+            "[progress-state]": _normalize_block(
+                "Completed: 1. Freeze evaluation scope and evidence\n2. Run independent review against UAC\nIn Progress: 1. Record report and remaining conditions\nRemaining: none"
+            ),
+            "[summary]": _normalize_block(
+                f"Independent evaluation completed with verdict {options.verdict}."
+            ),
             "[uac-coverage]": _normalize_block(options.uac_coverage),
             "[gap-check]": _normalize_block(options.gap_check),
             "[conditions]": _normalize_block(options.conditions),

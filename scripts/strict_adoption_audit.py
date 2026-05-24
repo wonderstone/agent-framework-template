@@ -112,6 +112,19 @@ MECHANISM_DEFINITIONS: dict[str, MechanismDefinition] = {
         required_manifest_sections=(),
         note="Checkpoint, receipt, and drift-reconciliation stack is shipped.",
     ),
+    "goal-framing-contract": MechanismDefinition(
+        id="goal-framing-contract",
+        required_paths=(
+            "scripts/goal_framing_audit.py",
+            "templates/git_audit_task_packet.template.md",
+            "templates/git_audit_receipt.template.md",
+            "templates/execution_progress_receipt.template.md",
+            "templates/managed_terminal_prompt_dispatch_receipt.template.md",
+        ),
+        design_only_paths=("docs/DOC_FIRST_EXECUTION_GUIDELINES.md",),
+        required_manifest_sections=(),
+        note="Reusable execution artifacts preserve goal, phase, current step, contribution, and progress state mechanically.",
+    ),
     "git-audit-pipeline": MechanismDefinition(
         id="git-audit-pipeline",
         required_paths=(
@@ -296,6 +309,11 @@ def _render_packet(
         "[manifest-schema-version]": str(manifest_schema_version),
         "[audit-version]": audit_version,
         "[fully-adopted | partially-adopted | design-only-upgrade-path-kept]": verdict,
+        "[goal]": "Verify whether the adopted repository kept the strict framework baseline honestly rather than by documentation-only claim.",
+        "[phase-plan]": "1. Inspect required mechanisms and manifest truth\n2. Inspect validation and independent review evidence\n3. Emit a verification verdict packet",
+        "[current-step]": "3. Emit a verification verdict packet",
+        "[step-contribution]": "This packet records the strict adoption verdict and the concrete evidence that supports or blocks it.",
+        "[progress-state]": "Completed: 1. Inspect required mechanisms and manifest truth\n2. Inspect validation and independent review evidence\nIn Progress: 1. Emit a verification verdict packet\nRemaining: none",
         "[Short summary of why this verdict was reached.]": verdict_summary,
         "| [mechanism-id] | [kept | downgraded | design-only-upgrade-path-kept | missing | unknown-mechanism] | [N/M paths present] | [missing paths or `none`] | [short note] |": mechanism_rows,
         "| [validation-label] | [path] | [yes / no] | [what this evidence proves] |": validation_rows,

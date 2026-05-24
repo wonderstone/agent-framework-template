@@ -43,6 +43,7 @@ At minimum, the planning artifact must include:
 6. user-visible acceptance criteria
 7. stop conditions, non-goals, or explicit deferrals
 8. for while-style tasks, the task ID, progress unit, checkpoint rule, truth surfaces, state-sync schedule, and true closeout boundary
+9. for reusable execution packets or receipts, `Goal`, `Phase`, `Current Step`, and `Total Steps`
 
 If those elements are absent, the plan is not implementation-ready.
 
@@ -78,6 +79,21 @@ When the user asks for a new phase, subsystem, or meaningful behavior change, th
 6. update current state tracking
 7. begin implementation only after those planning surfaces exist
 
+## Goal-Step Activation Rule
+
+No keyword is required to activate the framework's goal-step mode.
+
+Enable it automatically when all of the following are true:
+
+1. the task is non-trivial
+2. the work likely spans more than one bounded move or validation cycle
+3. the goal and acceptance boundary are already clear enough to name
+
+When those conditions hold, the agent should switch into the canonical progress frame without waiting for the user to explicitly say `goal`, `phase`, or `step`.
+
+If the task is also execution-ready, packetization should happen by default rather than leaving the boundary in chat memory alone.
+Managed-lane or delegated execution decisions happen only after that packet boundary is honest.
+
 Do not ask the user to choose between doc-first and code-first for non-trivial work unless they explicitly request a lighter-weight path.
 
 ## While-Style Task Stability Rule
@@ -108,6 +124,7 @@ Minimum anti-drift contract:
 - the execution contract records `Task ID`, `Progress unit`, `Checkpoint rule`, `Truth surfaces`, and `State sync schedule`
 - the task packet repeats that checkpoint contract inside the bounded execution scope
 - at each meaningful checkpoint, the task emits a progress receipt or equivalent receipt-bearing artifact
+- reusable packet and receipt artifacts preserve `Goal`, `Phase`, `Current Step`, and `Total Steps`
 - unresolved drift is reconciled through a drift packet before closeout or next-stage dispatch continues
 
 ## Document Update Rule

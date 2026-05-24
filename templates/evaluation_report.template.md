@@ -5,6 +5,26 @@
 - Evaluator: [evaluator]
 - Verdict: [PASS | CONDITIONAL | FAIL]
 
+## Goal
+
+[goal]
+
+## Phase
+
+[phase]
+
+## Current Step
+
+[current-step]
+
+## Total Steps
+
+[total-steps]
+
+## Summary
+
+[summary]
+
 ## UAC Coverage
 
 [uac-coverage]

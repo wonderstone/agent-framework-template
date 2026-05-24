@@ -187,6 +187,22 @@ These fields remain optional in v1.
 | Output priority override | Useful for advanced repos, but not required for the default policy |
 | Environment or bootstrap notes | Helpful context, but not a base contract field |
 
+## Browser Runtime Adaptation
+
+When a repository ships a browser-visible frontend, the framework should encourage one repo-owned headless browser smoke seam as part of the `Developer Toolchain` guidance rather than leaving browser debugging to manual refresh loops and copied console output.
+
+For browser-capable adopters, the recommended pattern is:
+
+1. prefer the browser automation framework already present in the repository; if Playwright already exists, reuse it rather than adding a second tool
+2. define one canonical smoke command for the frontend runtime instead of many one-off inspection scripts
+3. capture browser runtime signals that are directly actionable during repair, such as `console.error`, `pageerror`, `requestfailed`, first-party API `4xx/5xx`, and critical DOM-mount failures
+4. emit both a machine-readable artifact and a human-readable receipt so the agent can review failures without reopening the browser manually
+5. classify manual browser refresh plus copied console logs as fallback-only behavior when no honest repo-owned smoke seam exists yet
+
+This guidance does not make full end-to-end browser automation mandatory for every repository.
+
+It only says that when a frontend runtime already exists and browser debugging is a recurring workflow, the repository should expose one truthful headless smoke path in the same way it exposes other diagnostic or smoke seams.
+
 ---
 
 ## Verification Status Model
@@ -218,6 +234,8 @@ Verification status is not decorative. It must change behavior.
 Additional policy:
 
 every non-working status must pair with one of these outcomes:
+
+> Updated 2026-05-06: the framework now explicitly recommends a repo-owned headless browser smoke seam for frontend-capable adopters so browser debugging can be receipt-backed rather than chat-transcribed.
 
 1. explicit fallback path
 2. explicit stop rule

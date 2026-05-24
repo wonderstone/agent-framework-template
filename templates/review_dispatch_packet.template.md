@@ -6,6 +6,22 @@
 - Registry path: [registry-path]
 - Prompt file: [prompt-file]
 
+## Goal
+
+[goal]
+
+## Phase
+
+[phase]
+
+## Current Step
+
+[current-step]
+
+## Total Steps
+
+[total-steps]
+
 ## Executor Results
 
 | Executor | Probe status | Review status | Stdout path | Stderr path | Notes |

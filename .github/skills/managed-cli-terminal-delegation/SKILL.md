@@ -28,21 +28,14 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 
 - The agent keeps trusted-local managed-terminal usage bounded, recorded, and honest.
 - The execution ID remains the machine control anchor even when the terminal label changes later.
-- Prompt dispatch uses the repository-standard handshake, with outcomes limited to `started`, `started_after_submit`, or `degraded` and lane reuse preserved until control, readable output, or prompt-plus-enter viability is lost.
+- Prompt dispatch uses the repository-standard handshake, with outcomes limited to `started`, `started_after_submit`, or `degraded`; once a strong start signal appears, the main thread leaves the lane alone until the user returns for acceptance or status.
 
 ## Entry Instructions
 
-- Read `docs/runbooks/managed_cli_terminal_delegation.md`.
-- Confirm the task is packet-ready before opening a managed executor terminal.
-- Choose the executor lane and use the approved trusted-local starter command from the runbook.
-- Retain the execution ID as the machine control anchor.
-- Immediately write `execution_id -> terminal label -> starter command -> purpose -> lane state` into a durable repo-visible truth surface.
-- Run the prompt-dispatch handshake in order: pre-read, send prompt, read output immediately, send one allowed Enter only if the prompt buffered, read output again, then classify the outcome.
-- Use only `started`, `started_after_submit`, or `degraded` as dispatch outcomes.
-- Keep using the same lane while the execution ID is controllable, output is readable, and the prompt body plus the one allowed Enter step still makes the agent continue running.
-- If the user later surfaces or renames the terminal tab, treat that name as a human anchor only.
-- If the execution ID is lost or the session becomes unresponsive, restart the controlled terminal or fall back to copy-paste prompt handoff explicitly.
-- Keep packet boundaries, terminal-state reporting, owner review, and focused validation unchanged.
+- Read `docs/runbooks/managed_cli_terminal_delegation.md` and confirm the task is packet-ready for a trusted-local managed lane.
+- Choose or reuse the approved lane, keep `execution_id` as the machine anchor, and record `execution_id -> terminal label -> starter command -> purpose -> lane state` in a durable truth surface.
+- Run one handshake only: pre-read, send prompt, read output immediately, use one Enter if buffered, then re-read and classify only `started`, `started_after_submit`, or `degraded`.
+- After `started` or `started_after_submit`, stop interacting unless the lane asks for input; if control or readable output is lost, or the handshake still fails, restart the lane or degrade to explicit copy-paste handoff.
 
 ## References
 
@@ -87,6 +80,7 @@ Keep the managed CLI terminal delegation workflow honest by requiring packet-rea
 - If a controlled execution ID is unavailable, degrade to explicit copy-paste prompt handoff rather than pretending the human-visible terminal label is a control surface.
 - If the host tooling cannot keep a managed executor terminal alive reliably, restart the session and rewrite the registry truth instead of reusing a stale label.
 - If a prompt body was sent but the lane buffered it, use one explicit Enter step and re-read output before deciding whether the outcome is `started_after_submit` or `degraded`.
+- If a lane has already shown a strong start signal, do not treat missing immediate receipts or diffs as degradation and do not send a second task prompt in the same round.
 - If execution ID control is lost, output becomes unreadable, or the prompt body plus the one allowed Enter step still does not make the agent continue running, degrade or restart instead of guessing.
 
 ## Validator Notes

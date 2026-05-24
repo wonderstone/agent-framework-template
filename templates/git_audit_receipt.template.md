@@ -5,6 +5,22 @@
 - Executor: {{executor}}
 - Status: {{status}}
 
+## Goal
+
+{{goal}}
+
+## Phase
+
+{{phase}}
+
+## Current Step
+
+{{current_step}}
+
+## Total Steps
+
+{{total_steps}}
+
 ## Summary
 
 {{summary}}

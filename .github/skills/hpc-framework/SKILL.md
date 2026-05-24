@@ -171,7 +171,7 @@ def my_function(x): ...
 ```python
 # 编译缓存（避免重复编译）
 import jax
-jax.config.update('jax_compilation_cache_dir', '/tmp/jax_cache')
+jax.config.update('jax_compilation_cache_dir', '${TMPDIR:-/tmp}/jax_cache')
 
 # NVSHMEM 加速（NVIDIA GPU 间通信）
 # export XLA_FLAGS="--xla_gpu_experimental_enable_nvshmem=true"

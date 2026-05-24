@@ -6,6 +6,22 @@
 - Audit version: [audit-version]
 - Adoption verdict: [fully-adopted | partially-adopted | design-only-upgrade-path-kept]
 
+## Goal
+
+[goal]
+
+## Phase
+
+[phase]
+
+## Current Step
+
+[current-step]
+
+## Total Steps
+
+[total-steps]
+
 ## Verdict Summary
 
 - [Short summary of why this verdict was reached.]

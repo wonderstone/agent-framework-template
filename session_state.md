@@ -6,47 +6,46 @@
 ---
 
 ## Current Goal
-Wave 2 of the execution-proof stack is shipped and validated; no follow-on workstream is currently open.
+Expose the runtime-alignment and four-lane delegation asset family in adopter-facing setup guidance so manual adopters and bootstrap users can discover when to keep it.
 
 ---
 
 ## Working Hypothesis
-Execution-proof credibility improves only when strict adoption, runtime toolchain truth, independent evaluation, and local executor review all have durable artifacts rather than policy-only expectations.
+The runtime-alignment and four-lane delegation asset family is already shipped mechanically, but adopters still do not see it clearly enough in `docs/ADOPTION_GUIDE.md`. Updating the manual-copy inventory and the project-adapter guidance should close the remaining discoverability gap without reopening bootstrap or validator scope.
 
 **Confidence**: High
 
 **Evidence**:
-- Wave 1 already proved strict-adoption attestation and toolchain probe receipts can ship cleanly through bootstrap, manifest, validator, and tests.
-- The next missing surfaces named repeatedly in the 4-CLI discussion were the runner, evaluator pipeline, and local executor review loop.
+- `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` and `templates/four_lane_runtime_alignment_status.template.md` are present and wired into bootstrap plus validator enforcement.
+- `README.md`, `docs/INDEX.md`, and `.github/instructions/project-context.instructions.md` already expose the new asset family.
+- `docs/ADOPTION_GUIDE.md` still does not mention the runtime-alignment runbook or the four-lane status template in its manual-adoption inventory or its setup guidance.
 
-**Contradictions**: None.
+**Contradictions**: Root validator still has unrelated pre-existing skill-hygiene failures, so this slice should validate with a narrow docs-focused check rather than whole-repo green.
 
 ---
 
 ## Plan
-**Approach**: Ship the next three highest-value execution surfaces as one bounded Wave 2: Developer Toolchain runner, independent-evaluation pipeline, and local executor review loop, then wire them through bootstrap, manifest, validation, and tests.
+**Approach**: Land one bounded docs-only follow-up in `docs/ADOPTION_GUIDE.md` that adds the runtime-alignment runbook and four-lane status template to the adopter-facing inventory and tells maintainers when to keep them.
 
 **Steps**:
-1. Land a Wave 2 design doc and new templates for runner, evaluation, and executor review.
-2. Implement the three Wave 2 scripts with bounded receipt or packet outputs.
-3. Extend bootstrap and manifest contracts to ship the new assets for standard and full adopters.
-4. Extend validator coverage and add regression tests.
-5. Run repository validation, full tests, then git closeout.
+1. Re-open Phase 8 and `session_state.md` for one adopter-guidance follow-up slice.
+2. Update `docs/ADOPTION_GUIDE.md` so bootstrap and manual adopters both see the runtime-alignment runbook and four-lane status template.
+3. Run a focused docs validation check and record any unrelated existing blockers honestly.
 
-**Why this approach**: These are the highest-consensus post-Wave-1 gaps and they materially reduce downstream claims that the template lacks enough execution-layer support.
+**Why this approach**: It closes the remaining discoverability gap with the smallest honest change set and does not reopen bootstrap or validator mechanism work that is already complete.
 
 ---
 
 ## Active Work
-**Active Task ID**: (none)
+**Active Task ID**: runtime-alignment-adoption-guide-followup
 
-**Current Step**: No active work.
+**Current Step**: Freeze the packet and dispatch one DeepSeek lane to update `docs/ADOPTION_GUIDE.md` for runtime-alignment and four-lane asset discovery.
 
-**Next Planned Step**: None until the next framework workstream is opened.
+**Next Planned Step**: Review the lane result, run one focused docs validation check, and sync roadmap truth.
 
-**Progress Unit / Checkpoint Rule / Truth Surfaces / State Sync Schedule**: n/a / n/a / `session_state.md`, `docs/EXECUTION_PROOF_WAVE_2_PLAN.md`, validator and tests / update when the next bounded workstream starts
+**Progress Unit / Checkpoint Rule / Truth Surfaces / State Sync Schedule**: one adopter-guidance docs slice / after dispatch and after focused validation / `session_state.md`, `ROADMAP.md`, `docs/ADOPTION_GUIDE.md` / sync at packet dispatch and closeout
 
-**True Closeout Boundary / Host Closeout Action**: n/a / `task_complete`
+**True Closeout Boundary / Host Closeout Action**: `docs/ADOPTION_GUIDE.md` exposes the new asset family clearly enough for adopters and the focused docs check passes / `task_complete`
 
 ---
 
@@ -77,6 +76,10 @@ Execution-proof credibility improves only when strict adoption, runtime toolchai
 ---
 
 ## Recent Receipts
+- Synced the stricter managed-terminal stop-after-start rule into the template runbook, instruction pack, and managed-terminal skill: once a lane shows `started` or `started_after_submit` and is not asking for input, the main thread should leave it alone and wait for the user to return for acceptance or status rather than continuing same-turn observation or follow-up prompting. Focused validation via `scripts/active_docs_audit.py` reported only the repository's pre-existing unrelated nonportable-path issues in `hpc-framework` and `windows-ssh-automation` skills.
+- Re-opened Phase 8 for one bounded adopter-guidance follow-up: the next slice will update `docs/ADOPTION_GUIDE.md` so bootstrap and manual adopters can discover the runtime-alignment runbook and four-lane status template without reading maintainer-only state or roadmap entries.
+- Completed the runtime-alignment and four-lane asset mechanization slice: bootstrap now copies `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` plus `templates/four_lane_runtime_alignment_status.template.md`, validator-required asset sets and root-context requirements now enforce both, README visibility is updated, and focused regressions passed while the known unrelated root-validator skill-hygiene blockers remained outside scope.
+- Completed the runtime-alignment plus four-lane delegation feedback slice: the template now ships `docs/runbooks/runtime_alignment_and_four_lane_delegation.md`, `templates/four_lane_runtime_alignment_status.template.md`, a runtime-alignment row in `docs/AGENT_DELEGATION_GUIDE.md` acceptance checks, and project-context trigger routing for `runtime alignment`, `repo target`, `running services`, and `four-lane` topics. Focused validation found no slice-attributable issues; the root structured validator still fails on the repository's pre-existing unrelated skill-hygiene blockers.
 - Recorded the external skill absorption follow-on: `frontend-design` and `context7-docs` now ship through bootstrap and validator-required assets, while `docs/runbooks/design_gated_bounded_autonomy.md` plus `templates/design_gated_bounded_autonomy_packet.template.md` turn the extracted `Superpowers` / `gstack` / `autoresearch` patterns into one concrete local workflow and reusable adopter packet; `Task Master AI` remains outside the framework core.
 - Completed the final independent evaluation closeout for Wave 2 in `tmp/evaluation/execution_proof_wave_2/`: `evaluation_request.md` and `evaluation_report.md` now form a bounded PASS verdict pair backed by validator clean, `111 passed`, and standard dry-run smoke clean.
 - Completed Wave 2 of the execution-proof stack: shipped the Developer Toolchain runner, independent-evaluation pipeline, and local executor review loop through docs, templates, bootstrap, manifest schema 4, validator rules, strict-adoption mechanism definitions, targeted regressions, full tests, and bootstrap smoke validation (`111 passed`, validator clean, standard dry-run smoke clean).
@@ -106,6 +109,7 @@ Execution-proof credibility improves only when strict adoption, runtime toolchai
 
 ## Mid-Session Corrections
 - Corrected the initial anti-drift kickoff assumption that template-only edits would be enough; bootstrap assets, hooks, validator checks, and rule references also needed to move together to avoid a second drift layer.
+- Corrected a managed-lane judgment mistake during the DeepSeek delegation attempt: after the lane showed a valid `started_after_submit` signal (`Read` plus `✢ Generating…`), I should have switched to observation only. Planning to send another prompt because no receipt or diff had appeared yet conflicted with the runbook's forbidden-interference rule; the correct next action was to wait for packet-specific evidence or a clear `DONE` / `STUCK` / `ESCALATE` / input request.
 
 ---
 

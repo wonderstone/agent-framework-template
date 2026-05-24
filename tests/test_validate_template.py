@@ -31,9 +31,21 @@ bootstrap_repo = BOOTSTRAP_MODULE.bootstrap_repo
 
 
 def test_validate_repo_passes_for_current_repository() -> None:
-    issues = validate_repo(REPO_ROOT)
+    issues = validate_repo(REPO_ROOT, mode="adopter-baseline")
 
     assert issues == []
+
+
+def test_validate_repo_adopter_baseline_mode_skips_root_reference_only_files(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+    (repo_copy / "docs" / "EXECUTION_PROOF_WAVE_1_PLAN.md").unlink()
+
+    baseline_issues = validate_repo(repo_copy, mode="adopter-baseline")
+    root_issues = validate_repo(repo_copy, mode="root-self-hosted")
+
+    assert ValidationIssue("missing-file", "docs/EXECUTION_PROOF_WAVE_1_PLAN.md") not in baseline_issues
+    assert ValidationIssue("missing-file", "docs/EXECUTION_PROOF_WAVE_1_PLAN.md") in root_issues
 
 
 def test_validate_repo_reports_preference_drift(tmp_path: Path) -> None:
@@ -93,16 +105,32 @@ def test_validate_repo_reports_missing_absorbed_skill_assets(tmp_path: Path) -> 
     repo_copy = tmp_path / "repo"
     shutil.copytree(REPO_ROOT, repo_copy)
     (repo_copy / ".github" / "skills" / "context7-docs" / "SKILL.md").unlink()
+    (repo_copy / ".github" / "skills" / "frontend-playwright-diagnostics" / "SKILL.md").unlink()
     (repo_copy / "docs" / "SKILL_EXTERNAL_ABSORPTION_GUIDE.md").unlink()
     (repo_copy / "docs" / "runbooks" / "design_gated_bounded_autonomy.md").unlink()
+    (repo_copy / "docs" / "runbooks" / "frontend_playwright_diagnostics.md").unlink()
     (repo_copy / "templates" / "design_gated_bounded_autonomy_packet.template.md").unlink()
 
     issues = validate_repo(repo_copy)
 
     assert ValidationIssue("missing-file", ".github/skills/context7-docs/SKILL.md") in issues
+    assert ValidationIssue("missing-file", ".github/skills/frontend-playwright-diagnostics/SKILL.md") in issues
     assert ValidationIssue("missing-file", "docs/SKILL_EXTERNAL_ABSORPTION_GUIDE.md") in issues
     assert ValidationIssue("missing-file", "docs/runbooks/design_gated_bounded_autonomy.md") in issues
+    assert ValidationIssue("missing-file", "docs/runbooks/frontend_playwright_diagnostics.md") in issues
     assert ValidationIssue("missing-file", "templates/design_gated_bounded_autonomy_packet.template.md") in issues
+
+
+def test_validate_repo_reports_missing_runtime_alignment_assets(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+    (repo_copy / "docs" / "runbooks" / "runtime_alignment_and_four_lane_delegation.md").unlink()
+    (repo_copy / "templates" / "four_lane_runtime_alignment_status.template.md").unlink()
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue("missing-file", "docs/runbooks/runtime_alignment_and_four_lane_delegation.md") in issues
+    assert ValidationIssue("missing-file", "templates/four_lane_runtime_alignment_status.template.md") in issues
 
 
 def test_parse_developer_toolchain_entries_handles_pipe_in_command() -> None:
@@ -258,7 +286,7 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_next
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "**Next Planned Step**: None until the next framework workstream is opened.",
+        "**Next Planned Step**: none.",
         "**Next Planned Step**: Independent review, then git closeout.",
         1,
     )
@@ -279,8 +307,8 @@ def test_validate_repo_reports_stale_root_session_state_no_active_work_with_unch
     session_state = repo_copy / "session_state.md"
     updated = session_state.read_text(encoding="utf-8")
     updated = updated.replace(
-        "- [x] When a standard or full adopter is bootstrapped, it receives the Wave 2 runner, evaluation, and executor-review assets with explicit manifest contract sections.",
-        "- [ ] When a standard or full adopter is bootstrapped, it receives the Wave 2 runner, evaluation, and executor-review assets with explicit manifest contract sections.",
+        "- [x] When a maintainer probes and dispatches local executor review, the repository receives a durable packet that records availability and raw output paths honestly.",
+        "- [ ] Standard and full adopters inherit `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` and `templates/four_lane_runtime_alignment_status.template.md` through bootstrap.",
         1,
     )
     session_state.write_text(updated, encoding="utf-8")
@@ -358,6 +386,54 @@ def test_validate_repo_reports_missing_capability_asset(tmp_path: Path) -> None:
     issues = validate_repo(repo_copy)
 
     assert ValidationIssue("missing-file", "scripts/closeout_truth_audit.py") in issues
+
+
+def test_validate_repo_reports_missing_goal_framing_template_snippet(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    progress_template = repo_copy / "templates" / "execution_progress_receipt.template.md"
+    progress_template.write_text(
+        progress_template.read_text(encoding="utf-8").replace("## Phase Plan\n\n{{phase_plan}}\n\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "missing-goal-framing-snippet",
+        "templates/execution_progress_receipt.template.md: ## Phase Plan",
+    ) in issues
+
+
+def test_validate_repo_ignores_legacy_absorbed_skill_without_framework_contract(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    issues = validate_repo(repo_copy, mode="root-self-hosted")
+
+    assert not any(
+        issue.detail.startswith(".github/skills/db-engineering/SKILL.md:")
+        for issue in issues
+    )
+
+
+def test_validate_repo_still_checks_framework_native_github_skill(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    native_skill = repo_copy / ".github" / "skills" / "windows-ssh-automation" / "SKILL.md"
+    native_skill.write_text(
+        native_skill.read_text(encoding="utf-8").replace("## Purpose\n", "", 1),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy, mode="root-self-hosted")
+
+    assert ValidationIssue(
+        "missing-skill-heading",
+        ".github/skills/windows-ssh-automation/SKILL.md: ## Purpose",
+    ) in issues
 
 
 def test_validate_repo_reports_missing_skill_heading(tmp_path: Path) -> None:
@@ -815,6 +891,28 @@ def test_validate_repo_reports_standard_profile_bootstrap_drift_for_absorbed_ass
     assert ValidationIssue(
         "bootstrap-profile-mismatch",
         "standard profile missing 'templates/design_gated_bounded_autonomy_packet.template.md'",
+    ) in issues
+
+
+def test_validate_repo_reports_standard_profile_bootstrap_drift_for_runtime_alignment_assets(tmp_path: Path) -> None:
+    repo_copy = tmp_path / "repo"
+    shutil.copytree(REPO_ROOT, repo_copy)
+
+    bootstrap_script = repo_copy / "scripts" / "bootstrap_adoption.py"
+    bootstrap_script.write_text(
+        bootstrap_script.read_text(encoding="utf-8").replace(
+            '        "templates/four_lane_runtime_alignment_status.template.md",\n',
+            "",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate_repo(repo_copy)
+
+    assert ValidationIssue(
+        "bootstrap-profile-mismatch",
+        "standard profile missing 'templates/four_lane_runtime_alignment_status.template.md'",
     ) in issues
 
 

@@ -118,7 +118,54 @@
 **Acceptance Criteria**:
 - [x] Standard and full adopters inherit the Wave 2 runner, evaluator, and local-review assets with explicit manifest schema 4 contracts.
 - [x] The validator and strict-adoption auditor mechanically reject missing or malformed Wave 2 surfaces.
+
+---
+
+## Phase 7 — Ship Frontend Diagnostics Asset
+
+**Goal**: Turn the Playwright-first frontend diagnostics workflow into a shipped template asset so frontend-capable adopters inherit one browser-smoke seam with bootstrap and validator backing.
+
+**Status**: ✅ 2026-05-11
+
+| Item | Status |
+|---|---|
+| Add reusable frontend diagnostics runbook and skill | ✅ 2026-05-06 |
+| Copy the new assets through standard/full bootstrap | 🔄 in progress |
+| Mechanically require the assets through validator and focused tests | 🔄 in progress |
+
+**Acceptance Criteria**:
+- [ ] Standard and full adopters inherit `docs/runbooks/frontend_playwright_diagnostics.md` and `.github/skills/frontend-playwright-diagnostics/SKILL.md` through bootstrap.
+- [ ] The root validator reports the new runbook and skill as required framework assets.
+- [ ] `README.md`, `docs/INDEX.md`, and `.github/instructions/project-context.instructions.md` all expose the new frontend diagnostics surface clearly enough for adopters to discover it.
+- [ ] Focused bootstrap and validator regression tests fail if the new asset family is missing.
 - [x] Focused regressions, full repository tests, and bootstrap smoke all pass after the rollout.
+
+---
+
+## Phase 8 — Extract Runtime Alignment And Four-Lane Delegation Assets
+
+**Goal**: Turn the observed `repo target vs running services` acceptance pattern and honest four-lane delegated-execution reporting into generic template assets rather than repo-local folklore.
+
+**Status**: 🔄 active
+
+| Item | Status |
+|---|---|
+| Add a generic runbook for runtime alignment plus four-lane delegation | ✅ 2026-05-11 |
+| Add a reusable four-lane runtime-alignment status template | ✅ 2026-05-11 |
+| Wire the new assets through docs index, delegation guidance, and project-context topic routing | ✅ 2026-05-11 |
+| Copy the new assets through standard/full bootstrap | ✅ 2026-05-11 |
+| Mechanically require the new assets through validator and focused tests | ✅ 2026-05-11 |
+| Expose the new asset family in adopter-facing setup guidance | 🔄 in progress |
+
+**Acceptance Criteria**:
+- [x] The template ships one canonical runbook for coupling runtime alignment with four-lane delegation.
+- [x] The template ships one reusable four-lane status template that records lane labels, control state, validation, and runtime dependency.
+- [x] `docs/INDEX.md`, `docs/AGENT_DELEGATION_GUIDE.md`, and `.github/instructions/project-context.instructions.md` all expose the new asset family clearly enough for adopters to discover it.
+- [x] Standard and full adopters inherit `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` and `templates/four_lane_runtime_alignment_status.template.md` through bootstrap.
+- [x] The root validator reports the new runbook and template as required framework assets.
+- [x] Focused bootstrap and validator regression tests fail if the new asset family is missing.
+- [x] The structured validator reports no new failures attributable to the doc-only extraction slice; current root-validator failures remain the pre-existing unrelated skill-hygiene blockers already present in the repository.
+- [ ] `docs/ADOPTION_GUIDE.md` exposes when adopters should keep the runtime-alignment runbook and four-lane status template during bootstrap or manual adoption.
 
 ---
 

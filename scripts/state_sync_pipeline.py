@@ -108,6 +108,11 @@ class ProgressReceiptOptions:
     task_id: str
     status: str
     progress_unit: str
+    goal: str
+    phase_plan: str
+    current_step: str
+    step_contribution: str
+    progress_state: str
     summary: str
     touched_files: str
     expected_state_effect: str
@@ -234,6 +239,11 @@ def create_progress_receipt(options: ProgressReceiptOptions) -> Path:
             "receipt_seq": str(receipt_seq),
             "status": options.status,
             "progress_unit": options.progress_unit,
+            "goal": _normalize_block(options.goal),
+            "phase_plan": _normalize_block(options.phase_plan),
+            "current_step": _normalize_block(options.current_step),
+            "step_contribution": _normalize_block(options.step_contribution),
+            "progress_state": _normalize_block(options.progress_state),
             "summary": _normalize_block(options.summary),
             "touched_files": _normalize_block(options.touched_files),
             "expected_state_effect": _normalize_block(options.expected_state_effect),
@@ -274,6 +284,11 @@ def _build_parser() -> argparse.ArgumentParser:
     record_progress.add_argument("--task-id", required=True)
     record_progress.add_argument("--status", required=True)
     record_progress.add_argument("--progress-unit", required=True)
+    record_progress.add_argument("--goal", required=True)
+    record_progress.add_argument("--phase-plan", required=True)
+    record_progress.add_argument("--current-step", required=True)
+    record_progress.add_argument("--step-contribution", required=True)
+    record_progress.add_argument("--progress-state", required=True)
     record_progress.add_argument("--summary", required=True)
     record_progress.add_argument("--touched-files", required=True)
     record_progress.add_argument("--expected-state-effect", required=True)
@@ -353,6 +368,11 @@ def main() -> int:
                 task_id=args.task_id,
                 status=args.status,
                 progress_unit=args.progress_unit,
+                goal=args.goal,
+                phase_plan=args.phase_plan,
+                current_step=args.current_step,
+                step_contribution=args.step_contribution,
+                progress_state=args.progress_state,
                 summary=args.summary,
                 touched_files=args.touched_files,
                 expected_state_effect=args.expected_state_effect,

@@ -95,9 +95,12 @@ def test_review_dispatch_probes_and_dispatches(tmp_path: Path) -> None:
 
     probe_packet = Path(probe.stdout.strip())
     dispatch_packet = Path(dispatch.stdout.strip())
-    assert "| alpha | available | skipped | none | none | Probe command succeeded. |" in probe_packet.read_text(encoding="utf-8")
+    probe_text = probe_packet.read_text(encoding="utf-8")
+    assert "| alpha | available | skipped | none | none | Probe command succeeded. |" in probe_text
+    assert "## Goal" in probe_text
     dispatch_text = dispatch_packet.read_text(encoding="utf-8")
     assert "| alpha | available | completed |" in dispatch_text
     assert "| beta | unavailable | unavailable | none | none |" in dispatch_text
+    assert "## Progress State" in dispatch_text
     stdout_path = adopted_root / "tmp" / "executor_reviews" / "review-2" / "raw" / "alpha.stdout"
     assert stdout_path.read_text(encoding="utf-8").strip() == "review prompt"

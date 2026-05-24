@@ -13,6 +13,18 @@
 
 {{goal}}
 
+## Phase
+
+{{phase}}
+
+## Current Step
+
+{{current_step}}
+
+## Total Steps
+
+{{total_steps}}
+
 ## Truth Sources
 
 {{truth_sources}}

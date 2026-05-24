@@ -36,6 +36,10 @@ def test_create_task_packet_writes_markdown_from_template(tmp_path: Path) -> Non
         TaskPacketOptions(
             task_id="Template Audit 01",
             goal="Freeze scope before external review",
+            phase_plan="1. Freeze scope\n2. Run review\n3. Close out",
+            current_step="1. Freeze scope",
+            step_contribution="This step prevents the review from drifting across unrelated files.",
+            progress_state="Completed: none\nIn Progress: 1. Freeze scope\nRemaining: 1. Run review\n2. Close out",
             truth_sources="- docs/runbooks/resumable-git-audit-pipeline.md",
             allowed_files="- docs/**\n- scripts/git_audit_pipeline.py",
             do_not_touch="- .env",
@@ -52,6 +56,8 @@ def test_create_task_packet_writes_markdown_from_template(tmp_path: Path) -> Non
     contents = output_path.read_text(encoding="utf-8")
     assert "Template Audit 01" in contents
     assert "Freeze scope before external review" in contents
+    assert "## Phase Plan" in contents
+    assert "## Current Step" in contents
 
 
 def test_create_receipt_writes_summary_validation_and_risks(tmp_path: Path) -> None:
@@ -60,6 +66,11 @@ def test_create_receipt_writes_summary_validation_and_risks(tmp_path: Path) -> N
             task_id="Template Audit 01",
             executor="external-codex",
             status="completed",
+            goal="Freeze scope before external review",
+            phase_plan="1. Freeze scope\n2. Run review\n3. Close out",
+            current_step="2. Run review",
+            step_contribution="This receipt records the completed review pass inside the frozen audit plan.",
+            progress_state="Completed: 1. Freeze scope\n2. Run review\nRemaining: 1. Close out",
             summary="Added runbook and script",
             touched_files="- docs/runbooks/resumable-git-audit-pipeline.md",
             validation="- pytest tests/test_git_audit_pipeline.py -q",
@@ -72,6 +83,7 @@ def test_create_receipt_writes_summary_validation_and_risks(tmp_path: Path) -> N
     contents = output_path.read_text(encoding="utf-8")
     assert "external-codex" in contents
     assert "Added runbook and script" in contents
+    assert "## Goal" in contents
     assert "main thread still needs owner review" in contents
 
 

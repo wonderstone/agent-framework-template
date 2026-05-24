@@ -31,12 +31,11 @@ Turn repository-specific Windows host evaluation packaging into a repeatable ope
 
 ## Entry Instructions
 
-- Read the repository adapter first and locate any existing Windows runbooks, helper scripts, receipt directories, and operator metadata files.
-- Keep the default execution path truthful for the target host; if a copied binary is not trusted, prefer a native Windows build path or `go run` until a verified `.exe` exists.
-- Build one top-level operator entry point that explains what to read first, which helper script handles each lane, where receipts go, and what blocks execution.
-- Preserve the distinction between readonly, observation, and lifecycle lanes.
-- Treat historical receipts as time-scoped evidence; do not present them as the default behavior for future runs.
-- Stop and report blockers instead of mutating the contract when operator-confirmed values or host prerequisites are missing.
+- Read the repository adapter first and identify the real Windows runbooks, helper scripts, receipt roots, and operator-confirmed metadata already present in the repository.
+- Keep the execution path truthful for the target host: if a copied binary is not yet trusted, prefer a native Windows build path or `go run` until a verified `.exe` exists.
+- Build or maintain one top-level operator entry point that tells operators what to read first, which helper script owns each lane, where receipts go, and what blocks execution.
+- Preserve the distinction between readonly, observation, and lifecycle lanes, and treat historical receipts as time-scoped evidence rather than the default behavior for future runs.
+- If operator-confirmed values, host prerequisites, or a trustworthy build path are missing, stop and report the blocker instead of mutating the contract or inventing host facts.
 
 ## References
 
