@@ -205,7 +205,7 @@ Goal:
 - use project name <PROJECT_NAME>
 - use profile <minimal|standard|full>
 - use project type <backend-api|web-frontend|cli-tool|library|full-stack>
-- add optional capabilities only if requested: <closeout-audit runtime-guards git-hooks>
+- add optional capabilities only if requested: <closeout-audit huashu-design runtime-guards git-hooks>
 - if long-term skill accumulation matters in this repo, keep the SKILL and harvest-governance surfaces rather than dropping them during setup
 - do not mechanically copy every template surface, but also do not silently weaken the mechanism stack and then blame the template for the resulting gap
 
@@ -309,6 +309,7 @@ python3 scripts/bootstrap_adoption.py ../your-repo \
 Optional capabilities:
 
 - `--capability closeout-audit` — ship executable receipt-anchor auditing
+- `--capability huashu-design` — ship a first-class huashu design skill, runbook, and briefing template
 - `--capability runtime-guards` — ship runtime guard runner plus registry skeleton
 - `--capability git-hooks` — ship `.githooks/` and installer without forcing activation
 

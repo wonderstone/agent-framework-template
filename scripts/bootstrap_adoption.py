@@ -567,6 +567,13 @@ CAPABILITY_COPY_PATHS: dict[str, tuple[str, ...]] = {
     "closeout-audit": (
         "scripts/closeout_truth_audit.py",
     ),
+    "huashu-design": (
+        ".github/instructions/huashu-design.instructions.md",
+        ".github/skills/huashu-design/SKILL.md",
+        "docs/HUASHU_DESIGN_CAPABILITY.md",
+        "docs/runbooks/huashu_design.md",
+        "templates/huashu_design_brief.template.md",
+    ),
     "runtime-guards": (
         "scripts/runtime_surface_guardrails.py",
         "templates/runtime_surface_registry.template.py",

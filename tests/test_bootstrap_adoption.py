@@ -245,10 +245,15 @@ def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:
         target_dir=tmp_path,
         project_name="Capability Demo",
         profile="minimal",
-        capabilities=("closeout-audit", "runtime-guards", "git-hooks"),
+        capabilities=("closeout-audit", "huashu-design", "runtime-guards", "git-hooks"),
     )
 
     assert (tmp_path / "scripts" / "closeout_truth_audit.py").exists()
+    assert (tmp_path / ".github" / "instructions" / "huashu-design.instructions.md").exists()
+    assert (tmp_path / ".github" / "skills" / "huashu-design" / "SKILL.md").exists()
+    assert (tmp_path / "docs" / "HUASHU_DESIGN_CAPABILITY.md").exists()
+    assert (tmp_path / "docs" / "runbooks" / "huashu_design.md").exists()
+    assert (tmp_path / "templates" / "huashu_design_brief.template.md").exists()
     assert (tmp_path / "scripts" / "runtime_surface_guardrails.py").exists()
     assert (tmp_path / "scripts" / "install_git_hooks.sh").exists()
     assert (tmp_path / ".githooks" / "pre-commit").exists()
@@ -261,7 +266,7 @@ def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:
     assert manifest["project_name"] == "Capability Demo"
     assert manifest["profile"] == "minimal"
     assert manifest["project_type"] == "cli-tool"
-    assert manifest["capabilities"] == ["closeout-audit", "runtime-guards", "git-hooks"]
+    assert manifest["capabilities"] == ["closeout-audit", "huashu-design", "runtime-guards", "git-hooks"]
     assert manifest["developer_toolchain_contract"]["version"] == "v1"
     assert manifest["developer_toolchain_contract"]["enforcement"] == "required-core"
     assert manifest["developer_toolchain_contract"]["allow_surface_qualifiers"] is True
@@ -271,11 +276,33 @@ def test_bootstrap_capabilities_copy_opt_in_assets(tmp_path: Path) -> None:
     assert "independent_evaluation_contract" not in manifest
     assert "executor_review_contract" not in manifest
     assert ".github/agent-framework-manifest.json" in manifest["expected_files"]
+    assert ".github/instructions/huashu-design.instructions.md" in manifest["expected_files"]
+    assert ".github/skills/huashu-design/SKILL.md" in manifest["expected_files"]
+    assert "docs/HUASHU_DESIGN_CAPABILITY.md" in manifest["expected_files"]
     assert "scripts/closeout_truth_audit.py" in manifest["expected_files"]
     assert ".github/runtime_surface_registry.py" in manifest["expected_files"]
     assert ".github/local_executor_registry.json" not in manifest["expected_files"]
     assert not (tmp_path / ".github" / "local_executor_registry.json").exists()
-    assert result.capabilities == ("closeout-audit", "runtime-guards", "git-hooks")
+    assert result.capabilities == ("closeout-audit", "huashu-design", "runtime-guards", "git-hooks")
+
+
+def test_bootstrap_huashu_design_capability_ships_reviewable_skeleton(tmp_path: Path) -> None:
+    bootstrap_repo(
+        target_dir=tmp_path,
+        project_name="Huashu Demo",
+        profile="minimal",
+        capabilities=("huashu-design",),
+    )
+
+    skill = (tmp_path / ".github" / "skills" / "huashu-design" / "SKILL.md").read_text(encoding="utf-8")
+    instruction = (tmp_path / ".github" / "instructions" / "huashu-design.instructions.md").read_text(
+        encoding="utf-8"
+    )
+    runbook = (tmp_path / "docs" / "runbooks" / "huashu_design.md").read_text(encoding="utf-8")
+
+    assert "ID: huashu-design" in skill
+    assert "Use this instruction when a task is specifically about huashu structure" in instruction
+    assert "Input Packet" in runbook
 
 
 def test_bootstrap_standard_ships_execution_proof_round_trip(tmp_path: Path) -> None:

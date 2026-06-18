@@ -55,6 +55,7 @@ python3 scripts/bootstrap_adoption.py ../your-repo \
 Optional capability flags:
 
 - `--capability closeout-audit` adds `scripts/closeout_truth_audit.py`
+- `--capability huashu-design` adds a huashu design skill, instruction entrypoint, runbook, and briefing template
 - `--capability runtime-guards` adds the runtime guard runner plus `.github/runtime_surface_registry.py`
 - `--capability git-hooks` adds `.githooks/` and `scripts/install_git_hooks.sh`
 

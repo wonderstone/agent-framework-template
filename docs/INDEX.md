@@ -12,6 +12,7 @@
 | Document | Description |
 |---|---|
 | `docs/FRAMEWORK_ARCHITECTURE.md` | How the agent framework layers work and why |
+| `docs/HUASHU_DESIGN_CAPABILITY.md` | Capability contract for turning huashu design requests into a reusable skill, briefing template, and reviewable workflow |
 | `docs/ADOPTION_GUIDE.md` | Step-by-step guide for adopting this framework in a new project |
 | `docs/CLOSEOUT_SUMMARY_TEMPLATE.md` | Stable closeout-summary format for `task_complete.summary`, including visible markers and global state fields |
 | `docs/PROGRESS_UPDATE_TEMPLATE.md` | Stable progress-update format for while-style work, clearly separated from final closeout |
@@ -69,6 +70,7 @@
 | `docs/runbooks/multi-model-discussion-loop.md` | Append-only discussion workflow for framework choice, plan review, and other open design questions |
 | `docs/runbooks/design_gated_bounded_autonomy.md` | Concrete workflow for explicit routing, design approval, bounded keep-or-revert execution loops, and post-task learning landing |
 | `docs/runbooks/frontend_playwright_diagnostics.md` | Reusable workflow for replacing manual browser transcript loops with one repo-owned Playwright smoke and receipt seam |
+| `docs/runbooks/huashu_design.md` | Capability runbook for collecting brief inputs, generating candidate huashu directions, and landing reusable poster or sales-copy assets safely |
 | `docs/runbooks/managed_cli_terminal_delegation.md` | Trusted-local managed terminal workflow for CLI executors, including the prompt-dispatch handshake, `started` / `started_after_submit` / `degraded` outcomes, execution-ID recording, and hard-condition lane reuse rules |
 | `docs/runbooks/runtime_alignment_and_four_lane_delegation.md` | Generic runbook for coupling repo-vs-runtime alignment proof with honest four-lane delegated execution and owner acceptance |
 | `docs/runbooks/post-task-harvest.md` | Landing-tier workflow for turning reusable post-task learning into runbooks, scripts, CI gates, or skills |
@@ -79,5 +81,5 @@
 
 ---
 
-*Last updated: 2026-05-22 — re-tiered the index into core default, advanced optional families, and reference/design-history surfaces*
+*Last updated: 2026-06-18 — added the `huashu-design` capability skeleton surfaces*
 *Maintainer rule: this file is updated as part of the commit that adds or removes a TYPE-A doc.*
